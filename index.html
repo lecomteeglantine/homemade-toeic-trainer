@@ -258,6 +258,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 .section-head{ display:flex; align-items:end; justify-content:space-between; gap:12px; margin:0 0 14px; flex-wrap:wrap; }
 .targetset{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .targetset input{ width:110px; min-height:48px; border:1.5px solid var(--line); border-radius:12px; padding:0 14px; font-family:var(--num); font-weight:800; font-size:1.1rem; color:var(--ink); background:var(--card); }
+.passage{ white-space:pre-line; background:var(--bg2); border:1px solid var(--line); border-radius:14px; padding:14px 16px; max-height:340px; overflow:auto; font-size:.95rem; line-height:1.7; }
 @media print{
   header.top, nav.tabs, footer.foot, .panel, .panel-bg, .toast, .skip, .btn, .targetset, .seg, .switch{ display:none !important; }
   body::before{ display:none !important; }
@@ -1088,6 +1089,199 @@ const LISTENING = [
  {prompt:"Do you know where Mr. Tanaka is?",opts:["He's in a meeting.","At three o'clock.","It's his office."],a:0,why:"Where + personne → on indique où elle se trouve."}
 ];
 
+const FULLMOCK = {
+ listening: [
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Écoute les quatre phrases (A à D) et choisis celle qui décrit le mieux la scène.", scene:"Une femme est assise à un bureau et tape sur un ordinateur portable.", audio:"A. A woman is typing on a laptop. B. A woman is leaving the office. C. A man is reading a newspaper. D. Some people are waiting in line.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["A woman is typing on a laptop.","A woman is leaving the office.","A man is reading a newspaper.","Some people are waiting in line."], a:0, why:"Seule A décrit l'action visible : taper sur un ordinateur."}]},
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Choisis la phrase qui décrit le mieux la scène.", scene:"Des cartons sont empilés sur des étagères dans un entrepôt.", audio:"A. The shelves are empty. B. Boxes are stacked in a warehouse. C. A truck is being repaired. D. Workers are having lunch.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["The shelves are empty.","Boxes are stacked in a warehouse.","A truck is being repaired.","Workers are having lunch."], a:1, why:"B correspond : des cartons empilés dans un entrepôt."}]},
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Choisis la phrase qui décrit le mieux la scène.", scene:"Un homme debout présente des documents devant un petit groupe en réunion.", audio:"A. People are boarding a plane. B. A man is giving a presentation. C. The room is completely empty. D. A woman is watering the plants.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["People are boarding a plane.","A man is giving a presentation.","The room is completely empty.","A woman is watering the plants."], a:1, why:"B décrit l'homme qui fait une présentation."}]},
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Choisis la phrase qui décrit le mieux la scène.", scene:"Plusieurs personnes attendent debout à un arrêt de bus.", audio:"A. Some people are waiting at a bus stop. B. A bus is being washed. C. The street is empty. D. A man is driving a car.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["Some people are waiting at a bus stop.","A bus is being washed.","The street is empty.","A man is driving a car."], a:0, why:"A décrit des personnes qui attendent à l'arrêt de bus."}]},
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Choisis la phrase qui décrit le mieux la scène.", scene:"Un serveur apporte une assiette à des clients attablés au restaurant.", audio:"A. A chef is cooking in the kitchen. B. A waiter is serving a meal. C. The tables are being cleaned. D. Customers are paying the bill.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["A chef is cooking in the kitchen.","A waiter is serving a meal.","The tables are being cleaned.","Customers are paying the bill."], a:1, why:"B décrit le serveur qui apporte un plat."}]},
+  {part:"Partie 1 — Photographies (réel : 6 questions)", instr:"Choisis la phrase qui décrit le mieux la scène.", scene:"Des ouvriers portant des casques travaillent sur un chantier.", audio:"A. Workers are wearing safety helmets. B. The building is finished. C. People are swimming in a pool. D. A meeting is taking place.", optAudio:true, qs:[{stem:"Quelle phrase décrit le mieux la scène ?", opts:["Workers are wearing safety helmets.","The building is finished.","People are swimming in a pool.","A meeting is taking place."], a:0, why:"A décrit les ouvriers portant des casques."}]},
+
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Écoute la question, puis choisis la meilleure réponse (A, B ou C).", audio:"Where did you put the signed contract?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["It's in the top drawer.","Yesterday morning.","By the manager."], a:0, why:"Where attend un lieu."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"When will the shipment arrive?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["At the warehouse.","Next Tuesday.","Yes, it did."], a:1, why:"When attend un moment."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Could you help me prepare the quarterly report?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Of course, no problem.","It's a long report.","No, it isn't."], a:0, why:"À une demande polie, on accepte."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Why was the meeting postponed?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["In room 4.","Because the director is away.","Yes, tomorrow."], a:1, why:"Why attend une raison."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Who's in charge of the new project?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Next month.","Ms. Dubois is.","At the office."], a:1, why:"Who attend une personne."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Isn't the store open on Sundays?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Actually, it closes at noon.","A brand-new store.","On the second floor."], a:0, why:"Question négative : on confirme ou on corrige."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"How do I get to the conference room?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Take the elevator to the third floor.","About an hour ago.","With the new client."], a:0, why:"How (chemin) attend une indication de direction."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Would you like coffee or tea?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Tea, please.","Yes, I would.","At the café."], a:0, why:"Question alternative : on choisit une option."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Has the invoice been sent yet?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Yes, this morning.","To the supplier.","It's quite expensive."], a:0, why:"Question fermée : réponse oui + précision de temps."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Do you know when the store opens?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["At nine o'clock.","On Main Street.","A new manager."], a:0, why:"When attend une heure."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Why don't we take a short break?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["That's a good idea.","Because it's broken.","In the meeting room."], a:0, why:"Why don't we...? = suggestion : on l'accepte."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Whose laptop is this?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["I think it's Daniel's.","On the desk.","Last week."], a:0, why:"Whose attend un possesseur."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"The printer isn't working again.", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["I'll call technical support.","It's a new printer.","Yes, please."], a:0, why:"Face à un problème, on propose une solution."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"How much does express delivery cost?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["About twenty dollars.","Next Friday.","To the warehouse."], a:0, why:"How much attend un prix."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Should I email the client or call her?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Email is probably better.","She's a new client.","At three o'clock."], a:0, why:"Question alternative : on choisit une option."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Where can I find the supply room?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Down the hall on the left.","Some printer paper.","Yesterday afternoon."], a:0, why:"Where attend un lieu."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Didn't you receive my message?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Sorry, I haven't checked my inbox yet.","A long message.","To the whole team."], a:0, why:"Question négative : on s'explique."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"When is the deadline for the proposal?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["This Friday at noon.","In the conference room.","By the finance team."], a:0, why:"When attend une échéance."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Can you recommend a good supplier?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Yes, we use Greenleaf.","It was expensive.","Last quarter."], a:0, why:"On répond par une recommandation."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Is the elevator out of order?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Yes, please use the stairs.","On the fifth floor.","A new building."], a:0, why:"Question fermée : oui + conseil."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Who approved this expense?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["The finance manager did.","Two hundred euros.","Last Monday."], a:0, why:"Who attend une personne."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"What time does the workshop start?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["At ten thirty.","In the main hall.","About training."], a:0, why:"What time attend une heure."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"I'd like to reserve a table for four.", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["For what time, please?","It was delicious.","Near the window, yes."], a:0, why:"On répond à une réservation par une question pratique."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Could you send me the updated schedule?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Sure, I'll do it right away.","It's a busy week.","By train."], a:0, why:"À une demande, on accepte."}]},
+  {part:"Partie 2 — Question-Réponse (réel : 25 questions)", instr:"Choisis la meilleure réponse.", audio:"Why has the flight been delayed?", optAudio:true, qs:[{stem:"Choisis la meilleure réponse.", opts:["Because of bad weather.","To Berlin.","At gate 12."], a:0, why:"Why attend une raison."}]},
+
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Hi, I'd like to return this printer; it stopped working after only two days.\nMan: I'm sorry to hear that. Do you have your receipt?\nWoman: Yes, here it is. I'd prefer a refund rather than a replacement.\nMan: No problem, I'll process the refund to your card right now.", qs:[
+    {stem:"What is the woman's problem?", opts:["A printer is not working.","She lost her receipt.","The store is closed.","Her card was declined."], a:0, why:"Elle rapporte une imprimante en panne."},
+    {stem:"What does the woman prefer?", opts:["A replacement.","A refund.","A discount.","A repair."], a:1, why:"Elle préfère un remboursement."},
+    {stem:"What will the man do next?", opts:["Call a technician.","Process a refund.","Close the store.","Order a new printer."], a:1, why:"Il va effectuer le remboursement."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: Good morning, I have a ten o'clock meeting with Ms. Carter.\nWoman: She's running a little late, about fifteen minutes. Would you like some coffee while you wait?\nMan: That would be great, thank you.\nWoman: Please have a seat in the lounge; I'll let you know when she's ready.", qs:[
+    {stem:"Why is the man at the office?", opts:["For a job interview.","For a meeting.","To deliver a package.","To fix a computer."], a:1, why:"Il a une réunion avec Ms. Carter."},
+    {stem:"What is the problem?", opts:["Ms. Carter is late.","The lounge is closed.","He forgot his badge.","The coffee machine is broken."], a:0, why:"Ms. Carter a du retard."},
+    {stem:"What does the woman offer?", opts:["A refund.","Some coffee.","A taxi.","A discount."], a:1, why:"Elle propose un café."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Good afternoon, Harbor Hotel. How can I help you?\nMan: Hello, I'd like to book a double room for next weekend, from Friday to Sunday.\nWoman: Certainly. We have a room available with a sea view for ninety euros a night.\nMan: That sounds perfect. Does that include breakfast?\nWoman: Yes, breakfast is included and served until ten.", qs:[
+    {stem:"Why is the man calling?", opts:["To book a room.","To cancel a reservation.","To complain about a room.","To ask for directions."], a:0, why:"Il veut réserver une chambre."},
+    {stem:"How much is the room per night?", opts:["Seventy euros.","Ninety euros.","One hundred euros.","Fifty euros."], a:1, why:"Quatre-vingt-dix euros la nuit."},
+    {stem:"What is included?", opts:["Parking.","Breakfast.","Airport transfer.","Dinner."], a:1, why:"Le petit-déjeuner est inclus."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: Hi, I ordered fifty boxes of paper last Monday, but they still haven't arrived.\nWoman: I'm very sorry. Let me check your order number.\nMan: It's 4471.\nWoman: I see — there was a delay at the warehouse. I can have them delivered by tomorrow afternoon.\nMan: Thank you, that would be great.", qs:[
+    {stem:"What is the man calling about?", opts:["A late delivery.","A wrong invoice.","A damaged product.","A price increase."], a:0, why:"Sa commande n'est pas arrivée."},
+    {stem:"What caused the problem?", opts:["A delay at the warehouse.","A payment error.","A strike.","A wrong address."], a:0, why:"Un retard à l'entrepôt."},
+    {stem:"When will the order be delivered?", opts:["Tonight.","Tomorrow afternoon.","Next Monday.","In an hour."], a:1, why:"Demain après-midi."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Tech support, how can I help?\nMan: Hi, I can't log into my account. It says my password is incorrect.\nWoman: No problem. I'll send you a reset link by email. Can you confirm your address?\nMan: Yes, it's david.morel at the company domain.\nWoman: Done. Please check your inbox in a few minutes.", qs:[
+    {stem:"What is the man's problem?", opts:["He can't log in.","His computer is broken.","He lost a file.","The website is down."], a:0, why:"Il n'arrive pas à se connecter."},
+    {stem:"What will the woman send?", opts:["A new computer.","A reset link.","An invoice.","A manual."], a:1, why:"Un lien de réinitialisation par e-mail."},
+    {stem:"What should the man do next?", opts:["Restart his computer.","Check his inbox.","Call back later.","Visit the office."], a:1, why:"Vérifier sa boîte mail."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: I'd like to change my train ticket to an earlier departure if possible.\nWoman: Let me see. There's a train at 2 p.m. instead of 5 p.m. The difference is fifteen euros.\nMan: That's fine. Can I keep the same seat type?\nWoman: Yes, a window seat is still available.", qs:[
+    {stem:"What does the man want to do?", opts:["Cancel his ticket.","Change to an earlier train.","Buy a return ticket.","Get a refund."], a:1, why:"Partir plus tôt."},
+    {stem:"How much is the difference?", opts:["Five euros.","Fifteen euros.","Fifty euros.","Nothing."], a:1, why:"Quinze euros."},
+    {stem:"What seat does he get?", opts:["An aisle seat.","A window seat.","A first-class seat.","No seat."], a:1, why:"Une place côté fenêtre."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Welcome to the team! Today I'll show you around and set up your computer.\nMan: Thank you. When do I get my access badge?\nWoman: Security will give it to you this afternoon. First, let's go over the schedule for your first week.\nMan: Sounds good.", qs:[
+    {stem:"Who most likely is the man?", opts:["A new employee.","A customer.","A delivery driver.","A manager."], a:0, why:"On lui souhaite la bienvenue dans l'équipe."},
+    {stem:"What does the man ask about?", opts:["His salary.","His access badge.","His holidays.","His office."], a:1, why:"Il demande son badge d'accès."},
+    {stem:"What will they do first?", opts:["Have lunch.","Go over the schedule.","Meet the director.","Set up email."], a:1, why:"Passer en revue le programme de la semaine."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: I'm worried we won't finish the proposal by Friday.\nWoman: I agree. Should we ask for a short extension?\nMan: Maybe. Let's email the client and request until Monday.\nWoman: Good idea. I'll write the message now.", qs:[
+    {stem:"What are the speakers worried about?", opts:["A deadline.","A budget.","A delivery.","A meeting room."], a:0, why:"Ils craignent de ne pas finir à temps."},
+    {stem:"What do they decide to do?", opts:["Cancel the project.","Request an extension.","Hire more staff.","Work on Saturday."], a:1, why:"Demander un délai supplémentaire."},
+    {stem:"Who will write the email?", opts:["The man.","The woman.","The client.","The manager."], a:1, why:"La femme va l'écrire."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: I'd like to register for the marketing conference in June.\nMan: Of course. The early-bird rate is one hundred euros until May 15.\nWoman: Great, I'll register today then. Is lunch included?\nMan: Yes, lunch and all materials are included.", qs:[
+    {stem:"What does the woman want to do?", opts:["Register for a conference.","Cancel a booking.","Give a presentation.","Book a hotel."], a:0, why:"S'inscrire à la conférence."},
+    {stem:"Why should she register before May 15?", opts:["To get the early-bird rate.","To choose a seat.","To get a refund.","To meet the speaker."], a:0, why:"Pour le tarif réduit early-bird."},
+    {stem:"What is included?", opts:["Transport.","Lunch and materials.","Accommodation.","A certificate only."], a:1, why:"Le déjeuner et les supports."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: The shipment we received this morning is damaged. Several boxes are crushed.\nWoman: That's unacceptable. Please take photos and send them to the supplier.\nMan: I already did. They offered to resend the order for free.\nWoman: Good. Make sure the new delivery is inspected on arrival.", qs:[
+    {stem:"What is the problem?", opts:["A shipment is damaged.","An order is late.","A price is too high.","A machine is broken."], a:0, why:"La livraison est endommagée."},
+    {stem:"What did the man already do?", opts:["Sent photos to the supplier.","Called the manager.","Returned the boxes.","Cancelled the order."], a:0, why:"Il a envoyé des photos au fournisseur."},
+    {stem:"What does the woman ask him to do?", opts:["Inspect the next delivery.","Pay the invoice.","Find a new supplier.","Close the warehouse."], a:0, why:"Faire inspecter la prochaine livraison."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Can we schedule a call with the New York office tomorrow?\nMan: Sure, but remember there's a six-hour time difference.\nWoman: Right. How about 3 p.m. our time? That's 9 a.m. for them.\nMan: Perfect, I'll send the invitation now.", qs:[
+    {stem:"What are they trying to arrange?", opts:["A conference call.","A business trip.","A training session.","A lunch."], a:0, why:"Un appel avec le bureau de New York."},
+    {stem:"What must they consider?", opts:["The time difference.","The budget.","The meeting room.","The weather."], a:0, why:"Le décalage horaire de six heures."},
+    {stem:"What time will the call take place (their time)?", opts:["9 a.m.","3 p.m.","6 p.m.","Noon."], a:1, why:"15 h chez eux."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Man: I heard the company is relocating to a new office. Is that true?\nWoman: Yes, we're moving downtown next month. It's closer to the train station.\nMan: That's good news. Will we have more space?\nWoman: Definitely — and a larger parking area too.", qs:[
+    {stem:"What are they discussing?", opts:["An office relocation.","A new hire.","A product launch.","A holiday schedule."], a:0, why:"Le déménagement des bureaux."},
+    {stem:"Why is the new location convenient?", opts:["It's closer to the station.","It's cheaper.","It's near the airport.","It has a restaurant."], a:0, why:"Plus proche de la gare."},
+    {stem:"What advantage does the man ask about?", opts:["More space.","Higher salary.","Free meals.","Flexible hours."], a:0, why:"Il demande s'il y aura plus d'espace."}
+  ]},
+  {part:"Partie 3 — Conversations (réel : 39 questions)", instr:"Écoute la conversation, puis réponds aux trois questions.", audio:"Woman: Our website traffic dropped last week. Do you know why?\nMan: Yes, the server was down for maintenance on Tuesday.\nWoman: That explains it. Can we schedule maintenance at night next time?\nMan: Good idea. I'll arrange it with the IT team.", qs:[
+    {stem:"What problem is mentioned?", opts:["Website traffic dropped.","Sales increased.","A product failed.","An employee resigned."], a:0, why:"Le trafic du site a baissé."},
+    {stem:"What caused it?", opts:["Server maintenance.","A price change.","Bad weather.","A holiday."], a:0, why:"Une maintenance du serveur le mardi."},
+    {stem:"What does the woman suggest?", opts:["Doing maintenance at night.","Closing the website.","Hiring more staff.","Changing servers."], a:0, why:"Programmer la maintenance la nuit."}
+  ]},
+
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'annonce, puis réponds aux trois questions.", audio:"Attention all passengers. Flight 207 to Berlin has been delayed due to bad weather. The new departure time is 3:45 p.m. Passengers are kindly asked to remain near gate 12, where snacks and refreshments will be provided. We apologize for the inconvenience.", qs:[
+    {stem:"What is the purpose of the announcement?", opts:["To announce a delay.","To cancel a flight.","To open a new gate.","To sell tickets."], a:0, why:"Annonce d'un retard."},
+    {stem:"Why is the flight delayed?", opts:["Technical problems.","Bad weather.","A strike.","A security check."], a:1, why:"Le mauvais temps."},
+    {stem:"What are passengers asked to do?", opts:["Change gates.","Stay near gate 12.","Collect their luggage.","Board immediately."], a:1, why:"Rester près de la porte 12."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute le message, puis réponds aux trois questions.", audio:"Hello, this is David from Tech Support, returning your call about the software installation. Unfortunately, the version you downloaded is not compatible with your operating system. Please visit our website to download the correct version, and call me back if you need any help. Thank you.", qs:[
+    {stem:"Why is David calling?", opts:["To return a call about software.","To sell a computer.","To schedule a meeting.","To confirm a delivery."], a:0, why:"Il rappelle au sujet d'un logiciel."},
+    {stem:"What is the problem?", opts:["The website is down.","The software is incompatible.","The payment failed.","The order is late."], a:1, why:"Version non compatible."},
+    {stem:"What does David suggest?", opts:["Visiting the website.","Coming to the office.","Sending an email.","Buying a new computer."], a:0, why:"Aller sur le site pour la bonne version."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'annonce, puis réponds aux trois questions.", audio:"Attention shoppers. The store will be closing in fifteen minutes. Please bring your final purchases to the checkout counters now. Our store will reopen tomorrow at nine a.m. Thank you for shopping with us, and have a pleasant evening.", qs:[
+    {stem:"What is the announcement about?", opts:["The store is closing soon.","A special sale.","A lost child.","A new product."], a:0, why:"Le magasin ferme dans quinze minutes."},
+    {stem:"What should shoppers do now?", opts:["Go to the checkout.","Leave immediately.","Visit the second floor.","Return their items."], a:0, why:"Aller payer aux caisses."},
+    {stem:"When does the store reopen?", opts:["At 8 a.m.","At 9 a.m.","At noon.","In one hour."], a:1, why:"Demain à 9 h."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'introduction, puis réponds aux trois questions.", audio:"Good morning, and welcome to the City History Museum. Our guided tour begins in the main hall and lasts about ninety minutes. Please note that photography without flash is allowed. The gift shop is located near the exit. Let's begin with the ancient art gallery.", qs:[
+    {stem:"Where does this talk take place?", opts:["At a museum.","At an airport.","At a hotel.","At a factory."], a:0, why:"Au musée d'histoire."},
+    {stem:"How long does the tour last?", opts:["Thirty minutes.","Ninety minutes.","Two hours.","All day."], a:1, why:"Environ quatre-vingt-dix minutes."},
+    {stem:"What is allowed?", opts:["Photography without flash.","Eating in the galleries.","Touching the artwork.","Loud talking."], a:0, why:"La photo sans flash est autorisée."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute le bulletin, puis réponds aux trois questions.", audio:"And now the traffic report. Due to road work on Highway 5, drivers should expect delays of about thirty minutes this morning. We recommend taking Park Avenue as an alternative route. The road work is expected to finish by Friday. Drive safely.", qs:[
+    {stem:"What is the report about?", opts:["Traffic.","Weather.","Sports.","Business news."], a:0, why:"Un bulletin de circulation."},
+    {stem:"What is causing the delays?", opts:["Road work.","An accident.","Snow.","A parade."], a:0, why:"Des travaux sur l'autoroute 5."},
+    {stem:"What does the report recommend?", opts:["Taking Park Avenue.","Staying home.","Using the highway.","Leaving later."], a:0, why:"Emprunter Park Avenue."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'introduction, puis réponds aux trois questions.", audio:"Welcome, everyone, to today's training session on customer service. Over the next two hours, we'll cover how to handle complaints and build customer loyalty. There will be a short break halfway through. Please turn off your phones and feel free to ask questions at any time.", qs:[
+    {stem:"What is the session about?", opts:["Customer service.","Computer software.","Financial planning.","Safety rules."], a:0, why:"La relation client."},
+    {stem:"How long will it last?", opts:["One hour.","Two hours.","Half a day.","Thirty minutes."], a:1, why:"Deux heures."},
+    {stem:"What are participants asked to do?", opts:["Turn off their phones.","Take notes only.","Leave early.","Work in pairs."], a:0, why:"Éteindre leurs téléphones."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'annonce, puis réponds aux trois questions.", audio:"We're excited to announce the launch of our new smartphone, the Zenith X, available in stores next Monday. To celebrate, customers who buy in the first week will receive a free pair of headphones. Visit our website for more details and to pre-order now.", qs:[
+    {stem:"What is being announced?", opts:["A product launch.","A store closing.","A job opening.","A price increase."], a:0, why:"Le lancement d'un smartphone."},
+    {stem:"What do early buyers receive?", opts:["Free headphones.","A discount card.","Free delivery.","A gift voucher."], a:0, why:"Une paire d'écouteurs gratuite."},
+    {stem:"How can customers pre-order?", opts:["On the website.","By phone.","In the factory.","By email."], a:0, why:"Sur le site internet."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute le discours d'accueil, puis réponds aux trois questions.", audio:"Good evening, and thank you all for attending our annual sales conference. Tonight we'll review this year's results and present awards to our top performers. Dinner will be served at eight, followed by the keynote speech. We hope you enjoy the evening.", qs:[
+    {stem:"What is the occasion?", opts:["An annual sales conference.","A product demonstration.","A job fair.","A retirement party."], a:0, why:"La conférence annuelle des ventes."},
+    {stem:"What will happen tonight?", opts:["Awards will be presented.","A factory will open.","A sale will start.","A new office will be shown."], a:0, why:"Remise de prix aux meilleurs."},
+    {stem:"When is dinner served?", opts:["At seven.","At eight.","At nine.","At ten."], a:1, why:"À vingt heures."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute la consigne de sécurité, puis réponds aux trois questions.", audio:"Before we begin the factory tour, please put on your safety helmet and follow the yellow line on the floor. Do not touch any machines. In case of emergency, the exits are clearly marked with green signs. The tour will take about forty-five minutes.", qs:[
+    {stem:"What must visitors wear?", opts:["A safety helmet.","A uniform.","Gloves only.","A badge."], a:0, why:"Un casque de sécurité."},
+    {stem:"What should visitors not do?", opts:["Touch the machines.","Ask questions.","Take photos.","Follow the line."], a:0, why:"Ne pas toucher les machines."},
+    {stem:"How long is the tour?", opts:["Fifteen minutes.","Forty-five minutes.","Two hours.","All morning."], a:1, why:"Environ quarante-cinq minutes."}
+  ]},
+  {part:"Partie 4 — Exposés courts (réel : 30 questions)", instr:"Écoute l'annonce du café, puis réponds aux trois questions.", audio:"Good morning and welcome to Sunrise Café. Today's special is a fresh vegetable soup with homemade bread for only six euros. We also have a new selection of organic teas. Don't forget to ask about our loyalty card — every tenth coffee is free. Enjoy your visit.", qs:[
+    {stem:"What is today's special?", opts:["Vegetable soup with bread.","A chicken sandwich.","A fruit salad.","A pizza."], a:0, why:"Soupe de légumes avec du pain."},
+    {stem:"What is new at the café?", opts:["A selection of organic teas.","A breakfast menu.","A larger terrace.","A delivery service."], a:0, why:"Une sélection de thés bio."},
+    {stem:"What does the loyalty card offer?", opts:["Every tenth coffee free.","A free dessert.","A discount on soup.","Free delivery."], a:0, why:"Le dixième café offert."}
+  ]}
+ ],
+ reading: [
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou la forme qui complète correctement la phrase.", qs:[{stem:"All employees must ____ their badges at the entrance.", opts:["show","shows","showing","to show"], a:0, why:"Après must, on emploie la base verbale."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The new policy will take effect ____ January 1st.", opts:["in","on","at","by"], a:1, why:"on + date précise."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The report was ____ by the finance department.", opts:["prepare","prepared","preparing","prepares"], a:1, why:"Voix passive : was + participe passé."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"We received ____ applications than last year.", opts:["many","much","more","most"], a:2, why:"Comparatif : more ... than."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"Please contact us if you have any ____.", opts:["question","questions","questioning","questioned"], a:1, why:"any + nom pluriel dénombrable."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The manager asked the team to work ____.", opts:["efficient","efficiency","efficiently","efficiencies"], a:2, why:"Un adverbe modifie le verbe : efficiently."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"Sales have increased ____ the new campaign.", opts:["because","because of","although","despite"], a:1, why:"because of + nom."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"____ the manager nor the assistant was available.", opts:["Either","Neither","Both","Whether"], a:1, why:"Neither ... nor ..."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The documents need to ____ before Friday.", opts:["submit","submitted","be submitted","submitting"], a:2, why:"Passif après need to : be + participe."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"If demand increases, we ____ production.", opts:["increase","increased","will increase","would increase"], a:2, why:"1er conditionnel : if + présent, will + base."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"She has worked here ____ five years.", opts:["since","for","during","by"], a:1, why:"for + durée."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The conference will be held ____ the main hall.", opts:["in","on","at","of"], a:0, why:"in + grand espace clos."}]},
+
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis le courriel et choisis le mot qui convient pour chaque espace.", passage:"Dear Mr. Lee,\nThank you for your interest in our services. We are pleased to (1)____ that your application has been approved. Your account will be (2)____ within 24 hours. If you have any questions, please do not (3)____ to contact our support team. We look forward to (4)____ with you.\nBest regards, Customer Service", qs:[
+    {stem:"Espace (1)", opts:["confirm","confirms","confirming","confirmed"], a:0, why:"to confirm : base verbale après to."},
+    {stem:"Espace (2)", opts:["activate","activated","activating","activates"], a:1, why:"will be + participe (passif) : activated."},
+    {stem:"Espace (3)", opts:["hesitate","hesitated","hesitating","hesitation"], a:0, why:"do not hesitate to contact."},
+    {stem:"Espace (4)", opts:["work","worked","working","works"], a:2, why:"look forward to + V-ing : working."}
+  ]},
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis la note et choisis le mot qui convient pour chaque espace.", passage:"Please be advised that the office will be closed for maintenance on Saturday. All staff are (1)____ to save their work before leaving on Friday. The elevators will also be (2)____ during this period, so please use the stairs. We (3)____ for any inconvenience this may cause. Normal operations will (4)____ on Monday.", qs:[
+    {stem:"Espace (1)", opts:["ask","asked","asking","asks"], a:1, why:"are asked (passif) : être prié de."},
+    {stem:"Espace (2)", opts:["unavailable","available","avail","availability"], a:0, why:"hors service : will be unavailable."},
+    {stem:"Espace (3)", opts:["apologize","apologizes","apologized","apologizing"], a:0, why:"We apologize for ..."},
+    {stem:"Espace (4)", opts:["resume","resumed","resuming","resumes"], a:0, why:"will + base verbale : resume."}
+  ]},
+
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'annonce, puis réponds aux questions.", passage:"GREENLEAF OFFICE SUPPLIES — Spring Sale!\nFor the entire month of April, enjoy 20% off all paper products and 15% off office furniture. Orders over $100 qualify for free delivery within the city. Visit our store on Oak Street or order online at greenleaf-supplies.com. Members of our loyalty program receive an additional 5% discount. Hurry — these offers end April 30!", qs:[
+    {stem:"What is being advertised?", opts:["A grand opening.","A seasonal sale.","A job opening.","A new store location."], a:1, why:"C'est une promotion de printemps (Spring Sale)."},
+    {stem:"How can a customer get free delivery?", opts:["By visiting the store.","By spending over $100.","By joining the loyalty program.","By ordering furniture."], a:1, why:"Livraison gratuite au-delà de 100 $."},
+    {stem:"What do loyalty members receive?", opts:["Free furniture.","An extra 5% discount.","Free membership.","A longer sale."], a:1, why:"Une réduction supplémentaire de 5 %."}
+  ]},
+  {part:"Partie 7 — Compréhension, double texte (réel : 54 questions)", instr:"Lis les deux courriels, puis réponds aux questions.", passage:"COURRIEL 1\nTo: bookings@harborhotel.com — Subject: Reservation request\nHello, I would like to book a single room for three nights, from May 5 to May 8. I will be attending a conference nearby and would prefer a quiet room away from the elevator. Could you also confirm whether breakfast is included? Thank you, Marc Olsen\n\nCOURRIEL 2 (réponse)\nDear Mr. Olsen, Thank you for your request. We have reserved a single room on the fifth floor, away from the elevator, for the dates you mentioned. Breakfast is included and served from 7 to 10 a.m. Please note that check-in begins at 2 p.m. We look forward to welcoming you. Best regards, Harbor Hotel", qs:[
+    {stem:"Why is Mr. Olsen traveling?", opts:["For a holiday.","To attend a conference.","To visit family.","For a job interview."], a:1, why:"Il assiste à une conférence à proximité."},
+    {stem:"What did Mr. Olsen request?", opts:["A room near the elevator.","A quiet room.","A double room.","A late checkout."], a:1, why:"Il demande une chambre calme, loin de l'ascenseur."},
+    {stem:"What is included with the room?", opts:["Parking.","Breakfast.","Airport transfer.","A gym pass."], a:1, why:"Le petit-déjeuner est inclus."},
+    {stem:"When can Mr. Olsen check in?", opts:["At 7 a.m.","At 2 p.m.","At 10 a.m.","At noon."], a:1, why:"L'arrivée (check-in) commence à 14 h."}
+  ]}
+ ]
+};
+
 /* ============================================================
    Navigation
    ============================================================ */
@@ -1122,6 +1316,7 @@ function go(id){
   if(id==="chrono") renderChronoMenu();
   if(id==="listening") startListen();
   if(id!=="chrono" && typeof exam!=="undefined" && exam) stopExam();
+  if(id!=="chrono" && typeof mock!=="undefined" && mock) stopMock();
   $("#main").focus && $("#main").setAttribute("tabindex","-1");
   // mark daily streak on any navigation into learning
   if(["diagnostic","practice","vocab","pron","traps","mywords","listening","chrono"].includes(id)) touchStreak();
@@ -1538,8 +1733,9 @@ function renderTraps(){
 let exam=null;
 function fmtTime(s){ s=Math.max(0,s); const m=Math.floor(s/60), x=s%60; return m+":"+(x<10?"0":"")+x; }
 function renderChronoMenu(){
+  if(typeof mock!=="undefined" && mock) stopMock();
   const r=$("#chronoRun"); if(r) r.hidden=true; const rr=$("#chronoResult"); if(rr) rr.hidden=true;
-  const m=$("#chronoMenu"); m.hidden=false; m.innerHTML="";
+  const m=$("#chronoMenu"); m.hidden=false; m.innerHTML=""; m.insertAdjacentHTML("beforeend", '<div class="card" style="border-left:5px solid var(--teal);margin-bottom:16px"><span class="pill teal">Nouveau</span><h3 style="margin:12px 0 6px">TOEIC blanc complet (structuré)</h3><p style="margin:0 0 12px">Les 7 parties du TOEIC en deux sections chronométrées (Écoute approchée et Lecture), avec bilan par partie. Contenu original, score estimé.</p><button class="btn primary" onclick="startMock()">Lancer le TOEIC blanc complet</button></div>');
   const opts=[{n:10,s:300,label:"Rapide"},{n:15,s:480,label:"Standard"},{n:24,s:720,label:"Complet"}];
   const grid=el("div",{class:"grid g3"});
   opts.forEach(o=>{
@@ -1676,6 +1872,124 @@ function listenDone(){
   const c=$("#listenBody"); const pct=Math.round(listenState.ok/listenState.pool.length*100);
   c.innerHTML='<div class="card" style="text-align:center"><span class="pill '+(pct>=70?"green":"coral")+'">Bilan</span><div class="num" style="font-size:3rem;margin:10px 0">'+listenState.ok+' / '+listenState.pool.length+'</div><p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Ton oreille progresse vraiment !":pct>=70?"Bon travail, continue.":"L\'écoute se muscle avec la régularité.")+'</p><button class="btn primary" id="listenAgain">Recommencer</button></div>';
   $("#listenAgain").addEventListener("click",startListen);
+}
+
+/* ============================================================
+   TOEIC blanc structuré (Écoute approchée + Lecture)
+   ============================================================ */
+let mock=null;
+function mockSections(){
+  return [
+    {name:"Écoute", icon:"&#127911;", note:"Parties 1 à 4 — au vrai test : environ 45 min, 100 questions.", secs:2700, blocks:FULLMOCK.listening},
+    {name:"Lecture", icon:"&#128214;", note:"Parties 5 à 7 — au vrai test : 75 min, 100 questions.", secs:1200, blocks:FULLMOCK.reading}
+  ];
+}
+function startMock(){
+  if(exam&&exam.timer){ clearInterval(exam.timer); } exam=null;
+  mock={secs:mockSections(), si:0, bi:0, answers:{}, left:0, timer:null};
+  $("#chronoMenu").hidden=true; $("#chronoResult").hidden=true; $("#chronoRun").hidden=false;
+  renderSectionIntro();
+}
+function stopMock(){ if(mock&&mock.timer) clearInterval(mock.timer); mock=null; }
+function renderSectionIntro(){
+  if(mock.timer){ clearInterval(mock.timer); mock.timer=null; }
+  const s=mock.secs[mock.si]; const c=$("#chronoRun"); c.innerHTML="";
+  const card=el("div",{class:"card",style:"text-align:center"});
+  card.innerHTML='<span class="pill teal">Section '+(mock.si+1)+' / 2</span><h2 style="margin:12px 0 6px">'+s.icon+' '+esc(s.name)+'</h2><p>'+esc(s.note)+'</p><p class="disclaimer">Durée de cette section : '+Math.round(s.secs/60)+' minutes.'+(mock.si===0?' L\'audio utilise la voix de ton appareil.':'')+'</p>';
+  const b=el("button",{class:"btn primary block",style:"margin-top:8px"},"Commencer la section "+esc(s.name));
+  b.addEventListener("click",startSection);
+  card.appendChild(b); c.appendChild(card);
+}
+function startSection(){
+  const s=mock.secs[mock.si]; mock.bi=0; mock.left=s.secs;
+  mock.timer=setInterval(tickMock,1000); renderMockBlock();
+}
+function tickMock(){
+  if(!mock) return; mock.left--;
+  const t=$("#mockTimer"); if(t){ t.textContent=fmtTime(mock.left); t.style.color=mock.left<=60?"var(--coral)":"var(--ink)"; }
+  if(mock.left===60) toast("1 minute restante dans cette section");
+  if(mock.left<=0){ clearInterval(mock.timer); endSection(); }
+}
+function endSection(){
+  if(mock.timer) clearInterval(mock.timer);
+  if(mock.si < mock.secs.length-1){ mock.si++; renderSectionIntro(); window.scrollTo({top:0,behavior:prefersReduced()?"auto":"smooth"}); }
+  else finishMock();
+}
+function renderMockBlock(){
+  const s=mock.secs[mock.si]; const block=s.blocks[mock.bi]; const n=s.blocks.length;
+  const c=$("#chronoRun"); c.innerHTML="";
+  c.appendChild(el("div",null,'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="pill coral">'+esc(s.name)+' · bloc '+(mock.bi+1)+" / "+n+'</span><span class="num" id="mockTimer" style="font-size:1.3rem">'+fmtTime(mock.left)+'</span></div><div class="progress"><i style="width:'+Math.round(mock.bi/n*100)+'%"></i></div>'));
+  const card=el("div",{class:"card"});
+  card.appendChild(el("div",{class:"eyebrow",style:"color:var(--teal)"}, esc(block.part)));
+  if(block.instr) card.appendChild(el("p",{style:"margin:.2em 0 12px"}, esc(block.instr)));
+  if(block.scene) card.appendChild(el("div",{class:"note",style:"margin-bottom:12px"}, "Scène : "+esc(block.scene)));
+  if(block.audio){
+    const play=el("button",{class:"btn primary",style:"margin-bottom:10px"}); play.innerHTML='<span aria-hidden="true">&#128266;</span> Écouter';
+    play.addEventListener("click",e=>Speech.say(block.audio,e.currentTarget));
+    card.appendChild(play);
+    const det=el("details",{style:"margin:0 0 12px"}); det.innerHTML='<summary style="cursor:pointer;color:var(--blue);font-weight:600;min-height:40px;display:flex;align-items:center">Voir la transcription</summary><p style="margin:8px 0 0;color:var(--ink-soft);white-space:pre-line">'+esc(block.audio)+'</p>';
+    card.appendChild(det);
+  }
+  if(block.passage) card.appendChild(el("div",{class:"passage",style:"margin-bottom:14px"}, block.passage));
+  block.qs.forEach((q,qi)=>{
+    const qid=mock.si+"-"+mock.bi+"-"+qi;
+    if(q.stem) card.appendChild(el("div",{class:"q-stem",style:"font-size:1.05rem;margin:10px 0 10px"}, formatStem(q.stem)));
+    const opts=el("div",{class:"opts"});
+    q.opts.forEach((o,idx)=>{
+      const b=el("button",{class:"opt","aria-pressed":String(mock.answers[qid]===idx)});
+      b.innerHTML='<span class="key">'+"ABCD"[idx]+'</span><span style="flex:1">'+esc(o)+'</span>';
+      if(block.optAudio){
+        const ab=el("span",{class:"audio-btn","role":"button","tabindex":"0","aria-label":"Écouter la réponse "+"ABCD"[idx]},"&#128266;");
+        const sp=ev=>{ ev.stopPropagation(); Speech.say(o,ab); };
+        ab.addEventListener("click",sp);
+        ab.addEventListener("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();sp(ev);} });
+        b.appendChild(ab);
+      }
+      b.addEventListener("click",()=>{ mock.answers[qid]=idx; $$(".opt",opts).forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); });
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+  });
+  const row=el("div",{style:"display:flex;gap:10px;margin-top:16px"});
+  if(mock.bi>0){ const p=el("button",{class:"btn ghost"},"Précédent"); p.addEventListener("click",()=>{ mock.bi--; renderMockBlock(); }); row.appendChild(p); }
+  const nx=el("button",{class:"btn primary",style:"flex:1"}, mock.bi===n-1?("Terminer la section "+esc(s.name)):"Suivant");
+  nx.addEventListener("click",()=>{ if(mock.bi===n-1) endSection(); else { mock.bi++; renderMockBlock(); window.scrollTo({top:0,behavior:prefersReduced()?"auto":"smooth"}); } });
+  row.appendChild(nx); card.appendChild(row); c.appendChild(card);
+}
+function finishMock(){
+  if(mock.timer) clearInterval(mock.timer);
+  let ok=0,total=0; const byPart={}; const review=[];
+  mock.secs.forEach((s,si)=>{
+    s.blocks.forEach((block,bi)=>{
+      const partName=block.part.split("—")[0].trim();
+      block.qs.forEach((q,qi)=>{
+        total++; const qid=si+"-"+bi+"-"+qi; const sel=mock.answers[qid];
+        const good=sel===q.a; if(good) ok++;
+        recordAnswer("TOEIC blanc · "+partName, good);
+        (byPart[block.part]=byPart[block.part]||{ok:0,n:0}); byPart[block.part].n++; if(good) byPart[block.part].ok++;
+        if(!good) review.push({q:q});
+      });
+    });
+  });
+  const pct=Math.round(ok/total*100);
+  $("#chronoRun").hidden=true; const r=$("#chronoResult"); r.hidden=false; r.innerHTML="";
+  const est=estimateScore();
+  const head=el("div",{class:"card",style:"text-align:center"});
+  head.innerHTML='<span class="pill green">Examen blanc terminé</span><div class="num" style="font-size:3rem;margin:10px 0">'+ok+' / '+total+'</div><p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Très solide sur ce format !":pct>=70?"Bon résultat, continue.":"C\'est un entraînement : analyse tes erreurs ci-dessous.")+'</p>'+(est?'<p class="disclaimer">Score TOEIC estimé : <strong>'+est.score+'</strong> (estimation, pas un score officiel).</p>':'');
+  r.appendChild(head);
+  const dl=el("div",{class:"card",style:"margin-top:16px"}); dl.innerHTML="<h3>Résultats par partie</h3>";
+  Object.entries(byPart).forEach(([d,v])=>{ const p=Math.round(v.ok/v.n*100); const lv=levelOf(p); dl.appendChild(el("div",{class:"skill"},'<div class="h"><span>'+esc(d)+'</span><span class="v">'+v.ok+' / '+v.n+'</span></div><div class="bar"><i class="fill-'+lv.k+'" style="width:'+p+'%"></i></div>')); });
+  r.appendChild(dl);
+  if(review.length){
+    const rv=el("div",{class:"card",style:"margin-top:16px"}); rv.innerHTML="<h3>À revoir ("+review.length+")</h3>";
+    review.forEach(x=>{ rv.appendChild(el("div",{style:"border-top:1px solid var(--line);padding:12px 0"},'<div class="q-stem" style="font-size:1rem;margin:0 0 6px">'+formatStem(x.q.stem||"")+'</div><p style="margin:.2em 0;color:var(--green);font-weight:600">&#10003; '+esc(x.q.opts[x.q.a])+'</p><p style="margin:0">'+esc(x.q.why||"")+'</p>')); });
+    r.appendChild(rv);
+  }
+  const cta=el("div",{style:"display:flex;gap:12px;flex-wrap:wrap;margin-top:16px"});
+  cta.innerHTML='<button class="btn primary" onclick="startMock()">Refaire l\'examen blanc</button><button class="btn ghost" data-nav="dashboard">Voir mes progrès</button>';
+  r.appendChild(cta);
+  mock=null;
+  r.scrollIntoView({behavior:prefersReduced()?"auto":"smooth"});
 }
 
 /* ============================================================
