@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="warm">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Homemade TOEIC Trainer — entraînement TOEIC Listening & Reading : diagnostic, vocabulaire avec audio, leçons courtes, score estimé. Créé par Eglantine Lecomte. Non affilié à ETS Global.">
+<title>Homemade TOEIC Trainer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#4F7CFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TOEIC Trainer">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=Montserrat:wght@700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF8; --bg2:#F8F4EC; --card:#FFFFFF;
+  --ink:#22324B; --ink-soft:#5A6B82; --line:#ECE6DA;
+  --blue:#4F7CFF; --teal:#2EC4B6; --coral:#FF7F6A; --yellow:#FFD166; --green:#6BCB77; --orange:#FFB84C;
+  --blue-soft:#EAF0FF; --teal-soft:#E2F7F4; --coral-soft:#FFEDE9; --yellow-soft:#FFF6DF; --green-soft:#EAF7EC;
+  --r:22px; --r-sm:14px; --r-lg:30px;
+  --shadow:0 10px 30px rgba(34,50,75,.08), 0 2px 8px rgba(34,50,75,.05);
+  --shadow-lift:0 18px 44px rgba(34,50,75,.14);
+  --display:"Poppins",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --num:"Montserrat",system-ui,sans-serif;
+  --tap:56px;
+  --speed:.28s;
+}
+/* Accessibility toggles */
+html[data-contrast="high"]{
+  --bg:#FFFFFF; --bg2:#FFFFFF; --card:#FFFFFF;
+  --ink:#0A1422; --ink-soft:#243047; --line:#5A6B82;
+  --blue:#0B43D6; --teal:#0A7A6E; --coral:#C23A24; --green:#1E7A2E; --orange:#9A5A00; --yellow:#8A6A00;
+  --blue-soft:#E6ECFF; --teal-soft:#DCF3F0; --coral-soft:#FBE6E0; --yellow-soft:#FBF2D6; --green-soft:#E4F3E6;
+  --shadow:0 0 0 2px #0A1422; --shadow-lift:0 0 0 3px #0A1422;
+}
+html[data-text="large"]{ font-size:118%; }
+html[data-text="xlarge"]{ font-size:134%; }
+html[data-dys="on"]{ --body:"Atkinson Hyperlegible",sans-serif; --display:"Lexend",sans-serif; letter-spacing:.012em; word-spacing:.06em; }
+html[data-dys="on"] p, html[data-dys="on"] li{ line-height:1.85; }
+html[data-motion="reduced"] *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+@media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  font-family:var(--body); color:var(--ink); background:var(--bg);
+  line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{ /* soft organic ambient shapes */
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(40vw 40vw at 88% -6%, var(--teal-soft) 0%, transparent 60%),
+    radial-gradient(46vw 46vw at -8% 6%, var(--blue-soft) 0%, transparent 60%),
+    radial-gradient(50vw 40vw at 50% 116%, var(--yellow-soft) 0%, transparent 60%);
+  opacity:.7;
+}
+h1,h2,h3{ font-family:var(--display); color:var(--ink); line-height:1.18; margin:0 0 .4em; font-weight:600; }
+h1{ font-size:clamp(1.8rem,5vw,2.9rem); font-weight:700; letter-spacing:-.01em; }
+h2{ font-size:clamp(1.3rem,3.4vw,1.9rem); }
+h3{ font-size:1.12rem; }
+p{ margin:0 0 1em; color:var(--ink-soft); }
+a{ color:var(--blue); }
+.num{ font-family:var(--num); font-weight:800; letter-spacing:-.01em; }
+:focus-visible{ outline:3px solid var(--blue); outline-offset:3px; border-radius:6px; }
+html[data-contrast="high"] :focus-visible{ outline:4px solid #0A1422; }
+
+.skip{ position:absolute; left:-999px; top:0; background:var(--ink); color:#fff; padding:12px 18px; border-radius:0 0 12px 0; z-index:200; }
+.skip:focus{ left:0; }
+
+/* Layout */
+.wrap{ width:min(1080px,92vw); margin-inline:auto; }
+header.top{
+  position:sticky; top:0; z-index:100; backdrop-filter:saturate(1.2) blur(8px);
+  background:color-mix(in srgb, var(--bg) 86%, transparent); border-bottom:1px solid var(--line);
+}
+.top-in{ display:flex; align-items:center; gap:14px; padding:12px 0; }
+.brand{ display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--ink); margin-right:auto; }
+.brand .mark{ width:42px; height:42px; border-radius:13px; background:linear-gradient(135deg,var(--blue),var(--teal)); display:grid; place-items:center; color:#fff; font-family:var(--num); font-weight:800; font-size:1.05rem; box-shadow:var(--shadow); flex:none; }
+.brand b{ font-family:var(--display); font-weight:700; font-size:1.06rem; display:block; line-height:1.1; }
+.brand small{ color:var(--ink-soft); font-size:.74rem; }
+.icon-btn{
+  min-width:var(--tap); min-height:var(--tap); border:1px solid var(--line); background:var(--card);
+  border-radius:14px; cursor:pointer; font-family:var(--body); font-size:.86rem; color:var(--ink);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 14px; font-weight:600;
+  transition:transform var(--speed), box-shadow var(--speed), background var(--speed);
+}
+.icon-btn:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.icon-btn .gly{ font-size:1.1rem; }
+.hide-sm{ }
+@media (max-width:640px){ .hide-sm{ display:none; } .brand small{ display:none; } }
+
+/* Bottom nav (mobile-first) */
+nav.tabs{ position:sticky; bottom:0; z-index:90; background:color-mix(in srgb,var(--bg) 90%, transparent); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
+.tabs-in{ display:flex; gap:4px; padding:7px 0; overflow-x:auto; scrollbar-width:none; }
+.tabs-in::-webkit-scrollbar{ display:none; }
+.tab{
+  flex:1 0 auto; min-width:72px; min-height:var(--tap); border:none; background:transparent; cursor:pointer;
+  border-radius:14px; color:var(--ink-soft); font-family:var(--body); font-weight:600; font-size:.72rem;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:6px 8px;
+  transition:background var(--speed), color var(--speed);
+}
+.tab .gly{ font-size:1.3rem; line-height:1; }
+.tab[aria-current="page"]{ background:var(--blue-soft); color:var(--blue); }
+html[data-contrast="high"] .tab[aria-current="page"]{ outline:2px solid var(--blue); }
+
+main{ padding:26px 0 40px; min-height:60vh; }
+.view{ display:none; animation:rise .4s ease both; }
+.view.active{ display:block; }
+@keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:none; } }
+
+/* Cards */
+.card{ background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:var(--shadow); }
+.grid{ display:grid; gap:16px; }
+@media (min-width:720px){ .g2{ grid-template-columns:1fr 1fr; } .g3{ grid-template-columns:1fr 1fr 1fr; } .g4{ grid-template-columns:repeat(4,1fr); } }
+.pill{ display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:999px; font-size:.78rem; font-weight:600; font-family:var(--display); }
+.pill.blue{ background:var(--blue-soft); color:var(--blue); }
+.pill.teal{ background:var(--teal-soft); color:var(--teal); }
+.pill.coral{ background:var(--coral-soft); color:var(--coral); }
+.pill.green{ background:var(--green-soft); color:var(--green); }
+.eyebrow{ font-family:var(--display); font-weight:600; text-transform:uppercase; letter-spacing:.12em; font-size:.74rem; color:var(--teal); margin-bottom:8px; }
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:var(--tap);
+  padding:0 24px; border-radius:16px; border:none; cursor:pointer; font-family:var(--display);
+  font-weight:600; font-size:1rem; text-decoration:none; transition:transform var(--speed), box-shadow var(--speed), filter var(--speed);
+}
+.btn.primary{ background:linear-gradient(135deg,var(--blue),#6E8BFF); color:#fff; box-shadow:0 10px 24px rgba(79,124,255,.34); }
+html[data-contrast="high"] .btn.primary{ background:var(--blue); box-shadow:var(--shadow); }
+.btn.primary:hover{ transform:translateY(-2px); box-shadow:0 16px 32px rgba(79,124,255,.42); }
+.btn.ghost{ background:var(--card); border:1px solid var(--line); color:var(--ink); }
+.btn.ghost:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.btn.coral{ background:linear-gradient(135deg,var(--coral),#FF9784); color:#fff; box-shadow:0 10px 24px rgba(255,127,106,.32); }
+.btn.block{ width:100%; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+/* Hero */
+.hero{ position:relative; padding:8px 0 6px; }
+.hero .lead{ font-size:clamp(1.02rem,2.4vw,1.22rem); color:var(--ink-soft); max-width:40ch; }
+.value-row{ display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 22px; }
+.value{ display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:11px 15px; font-weight:600; font-family:var(--display); font-size:.92rem; box-shadow:var(--shadow); }
+.value .gly{ width:34px; height:34px; border-radius:11px; display:grid; place-items:center; flex:none; }
+.cta-row{ display:flex; flex-wrap:wrap; gap:12px; }
+
+/* Audio chip + word cards */
+.audio-btn{
+  min-width:46px; min-height:46px; border-radius:13px; border:1px solid var(--line); background:var(--teal-soft);
+  color:var(--teal); cursor:pointer; font-size:1.2rem; display:inline-flex; align-items:center; justify-content:center;
+  transition:transform var(--speed), background var(--speed); flex:none;
+}
+.audio-btn:hover{ transform:scale(1.06); }
+.audio-btn.speaking{ background:var(--teal); color:#fff; }
+.word{ display:flex; flex-direction:column; gap:10px; }
+.word .top{ display:flex; align-items:flex-start; gap:12px; }
+.word .w{ font-family:var(--display); font-weight:700; font-size:1.32rem; line-height:1.1; }
+.word .ipa{ color:var(--teal); font-family:var(--body); font-weight:600; font-size:.92rem; }
+.word .fr{ font-weight:600; color:var(--ink); }
+.word .ex{ font-style:italic; color:var(--ink-soft); }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.chip{ background:var(--bg2); border:1px solid var(--line); border-radius:999px; padding:4px 11px; font-size:.78rem; color:var(--ink-soft); }
+.save-w{ margin-left:auto; }
+.linkrow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+/* Filters */
+.filters{ display:flex; gap:8px; overflow-x:auto; padding:4px 0 10px; scrollbar-width:none; }
+.filters::-webkit-scrollbar{ display:none; }
+.filter{ flex:none; min-height:44px; padding:0 16px; border-radius:999px; border:1px solid var(--line); background:var(--card); cursor:pointer; font-weight:600; font-family:var(--display); font-size:.86rem; color:var(--ink-soft); }
+.filter[aria-pressed="true"]{ background:var(--blue); color:#fff; border-color:var(--blue); }
+
+/* Gauge */
+.gauge{ display:grid; place-items:center; position:relative; width:200px; height:200px; margin:0 auto; }
+.gauge svg{ transform:rotate(-90deg); }
+.gauge .val{ position:absolute; text-align:center; }
+.gauge .val .n{ font-family:var(--num); font-weight:800; font-size:2.6rem; line-height:1; color:var(--ink); }
+.gauge .val .l{ font-size:.78rem; color:var(--ink-soft); font-weight:600; }
+
+/* Skill bars */
+.skill{ margin-bottom:14px; }
+.skill .h{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:7px; font-weight:600; }
+.skill .h .v{ font-family:var(--num); font-weight:800; }
+.bar{ height:14px; border-radius:999px; background:var(--bg2); overflow:hidden; border:1px solid var(--line); }
+.bar > i{ display:block; height:100%; border-radius:999px; transition:width .8s cubic-bezier(.2,.8,.2,1); }
+.lvl-tag{ font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px; font-family:var(--display); }
+.lvl-red{ background:var(--coral-soft); color:var(--coral); } .fill-red{ background:var(--coral); }
+.lvl-orange{ background:var(--yellow-soft); color:var(--orange); } .fill-orange{ background:var(--orange); }
+.lvl-yellow{ background:var(--yellow-soft); color:#9A7B00; } .fill-yellow{ background:var(--yellow); }
+.lvl-green{ background:var(--green-soft); color:var(--green); } .fill-green{ background:var(--green); }
+
+/* Journey path */
+.journey{ position:relative; padding:30px 6px 10px; }
+.track{ position:relative; height:6px; background:var(--bg2); border-radius:999px; border:1px solid var(--line); }
+.track > i{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; background:linear-gradient(90deg,var(--teal),var(--blue)); }
+.dot{ position:absolute; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%; background:#fff; border:3px solid var(--blue); }
+.dot.target{ border-color:var(--green); }
+.dot .lab{ position:absolute; top:-30px; left:50%; transform:translateX(-50%); white-space:nowrap; font-size:.74rem; font-weight:700; font-family:var(--display); color:var(--ink); }
+.dot .lab.below{ top:auto; bottom:-30px; }
+
+/* Quiz */
+.q-stem{ font-family:var(--display); font-weight:600; font-size:1.18rem; margin:8px 0 16px; }
+.q-stem .blank{ color:var(--blue); font-weight:700; }
+.opts{ display:grid; gap:10px; }
+.opt{ display:flex; align-items:center; gap:12px; text-align:left; min-height:var(--tap); padding:12px 16px; border-radius:16px; border:1.5px solid var(--line); background:var(--card); cursor:pointer; font-family:var(--body); font-size:1rem; color:var(--ink); font-weight:500; transition:border-color var(--speed), background var(--speed), transform var(--speed); }
+.opt:hover{ transform:translateY(-1px); border-color:var(--blue); }
+.opt .key{ width:30px; height:30px; border-radius:9px; background:var(--bg2); display:grid; place-items:center; font-family:var(--display); font-weight:700; font-size:.9rem; flex:none; }
+.opt[aria-pressed="true"]{ border-color:var(--blue); background:var(--blue-soft); }
+.opt.correct{ border-color:var(--green); background:var(--green-soft); }
+.opt.wrong{ border-color:var(--coral); background:var(--coral-soft); }
+.opt .res{ margin-left:auto; font-weight:800; font-size:1.1rem; }
+.feedback{ margin-top:16px; border-radius:16px; padding:15px 17px; border:1.5px solid var(--line); }
+.feedback.ok{ background:var(--green-soft); border-color:var(--green); }
+.feedback.no{ background:var(--coral-soft); border-color:var(--coral); }
+.feedback h4{ margin:0 0 6px; font-family:var(--display); font-size:1rem; display:flex; align-items:center; gap:8px; }
+.feedback p{ margin:0; color:var(--ink); }
+.progress{ height:10px; border-radius:999px; background:var(--bg2); border:1px solid var(--line); overflow:hidden; margin:6px 0 18px; }
+.progress > i{ display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--teal)); transition:width .4s; }
+
+/* Settings panel */
+.panel-bg{ position:fixed; inset:0; background:rgba(34,50,75,.42); z-index:300; display:none; }
+.panel-bg.open{ display:block; }
+.panel{ position:fixed; top:0; right:0; bottom:0; width:min(440px,94vw); background:var(--bg); z-index:301; transform:translateX(100%); transition:transform .3s; overflow-y:auto; box-shadow:-20px 0 50px rgba(34,50,75,.2); padding:20px; }
+.panel.open{ transform:none; }
+.panel h2{ display:flex; align-items:center; justify-content:space-between; }
+.setrow{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid var(--line); }
+.setrow .lab b{ font-family:var(--display); display:block; }
+.setrow .lab small{ color:var(--ink-soft); }
+.seg{ display:inline-flex; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.seg button{ min-height:44px; min-width:48px; border:none; background:var(--card); cursor:pointer; font-family:var(--display); font-weight:600; color:var(--ink-soft); padding:0 12px; }
+.seg button[aria-pressed="true"]{ background:var(--blue); color:#fff; }
+.switch{ width:60px; height:34px; border-radius:999px; border:1px solid var(--line); background:var(--bg2); position:relative; cursor:pointer; flex:none; }
+.switch::after{ content:""; position:absolute; top:3px; left:3px; width:26px; height:26px; border-radius:50%; background:#fff; box-shadow:var(--shadow); transition:left var(--speed); }
+.switch[aria-pressed="true"]{ background:var(--green); }
+.switch[aria-pressed="true"]::after{ left:31px; }
+
+/* Misc */
+.note{ background:var(--bg2); border:1px dashed var(--line); border-radius:16px; padding:14px 16px; font-size:.9rem; color:var(--ink-soft); }
+.disclaimer{ font-size:.82rem; color:var(--ink-soft); }
+footer.foot{ border-top:1px solid var(--line); margin-top:30px; padding:26px 0 90px; }
+.foot .cols{ display:grid; gap:18px; }
+@media(min-width:720px){ .foot .cols{ grid-template-columns:1.4fr 1fr 1fr; } }
+.foot b{ font-family:var(--display); }
+.checklist{ list-style:none; padding:0; margin:0; }
+.checklist li{ display:flex; gap:12px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--line); }
+.checklist li .gly{ color:var(--green); font-size:1.15rem; flex:none; }
+.focus-hide{}
+html[data-focus="on"] .focus-hide{ display:none !important; }
+.banner{ display:flex; gap:12px; align-items:center; background:var(--blue-soft); border:1px solid var(--blue); border-radius:16px; padding:12px 16px; color:var(--ink); font-weight:600; }
+.toast{ position:fixed; left:50%; bottom:88px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:12px 20px; border-radius:14px; font-weight:600; z-index:400; opacity:0; pointer-events:none; transition:all .3s; box-shadow:var(--shadow-lift); }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+.mini-stats{ display:flex; gap:10px; flex-wrap:wrap; }
+.mini-stat{ flex:1 1 120px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--shadow); }
+.mini-stat .n{ font-family:var(--num); font-weight:800; font-size:1.5rem; }
+.mini-stat .l{ font-size:.78rem; color:var(--ink-soft); font-weight:600; }
+.section-head{ display:flex; align-items:end; justify-content:space-between; gap:12px; margin:0 0 14px; flex-wrap:wrap; }
+.targetset{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.targetset input{ width:110px; min-height:48px; border:1.5px solid var(--line); border-radius:12px; padding:0 14px; font-family:var(--num); font-weight:800; font-size:1.1rem; color:var(--ink); background:var(--card); }
+@media print{
+  header.top, nav.tabs, footer.foot, .panel, .panel-bg, .toast, .skip, .btn, .targetset, .seg, .switch{ display:none !important; }
+  body::before{ display:none !important; }
+  .view{ display:none !important; }
+  .view.active{ display:block !important; }
+  .card{ box-shadow:none !important; border:1px solid #888 !important; break-inside:avoid; }
+  *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#" data-nav="home" aria-label="Homemade TOEIC Trainer, accueil">
+      <span class="mark">HT</span>
+      <span><b>Homemade TOEIC Trainer</b><small>Créé par Eglantine Lecomte</small></span>
+    </a>
+    <button class="icon-btn" id="openSettings" aria-haspopup="dialog"><span class="gly" aria-hidden="true">&#9881;</span><span class="hide-sm">Accessibilité</span></button>
+    <button class="icon-btn hide-sm" data-nav="about"><span class="gly" aria-hidden="true">&#9432;</span>À propos</button>
+  </div>
+</header>
+
+<main id="main"><div class="wrap">
+
+<!-- HOME -->
+<section class="view active" id="home" aria-labelledby="home-h">
+  <div class="hero">
+    <span class="eyebrow">TOEIC Listening &amp; Reading</span>
+    <h1 id="home-h">Connais ton niveau.<br>Travaille ce qui compte vraiment.</h1>
+    <p class="lead">Un entraînement clair et chaleureux pour préparer le TOEIC : un diagnostic, des leçons courtes, du vocabulaire avec audio, et un score estimé qui progresse avec toi.</p>
+    <div class="value-row" aria-hidden="false">
+      <span class="value"><span class="gly" style="background:var(--blue-soft)">&#127919;</span> Repère tes points faibles</span>
+      <span class="value"><span class="gly" style="background:var(--teal-soft)">&#128202;</span> Suis ta progression</span>
+      <span class="value"><span class="gly" style="background:var(--coral-soft)">&#128640;</span> Atteins ton objectif</span>
+    </div>
+    <div class="cta-row">
+      <button class="btn primary" data-nav="diagnostic"><span aria-hidden="true">&#9889;</span> Démarrer mon diagnostic</button>
+      <button class="btn ghost" data-nav="vocab">Explorer le vocabulaire</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:22px;border-left:5px solid var(--coral)">
+    <span class="pill coral">À lire avant de commencer</span>
+    <h3 style="margin:12px 0 6px">Un kit de démarrage, pas une préparation complète</h3>
+    <p style="margin:0 0 10px">Cette plateforme est un <strong>starter kit gratuit</strong> : elle te fait découvrir le format du TOEIC, du vocabulaire et des stratégies pour bien démarrer. Pour aller plus loin, garde en tête que :</p>
+    <ul class="checklist" style="margin:0">
+      <li><span class="gly" aria-hidden="true">&#128218;</span> Pour une préparation <strong>complète</strong>, complète-la avec des <strong>ouvrages de la bibliothèque universitaire</strong> et/ou des <strong>plateformes payantes</strong> spécialisées (tests blancs intégraux, suivi détaillé).</li>
+      <li><span class="gly" aria-hidden="true">&#127908;</span> Préparer le TOEIC Listening &amp; Reading <strong>n'équivaut pas à améliorer ton expression à l'oral</strong> : ce test n'évalue pas la prise de parole.</li>
+      <li><span class="gly" aria-hidden="true">&#129489;&#8205;&#127979;</span> Et surtout, <strong>rien ne remplace un·e enseignant·e</strong> pour progresser vraiment et être bien accompagné·e.</li>
+    </ul>
+    <button class="btn ghost" data-nav="resources" style="margin-top:14px">Voir les ressources pour aller plus loin</button>
+  </div>
+
+  <div class="grid g3" style="margin-top:26px">
+    <button class="card focus-hide" data-nav="practice" style="text-align:left;cursor:pointer;border:1px solid var(--line)">
+      <span class="pill blue">Entraînement</span>
+      <h3 style="margin-top:12px">Leçons &amp; exercices courts</h3>
+      <p style="margin:0">3 à 7 minutes : grammaire, collocations, phrasal verbs, avec correction expliquée.</p>
+    </button>
+    <button class="card focus-hide" data-nav="vocab" style="text-align:left;cursor:pointer;border:1px solid var(--line)">
+      <span class="pill teal">Vocabulaire</span>
+      <h3 style="margin-top:12px">Chaque mot a son audio</h3>
+      <p style="margin:0">Prononciation, transcription phonétique (IPA), traduction, exemple et collocations.</p>
+    </button>
+    <button class="card focus-hide" data-nav="traps" style="text-align:left;cursor:pointer;border:1px solid var(--line)">
+      <span class="pill coral">Pièges francophones</span>
+      <h3 style="margin-top:12px">French Learner Traps</h3>
+      <p style="margin:0">Les faux amis qui coûtent le plus de points, et comment les éviter.</p>
+    </button>
+    <button class="card focus-hide" data-nav="resources" style="text-align:left;cursor:pointer;border:1px solid var(--line)">
+      <span class="pill green">Pour aller plus loin</span>
+      <h3 style="margin-top:12px">Autres ressources</h3>
+      <p style="margin:0">Plateformes plus complètes, ouvrages à la BU et conseils de ton enseignant·e.</p>
+    </button>
+  </div>
+
+  <div class="note" style="margin-top:22px">
+    <strong>Bon à savoir.</strong> Ta progression est enregistrée <strong>sur cet appareil</strong> (dans ton navigateur), rien n'est envoyé ailleurs. Le score affiché est une <strong>estimation</strong> pédagogique, pas un score officiel.
+  </div>
+</section>
+
+<!-- DIAGNOSTIC -->
+<section class="view" id="diagnostic" aria-labelledby="diag-h">
+  <span class="eyebrow">Diagnostic</span>
+  <h1 id="diag-h">Voyons où tu en es</h1>
+  <p class="lead">Quelques questions ciblées par compétence. Réponds à <strong>toutes</strong> : il n'y a pas de point négatif. À la fin, tu obtiens un score estimé et tes points faibles.</p>
+  <div id="diagIntro" class="card" style="margin-top:8px">
+    <div class="banner" style="margin-bottom:16px"><span aria-hidden="true">&#128161;</span> Astuce : si tu hésites, choisis ta meilleure intuition et avance.</div>
+    <button class="btn primary block" id="startDiag">Commencer le diagnostic</button>
+  </div>
+  <div id="diagRun" hidden></div>
+  <div id="diagResult" hidden></div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="view" id="dashboard" aria-labelledby="dash-h">
+  <div class="section-head">
+    <div><span class="eyebrow">Mon tableau de bord</span><h1 id="dash-h" style="margin:0">Ta progression</h1></div>
+  </div>
+  <div id="dashEmpty" class="card" hidden>
+    <h3>Commence par le diagnostic</h3>
+    <p>Tu verras ici ton score estimé, ta progression et tes compétences à renforcer.</p>
+    <button class="btn primary" data-nav="diagnostic">Démarrer mon diagnostic</button>
+  </div>
+  <div id="dashFull" hidden>
+    <div class="grid g2">
+      <div class="card" style="text-align:center">
+        <span class="pill teal" style="margin-bottom:6px">Score TOEIC estimé</span>
+        <div class="gauge" id="scoreGauge"></div>
+        <p class="disclaimer" id="confLine" style="margin:6px 0 0">Estimation — indice de confiance : —</p>
+      </div>
+      <div class="card">
+        <h3>Mon objectif</h3>
+        <div class="targetset">
+          <label for="targetInput" class="sr">Score visé</label>
+          <input id="targetInput" type="number" min="300" max="990" step="5" value="800" inputmode="numeric">
+          <button class="btn ghost" id="saveTarget">Enregistrer</button>
+        </div>
+        <p id="gapLine" style="margin:14px 0 0;font-weight:600;color:var(--ink)"></p>
+        <div class="journey"><div class="track"><i id="trackFill"></i><span class="dot" id="dotCur"><span class="lab" id="labCur"></span></span><span class="dot target" id="dotTgt"><span class="lab below" id="labTgt"></span></span></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:8px"><h3 style="margin:0">Objectif du jour</h3>
+        <span class="targetset"><label for="goalInput" class="sr">Objectif quotidien</label><input id="goalInput" type="number" min="3" max="100" step="1" value="10" inputmode="numeric" style="width:84px"><button class="btn ghost" id="saveGoal" style="min-height:44px;padding:0 12px">OK</button></span>
+      </div>
+      <div class="progress" style="height:14px"><i id="goalBar" style="width:0%"></i></div>
+      <p id="goalLine" style="margin:8px 0 0;font-weight:600;color:var(--ink)"></p>
+    </div>
+
+    <div class="mini-stats focus-hide" style="margin-top:16px">
+      <div class="mini-stat"><div class="n" id="stStreak">0</div><div class="l">jours d'affilée</div></div>
+      <div class="mini-stat"><div class="n" id="stAnswered">0</div><div class="l">questions traitées</div></div>
+      <div class="mini-stat"><div class="n" id="stWords">0</div><div class="l">mots dans My Words</div></div>
+      <div class="mini-stat"><div class="n" id="stAcc">—</div><div class="l">réussite globale</div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Mes compétences</h3>
+      <p style="margin:0 0 12px" id="nextStepLine"></p>
+      <div id="skillBars"></div>
+    </div>
+
+    <button class="btn ghost focus-hide" id="printBilan" style="margin-top:16px">Imprimer / exporter mon bilan (PDF)</button>
+    <button class="btn ghost focus-hide" id="resetData" style="margin-top:16px">Réinitialiser ma progression</button>
+  </div>
+</section>
+
+<!-- PRACTICE -->
+<section class="view" id="practice" aria-labelledby="prac-h">
+  <span class="eyebrow">Entraînement</span>
+  <h1 id="prac-h">Leçons &amp; exercices courts</h1>
+  <p class="lead">Choisis un thème. Tu auras une correction expliquée après chaque réponse — c'est là qu'on progresse le plus.</p>
+  <div id="pracMenu" class="grid g2" style="margin-top:8px"></div>
+  <div id="pracRun" hidden></div>
+</section>
+
+<!-- CHRONO -->
+<section class="view" id="chrono" aria-labelledby="ch-h">
+  <span class="eyebrow">Examen blanc</span>
+  <h1 id="ch-h">Mode chronométré</h1>
+  <p class="lead">Comme le jour J : un temps limité, sans correction immédiate. Réponds à tout — il n'y a pas de point négatif.</p>
+  <div id="chronoMenu"></div>
+  <div id="chronoRun" hidden></div>
+  <div id="chronoResult" hidden></div>
+</section>
+
+<!-- VOCAB -->
+<section class="view" id="vocab" aria-labelledby="voc-h">
+  <span class="eyebrow">Vocabulaire</span>
+  <h1 id="voc-h">Le vocabulaire TOEIC, en écoutant</h1>
+  <p class="lead">Touche le bouton audio pour entendre chaque mot. La prononciation utilise la voix de ton appareil.</p>
+  <div class="linkrow" style="margin-bottom:10px"><input id="vocSearch" type="search" placeholder="Rechercher un mot ou un sens…" aria-label="Rechercher dans le vocabulaire" style="flex:1;min-height:48px;border:1.5px solid var(--line);border-radius:14px;padding:0 16px;font-family:var(--body);font-size:1rem;background:var(--card);color:var(--ink)"><span id="vocCount" class="chip"></span></div>
+  <div id="voiceWarn" class="note" hidden style="margin-bottom:10px"></div>
+  <div class="filters" id="vocFilters" role="group" aria-label="Filtrer par thème"></div>
+  <div class="grid g2" id="vocList"></div>
+</section>
+
+<!-- MY WORDS -->
+<section class="view" id="mywords" aria-labelledby="mw-h">
+  <span class="eyebrow">My Words</span>
+  <h1 id="mw-h">Mes mots à revoir</h1>
+  <p class="lead">Les mots que tu enregistres reviennent ici pour une révision espacée toute simple.</p>
+  <div id="mwEmpty" class="card"><h3>Aucun mot pour l'instant</h3><p>Ajoute des mots depuis le vocabulaire avec le bouton <strong>+ My Words</strong>.</p><button class="btn ghost" data-nav="vocab">Aller au vocabulaire</button></div>
+  <div id="mwList" class="grid g2"></div>
+</section>
+
+<!-- PRONUNCIATION -->
+<section class="view" id="pron" aria-labelledby="pr-h">
+  <span class="eyebrow">Pronunciation Academy</span>
+  <h1 id="pr-h">Prononciation &amp; écoute</h1>
+  <p class="lead">L'accent qui change le sens, les formes réduites de l'oral, et les nombres qui piègent à l'écoute.</p>
+  <div id="pronBody"></div>
+</section>
+
+<!-- LISTENING -->
+<section class="view" id="listening" aria-labelledby="li-h">
+  <span class="eyebrow">Écoute · Part 2</span>
+  <h1 id="li-h">Entraînement à l'écoute</h1>
+  <p class="lead">Comme dans la Partie 2 du TOEIC : écoute la question, puis choisis la meilleure réponse. Tu peux réécouter autant que tu veux.</p>
+  <div id="voiceWarn2" class="note" hidden style="margin-bottom:10px"></div>
+  <div id="listenBody"></div>
+</section>
+
+<!-- TRAPS -->
+<section class="view" id="traps" aria-labelledby="tr-h">
+  <span class="eyebrow">French Learner Traps</span>
+  <h1 id="tr-h">Les faux amis qui coûtent cher</h1>
+  <p class="lead">Ces mots ressemblent au français mais ne veulent pas dire la même chose. Écoute-les et retiens le bon sens.</p>
+  <div class="grid g2" id="trapList"></div>
+</section>
+
+<!-- EXAM DAY -->
+<section class="view" id="examday" aria-labelledby="ed-h">
+  <span class="eyebrow">Le jour J</span>
+  <h1 id="ed-h">Prêt·e pour le jour de l'examen</h1>
+  <p class="lead">L'essentiel à retenir pour aborder la session sereinement.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>À apporter</h3>
+      <ul class="checklist">
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Une pièce d'identité officielle avec photo</li>
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Un crayon à papier HB ou 2B + une gomme (criterium interdit)</li>
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Ta convocation si elle t'a été demandée</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>À retenir</h3>
+      <ul class="checklist">
+        <li><span class="gly" aria-hidden="true">&#10003;</span> ~2 h de test : écoute (~45 min) puis lecture (75 min), sans pause</li>
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Pas de point négatif : réponds à toutes les questions</li>
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Téléphone éteint et rangé, toute montre hors de vue</li>
+        <li><span class="gly" aria-hidden="true">&#10003;</span> Gère bien ton temps sur la partie lecture</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note" style="margin-top:16px">Les consignes du surveillant le jour J priment toujours. Ce rappel ne remplace pas la convocation officielle.</div>
+</section>
+
+<!-- ABOUT -->
+<section class="view" id="about" aria-labelledby="ab-h">
+  <span class="eyebrow">À propos</span>
+  <h1 id="ab-h">Homemade TOEIC Trainer</h1>
+  <div class="card">
+    <p><strong>Conçu et créé par Eglantine Lecomte</strong>, enseignante d'anglais à l'Université Claude Bernard Lyon 1.</p>
+    <p>Cette plateforme aide les étudiant·e·s à découvrir le format du TOEIC Listening &amp; Reading, à repérer leurs points faibles et à progresser grâce à des leçons courtes, du vocabulaire avec audio et un score estimé.</p>
+    <h3 style="margin-top:18px">Indépendance</h3>
+    <p class="disclaimer">Site pédagogique indépendant, <strong>non affilié à ETS Global</strong>. TOEIC et ETS sont des marques déposées d'ETS. Les contenus proposés ici sont originaux et destinés à l'entraînement ; ils ne reproduisent pas de questions officielles. Le score affiché est une estimation, pas un résultat officiel.</p>
+    <h3 style="margin-top:18px">Accessibilité</h3>
+    <p class="disclaimer">La plateforme vise les standards WCAG 2.2 AA / RGAA : navigation au clavier, contraste renforcé, grand texte, police adaptée à la dyslexie, mouvements réduits, mode focus et transcriptions audio. Ouvre les <button class="btn ghost" style="min-height:40px;padding:0 14px" id="aboutA11y">réglages d'accessibilité</button> à tout moment.</p>
+    <h3 style="margin-top:18px">Données &amp; confidentialité (RGPD)</h3>
+    <p class="disclaimer">Aucune donnée personnelle n'est collectée ni transmise : ta progression reste dans le stockage local de ton navigateur, sur ton appareil. Tu peux l'effacer à tout moment depuis le tableau de bord.</p>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="view" id="resources" aria-labelledby="res-h">
+  <span class="eyebrow">Pour aller plus loin</span>
+  <h1 id="res-h">D'autres ressources pour préparer le TOEIC</h1>
+  <p class="lead">Cette plateforme est un complément gratuit. Pour une préparation plus poussée, il existe des ressources plus complètes — et des personnes pour t'aider.</p>
+
+  <div class="card">
+    <span class="pill blue">Plateformes payantes</span>
+    <h3 style="margin-top:12px">Des entraînements plus complets</h3>
+    <p>Des plateformes commerciales spécialisées proposent des tests blancs intégraux, beaucoup plus de questions et un suivi détaillé. Les supports et tests officiels d'ETS (l'organisme du TOEIC) restent la référence pour coller exactement au format réel de l'examen.</p>
+    <p class="disclaimer">Certains accès sont parfois offerts aux étudiant·e·s : renseigne-toi auprès du centre de langues ou de la BU.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <span class="pill teal">À la bibliothèque universitaire</span>
+    <h3 style="margin-top:12px">Des ouvrages à emprunter gratuitement</h3>
+    <p>Les BU de Lyon 1 proposent des manuels de préparation au TOEIC, à emprunter sans frais. Cherche par exemple :</p>
+    <ul class="checklist">
+      <li><span class="gly" aria-hidden="true">&#10003;</span> Les guides officiels de préparation au TOEIC (ETS)</li>
+      <li><span class="gly" aria-hidden="true">&#10003;</span> Cambridge — Grammar &amp; Vocabulary for the TOEIC Test</li>
+      <li><span class="gly" aria-hidden="true">&#10003;</span> Longman / Pearson — Preparation Series for the TOEIC Test</li>
+      <li><span class="gly" aria-hidden="true">&#10003;</span> Barron's TOEIC et autres annales avec tests blancs</li>
+    </ul>
+    <a class="btn ghost" href="https://portaildoc.univ-lyon1.fr" target="_blank" rel="noopener">Ouvrir le portail des BU de Lyon 1</a>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <span class="pill coral">Le meilleur conseil</span>
+    <h3 style="margin-top:12px">Demande conseil à ton enseignant·e d'anglais</h3>
+    <p>Rien ne remplace un accompagnement humain : ton enseignant·e d'anglais peut t'orienter vers les bonnes ressources, cibler tes difficultés et répondre à tes questions. N'hésite pas à le·la solliciter.</p>
+  </div>
+
+  <div class="note" style="margin-top:16px">Homemade TOEIC Trainer reste indépendant et non affilié à ETS Global. Les marques citées appartiennent à leurs propriétaires respectifs.</div>
+</section>
+
+</div></main>
+
+<nav class="tabs" aria-label="Navigation principale"><div class="wrap tabs-in" id="tabBar"></div></nav>
+
+<footer class="foot"><div class="wrap cols">
+  <div>
+    <b style="font-size:1.05rem">Homemade TOEIC Trainer</b>
+    <p class="disclaimer" style="margin:8px 0 0">Conçu et développé par <strong>Eglantine Lecomte</strong> — Université Claude Bernard Lyon 1.</p>
+    <p class="disclaimer" style="margin:8px 0 0">&copy; Eglantine Lecomte. Tout le contenu pédagogique, les parcours et le système d'entraînement ont été créés par Eglantine Lecomte.</p>
+  </div>
+  <div>
+    <b>Liens</b>
+    <p class="disclaimer" style="margin:8px 0 0;display:flex;flex-direction:column;gap:6px">
+      <a href="#" data-nav="diagnostic">Diagnostic</a>
+      <a href="#" data-nav="vocab">Vocabulaire</a>
+      <a href="#" data-nav="examday">Le jour J</a>
+      <a href="#" data-nav="resources">Ressources</a>
+      <a href="#" data-nav="about">À propos</a>
+    </p>
+  </div>
+  <div>
+    <b>Indépendance</b>
+    <p class="disclaimer" style="margin:8px 0 0"><strong>Non affilié à ETS Global.</strong> TOEIC et ETS sont des marques déposées d'ETS. Score = estimation pédagogique.</p>
+  </div>
+</div></footer>
+
+<!-- Accessibility panel -->
+<div class="panel-bg" id="panelBg"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-h" hidden>
+  <h2 id="panel-h">Réglages d'accessibilité <button class="icon-btn" id="closePanel" aria-label="Fermer">&times;</button></h2>
+  <p class="disclaimer">Tes réglages sont mémorisés sur cet appareil.</p>
+
+  <div class="setrow">
+    <span class="lab"><b>Taille du texte</b><small>Confort de lecture</small></span>
+    <span class="seg" id="segText" role="group" aria-label="Taille du texte">
+      <button data-text="normal" aria-pressed="true">A</button>
+      <button data-text="large" aria-pressed="false">A+</button>
+      <button data-text="xlarge" aria-pressed="false">A++</button>
+    </span>
+  </div>
+  <div class="setrow">
+    <span class="lab"><b>Contraste élevé</b><small>Couleurs et bordures renforcées</small></span>
+    <button class="switch" id="swContrast" role="switch" aria-pressed="false" aria-label="Contraste élevé"></button>
+  </div>
+  <div class="setrow">
+    <span class="lab"><b>Police pour la dyslexie</b><small>Atkinson Hyperlegible, interlignes aérés</small></span>
+    <button class="switch" id="swDys" role="switch" aria-pressed="false" aria-label="Police pour la dyslexie"></button>
+  </div>
+  <div class="setrow">
+    <span class="lab"><b>Réduire les animations</b><small>Pour le confort et l'épilepsie photosensible</small></span>
+    <button class="switch" id="swMotion" role="switch" aria-pressed="false" aria-label="Réduire les animations"></button>
+  </div>
+  <div class="setrow">
+    <span class="lab"><b>Mode focus</b><small>Masque les éléments secondaires</small></span>
+    <button class="switch" id="swFocus" role="switch" aria-pressed="false" aria-label="Mode focus"></button>
+  </div>
+  <p class="note" style="margin-top:16px">Au clavier : <strong>Tab</strong> pour naviguer, <strong>Entrée</strong> ou <strong>Espace</strong> pour activer. Les boutons audio lisent le mot à voix haute.</p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Homemade TOEIC Trainer — créé par Eglantine Lecomte
+   100% statique. Données locales. Non affilié à ETS Global.
+   Couche de stockage isolée (Store) → migration Supabase aisée.
+   ============================================================ */
+
+/* ---------- Storage layer (swap to Supabase later here only) ---------- */
+const Store = (function(){
+  const KEY = "l1toeic.v1";
+  let mem = {};
+  function load(){ try{ const r = localStorage.getItem(KEY); mem = r ? JSON.parse(r) : {}; }catch(e){ mem = mem||{}; } return mem; }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ /* in-memory fallback */ } }
+  load();
+  return {
+    get(k, d){ return (k in mem) ? mem[k] : d; },
+    set(k, v){ mem[k] = v; save(); },
+    all(){ return mem; },
+    clear(){ mem = {}; save(); }
+  };
+})();
+
+/* ---------- Helpers ---------- */
+const $ = (s,c)=> (c||document).querySelector(s);
+const $$ = (s,c)=> Array.from((c||document).querySelectorAll(s));
+function el(tag, attrs, html){ const e=document.createElement(tag); if(attrs) for(const k in attrs){ if(k==="class") e.className=attrs[k]; else if(k==="html") e.innerHTML=attrs[k]; else e.setAttribute(k,attrs[k]); } if(html!=null) e.innerHTML=html; return e; }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1900); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ---------- Speech (audio for every word) ---------- */
+const Speech = (function(){
+  const ok = ("speechSynthesis" in window);
+  let voices = [];
+  function refresh(){ try{ voices = window.speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
+  if(ok){ refresh(); try{ window.speechSynthesis.onvoiceschanged = refresh; }catch(e){} }
+  function pick(){
+    const want = ["en-GB","en_GB","en-US","en_US","en"];
+    for(const w of want){ const v = voices.find(v=> (v.lang||"").replace("_","-").toLowerCase().startsWith(w.toLowerCase().slice(0,5)) || (v.lang||"").toLowerCase().startsWith(w.toLowerCase().slice(0,2))); if(v) return v; }
+    return voices.find(v=>(v.lang||"").toLowerCase().startsWith("en")) || voices[0] || null;
+  }
+  return {
+    ok,
+    say(text, btn){
+      if(!ok){ toast("Audio non disponible sur ce navigateur"); return; }
+      try{
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        const v = pick(); if(v){ u.voice=v; u.lang=v.lang; } else { u.lang="en-GB"; }
+        u.rate = .92; u.pitch = 1;
+        if(btn){ btn.classList.add("speaking"); u.onend=u.onerror=()=>btn.classList.remove("speaking"); }
+        window.speechSynthesis.speak(u);
+      }catch(e){ toast("Lecture audio impossible"); }
+    }
+  };
+})();
+
+/* ============================================================
+   CONTENT — extrait de la bibliothèque pédagogique
+   (Eglantine Lecomte). Structure prête pour l'enrichir.
+   ============================================================ */
+const VOCAB = [
+ {w:"recruitment",ipa:"/rɪˈkruːt.mənt/",fr:"recrutement",ex:"The recruitment process takes approximately four weeks.",col:["recruitment campaign","recruitment process","recruitment agency","recruitment drive"],t:"RH & recrutement"},
+ {w:"applicant",ipa:"/ˈæp.lɪ.kənt/",fr:"candidat",ex:"All applicants must submit a cover letter.",col:["successful applicant","qualified applicant","job applicant"],t:"RH & recrutement"},
+ {w:"candidate",ipa:"/ˈkæn.dɪ.deɪt/",fr:"candidat",ex:"The candidate impressed the interview panel.",col:["shortlisted candidate","ideal candidate","strong candidate"],t:"RH & recrutement"},
+ {w:"vacancy",ipa:"/ˈveɪ.kən.si/",fr:"poste vacant",ex:"The company has several vacancies in its sales department.",col:["job vacancy","fill a vacancy","current vacancy"],t:"RH & recrutement"},
+ {w:"resume (us) / cv (uk)",ipa:"/ˈrez.ə.meɪ/",fr:"CV",ex:"Please attach your resume to the application form.",col:["update a resume","submit a resume","resume screening"],t:"RH & recrutement"},
+ {w:"cover letter",ipa:"/ˈkʌv.ər ˌlet.ər/",fr:"lettre de motivation",ex:"A strong cover letter can improve your chances of being selected.",col:["write a cover letter","personalised cover letter"],t:"RH & recrutement"},
+ {w:"interview",ipa:"/ˈɪn.tə.vjuː/",fr:"entretien d'embauche",ex:"She was invited to a second interview.",col:["job interview","interview panel","conduct an interview","interview questions"],t:"RH & recrutement"},
+ {w:"qualification",ipa:"/ˌkwɒl.ɪ.fɪˈkeɪ.ʃən/",fr:"qualification",ex:"The position requires professional qualifications.",col:["academic qualifications","professional qualifications","required qualifications"],t:"RH & recrutement"},
+ {w:"experience",ipa:"/ɪkˈspɪə.ri.əns/",fr:"expérience",ex:"Previous experience is highly desirable.",col:["work experience","relevant experience","extensive experience"],t:"RH & recrutement"},
+ {w:"skills",ipa:"/skɪlz/",fr:"compétences",ex:"Communication skills are essential for this role.",col:["technical skills","interpersonal skills","leadership skills","transferable skills"],t:"RH & recrutement"},
+ {w:"promotion",ipa:"/prəˈməʊ.ʃən/",fr:"promotion",ex:"She received a promotion after three years.",col:["earn a promotion","promotion opportunity","promotion policy"],t:"RH & recrutement"},
+ {w:"salary",ipa:"/ˈsæl.ər.i/",fr:"salaire",ex:"The salary is competitive.",col:["annual salary","salary increase","salary package"],t:"RH & recrutement"},
+ {w:"benefits",ipa:"/ˈben.ɪ.fɪts/",fr:"avantages sociaux",ex:"The company offers excellent employee benefits.",col:["health benefits","retirement benefits","employee benefits package"],t:"RH & recrutement"},
+ {w:"payroll",ipa:"/ˈpeɪ.rəʊl/",fr:"paie",ex:"Payroll is processed at the end of each month.",col:["payroll department","payroll records","payroll costs"],t:"RH & recrutement"},
+ {w:"resignation",ipa:"/ˌrez.ɪɡˈneɪ.ʃən/",fr:"démission",ex:"The manager announced his resignation.",col:["submit a resignation","resignation letter","TOEIC EXERCISE","Match the word and definition"],t:"RH & recrutement"},
+ {w:"revenue",ipa:"/ˈrev.ə.njuː/",fr:"chiffre d'affaires, revenu",ex:"The company reported increased revenue this quarter.",col:["annual revenue","generate revenue","revenue growth","revenue stream"],t:"Finance & comptabilité"},
+ {w:"profit",ipa:"/ˈprɒf.ɪt/",fr:"bénéfice",ex:"The company made a substantial profit.",col:["net profit","profit margin","profit forecast","increase profits"],t:"Finance & comptabilité"},
+ {w:"loss",ipa:"/lɒs/",fr:"perte",ex:"The company suffered a financial loss.",col:["net loss","operating loss","record a loss"],t:"Finance & comptabilité"},
+ {w:"budget",ipa:"/ˈbʌdʒ.ɪt/",fr:"budget",ex:"The marketing budget was increased.",col:["annual budget","budget proposal","budget cuts","stay within budget"],t:"Finance & comptabilité"},
+ {w:"expenditure",ipa:"/ɪkˈspen.dɪ.tʃər/",fr:"dépenses",ex:"Government expenditure increased last year.",col:["capital expenditure","operating expenditure","reduce expenditure"],t:"Finance & comptabilité"},
+ {w:"expense",ipa:"/ɪkˈspens/",fr:"frais, dépense",ex:"Travel expenses will be reimbursed.",col:["business expenses","travel expenses","expense report"],t:"Finance & comptabilité"},
+ {w:"invoice",ipa:"/ˈɪn.vɔɪs/",fr:"facture",ex:"The invoice must be paid within 30 days.",col:["issue an invoice","unpaid invoice","invoice number","⚠ TOEIC Favorite Word"],t:"Finance & comptabilité"},
+ {w:"receipt",ipa:"/rɪˈsiːt/",fr:"reçu",ex:"Please keep your receipt.",col:["sales receipt","receipt number","provide a receipt","⚠ Important"],t:"Finance & comptabilité"},
+ {w:"payment",ipa:"/ˈpeɪ.mənt/",fr:"paiement",ex:"Payment is due on June 30.",col:["make a payment","payment deadline","payment method"],t:"Finance & comptabilité"},
+ {w:"refund",ipa:"/ˈriː.fʌnd/",fr:"remboursement",ex:"Customers may request a refund.",col:["full refund","partial refund","refund policy"],t:"Finance & comptabilité"},
+ {w:"asset",ipa:"/ˈæs.et/",fr:"actif",ex:"Real estate is an important asset.",col:["company assets","financial assets","asset management"],t:"Finance & comptabilité"},
+ {w:"liability",ipa:"/ˌlaɪ.əˈbɪl.ə.ti/",fr:"passif, dette",ex:"The company's liabilities increased.",col:["financial liabilities","current liabilities"],t:"Finance & comptabilité"},
+ {w:"debt",ipa:"/det/",fr:"dette",ex:"The company reduced its debt.",col:["outstanding debt","debt repayment","debt management"],t:"Finance & comptabilité"},
+ {w:"loan",ipa:"/ləʊn/",fr:"prêt",ex:"The company obtained a loan.",col:["bank loan","loan application","loan repayment"],t:"Finance & comptabilité"},
+ {w:"interest rate",ipa:"/ˈɪn.trəst reɪt/",fr:"taux d'intérêt",ex:"Interest rates have risen recently.",col:["fixed interest rate","variable interest rate"],t:"Finance & comptabilité"},
+ {w:"shareholder",ipa:"/ˈʃeəˌhəʊl.dər/",fr:"actionnaire",ex:"Shareholders approved the proposal.",col:["major shareholder","shareholder meeting"],t:"Finance & comptabilité"},
+ {w:"stock",ipa:"/stɒk/",fr:"action, titre",ex:"The company's stock price increased.",col:["stock market","stock price","stock exchange","⚠ TOEIC Trap"],t:"Finance & comptabilité"},
+ {w:"merger",ipa:"/ˈmɜː.dʒər/",fr:"fusion",ex:"The merger created a larger organisation.",col:["company merger","merger agreement"],t:"Finance & comptabilité"},
+ {w:"acquisition",ipa:"/ˌæk.wɪˈzɪʃ.ən/",fr:"acquisition",ex:"The acquisition expanded the firm's market share.",col:["strategic acquisition","acquisition deal"],t:"Finance & comptabilité"},
+ {w:"investment",ipa:"/ɪnˈvest.mənt/",fr:"investissement",ex:"The project requires significant investment.",col:["foreign investment","investment strategy","investment portfolio","TOEIC COLLOCATIONS"],t:"Finance & comptabilité"},
+ {w:"logistics",ipa:"/ləˈdʒɪs.tɪks/",fr:"logistique",ex:"The logistics department coordinates deliveries worldwide.",col:["logistics manager","logistics network","logistics operations"],t:"Logistique"},
+ {w:"supply chain",ipa:"/səˈplaɪ tʃeɪn/",fr:"chaîne d'approvisionnement",ex:"The company improved its supply chain efficiency.",col:["global supply chain","supply chain management","supply chain disruption"],t:"Logistique"},
+ {w:"supplier",ipa:"/səˈplaɪ.ər/",fr:"fournisseur",ex:"The supplier delivered the goods on time.",col:["reliable supplier","local supplier","supplier contract"],t:"Logistique"},
+ {w:"vendor",ipa:"/ˈven.dər/",fr:"vendeur, fournisseur",ex:"The vendor offered a competitive price.",col:["approved vendor","software vendor"],t:"Logistique"},
+ {w:"procurement",ipa:"/prəˈkjʊə.mənt/",fr:"approvisionnement, achat",ex:"Procurement costs increased this year.",col:["procurement process","procurement department"],t:"Logistique"},
+ {w:"order",ipa:"/ˈɔː.dər/",fr:"commande",ex:"The customer placed an order online.",col:["place an order","cancel an order","order confirmation","order number"],t:"Logistique"},
+ {w:"purchase order (po)",ipa:"/ˈpɜː.tʃəs ˌɔː.dər/",fr:"bon de commande",ex:"The supplier received the purchase order yesterday.",col:["issue a purchase order","purchase order number"],t:"Logistique"},
+ {w:"shipment",ipa:"/ˈʃɪp.mənt/",fr:"expédition",ex:"The shipment arrived ahead of schedule.",col:["international shipment","shipment tracking","shipment delay"],t:"Logistique"},
+ {w:"delivery",ipa:"/dɪˈlɪv.ər.i/",fr:"livraison",ex:"Delivery is expected next week.",col:["delivery service","delivery date","express delivery"],t:"Logistique"},
+ {w:"carrier",ipa:"/ˈkær.i.ər/",fr:"transporteur",ex:"The carrier reported a delay.",col:["shipping carrier","air carrier","freight carrier"],t:"Logistique"},
+ {w:"freight",ipa:"/freɪt/",fr:"fret, marchandise",ex:"Freight costs have increased.",col:["air freight","sea freight","freight charges"],t:"Logistique"},
+ {w:"warehouse",ipa:"/ˈweə.haʊs/",fr:"entrepôt",ex:"Products are stored in the warehouse.",col:["warehouse manager","warehouse inventory","warehouse operations"],t:"Logistique"},
+ {w:"inventory",ipa:"/ˈɪn.vən.tər.i/",fr:"inventaire",ex:"The inventory is updated weekly.",col:["inventory management","inventory levels","inventory control","⚠️ TOEIC Favorite Word"],t:"Logistique"},
+ {w:"backorder",ipa:"/ˈbækˌɔː.dər/",fr:"commande en attente",ex:"The product is on backorder.",col:["place on backorder","backorder notice"],t:"Logistique"},
+ {w:"dispatch",ipa:"/dɪˈspætʃ/",fr:"expédier",ex:"The goods were dispatched yesterday.",col:["dispatch department","dispatch goods"],t:"Logistique"},
+ {w:"tracking number",ipa:"/ˈtræk.ɪŋ ˌnʌm.bər/",fr:"numéro de suivi",ex:"Customers receive a tracking number by email.",col:["tracking information","shipment tracking"],t:"Logistique"},
+ {w:"customs",ipa:"/ˈkʌs.təmz/",fr:"douanes",ex:"The package is being held by customs.",col:["customs clearance","customs declaration"],t:"Logistique"},
+ {w:"import",ipa:"/ˈɪm.pɔːt/",fr:"importation",ex:"The company imports products from Asia.",col:["import duties","import licence"],t:"Logistique"},
+ {w:"export",ipa:"/ˈek.spɔːt/",fr:"exportation",ex:"Exports increased by 10% this year.",col:["export market","export licence","export department","TOEIC SUPER COLLOCATIONS"],t:"Logistique"},
+ {w:"correspondence",ipa:"/ˌkɒr.ɪˈspɒn.dəns/",fr:"correspondance",ex:"All correspondence should be kept on file.",col:["business correspondence","official correspondence"],t:"E-mails"},
+ {w:"recipient",ipa:"/rɪˈsɪp.i.ənt/",fr:"destinataire",ex:"The recipient confirmed receipt of the email.",col:["email recipient","intended recipient"],t:"E-mails"},
+ {w:"sender",ipa:"/ˈsen.dər/",fr:"expéditeur",ex:"The sender requested additional information.",col:["original sender","sender information"],t:"E-mails"},
+ {w:"inquiry",ipa:"/ɪnˈkwaɪə.ri/",fr:"demande de renseignements",ex:"We received an inquiry about the product.",col:["customer inquiry","inquiry form"],t:"E-mails"},
+ {w:"request",ipa:"/rɪˈkwest/",fr:"demande",ex:"Your request has been approved.",col:["submit a request","request information","special request"],t:"E-mails"},
+ {w:"confirmation",ipa:"/ˌkɒn.fəˈmeɪ.ʃən/",fr:"confirmation",ex:"Please send confirmation by email.",col:["booking confirmation","confirmation email"],t:"E-mails"},
+ {w:"notification",ipa:"/ˌnəʊ.tɪ.fɪˈkeɪ.ʃən/",fr:"notification",ex:"Customers received a notification.",col:["email notification","automatic notification"],t:"E-mails"},
+ {w:"reminder",ipa:"/rɪˈmaɪn.dər/",fr:"rappel",ex:"This is a reminder regarding your appointment.",col:["payment reminder","reminder email"],t:"E-mails"},
+ {w:"attachment",ipa:"/əˈtætʃ.mənt/",fr:"pièce jointe",ex:"The attachment contains the report.",col:["attached document","email attachment"],t:"E-mails"},
+ {w:"forward",ipa:"/ˈfɔː.wəd/",fr:"transférer",ex:"Please forward the email to the finance department.",col:["forward an email","forward information"],t:"E-mails"},
+ {w:"reply",ipa:"/rɪˈplaɪ/",fr:"répondre",ex:"Please reply by Friday.",col:["reply promptly","reply to an email"],t:"E-mails"},
+ {w:"enclosure",ipa:"/ɪnˈkləʊ.ʒər/",fr:"document joint",ex:"Please see the enclosed brochure.",col:["enclosed document","enclosed form"],t:"E-mails"},
+ {w:"brochure",ipa:"/ˈbrəʊ.ʃər/",fr:"brochure",ex:"The brochure describes our services.",col:["promotional brochure","information brochure"],t:"E-mails"},
+ {w:"announcement",ipa:"/əˈnaʊns.mənt/",fr:"annonce",ex:"The company made an important announcement.",col:["official announcement","public announcement"],t:"E-mails"},
+ {w:"newsletter",ipa:"/ˈnjuːzˌlet.ər/",fr:"lettre d'information",ex:"Employees receive a monthly newsletter.",col:["company newsletter","monthly newsletter"],t:"E-mails"},
+ {w:"subscription",ipa:"/səbˈskrɪp.ʃən/",fr:"abonnement",ex:"The subscription expires next month.",col:["annual subscription","subscription fee"],t:"E-mails"},
+ {w:"complaint",ipa:"/kəmˈpleɪnt/",fr:"réclamation",ex:"The customer filed a complaint.",col:["customer complaint","complaint procedure"],t:"E-mails"},
+ {w:"refund request",ipa:"/ˈriː.fʌnd rɪˈkwest/",fr:"demande de remboursement",ex:"The refund request was approved.",col:["process a refund request","submit a refund request"],t:"E-mails"},
+ {w:"follow-up",ipa:"/ˈfɒl.əʊ ʌp/",fr:"suivi",ex:"I am writing as a follow-up to our meeting.",col:["follow-up email","follow-up call","⚠️ TOEIC SUPER WORD"],t:"E-mails"},
+ {w:"deadline extension",ipa:"/ˈded.laɪn ɪkˈsten.ʃən/",fr:"prolongation de délai",ex:"The deadline extension was approved.",col:["request an extension","grant an extension","TOEIC EMAIL EXPRESSIONS","Très fréquentes :"],t:"E-mails"},
+ {w:"bank account",ipa:"/bæŋk əˈkaʊnt/",fr:"compte bancaire",ex:"The salary will be deposited into your bank account.",col:["current account","bank account number","business account"],t:"Banque & assurance"},
+ {w:"deposit",ipa:"/dɪˈpɒz.ɪt/",fr:"dépôt",ex:"The deposit was credited immediately.",col:["security deposit","cash deposit","deposit funds"],t:"Banque & assurance"},
+ {w:"withdrawal",ipa:"/wɪðˈdrɔː.əl/",fr:"retrait",ex:"ATM withdrawals are limited.",col:["cash withdrawal","withdrawal limit"],t:"Banque & assurance"},
+ {w:"balance",ipa:"/ˈbæl.əns/",fr:"solde",ex:"Please check your account balance.",col:["account balance","available balance"],t:"Banque & assurance"},
+ {w:"transfer",ipa:"/ˈtræns.fɜːr/",fr:"virement",ex:"The transfer was completed successfully.",col:["bank transfer","wire transfer","international transfer"],t:"Banque & assurance"},
+ {w:"mortgage",ipa:"/ˈmɔː.ɡɪdʒ/",fr:"prêt immobilier",ex:"They applied for a mortgage.",col:["mortgage payment","mortgage application"],t:"Banque & assurance"},
+ {w:"premium",ipa:"/ˈpriː.mi.əm/",fr:"prime d'assurance",ex:"Insurance premiums increased.",col:["annual premium","insurance premium"],t:"Banque & assurance"},
+ {w:"insurance policy",ipa:"/ɪnˈʃʊə.rəns ˈpɒl.ə.si/",fr:"contrat d'assurance",ex:"The policy covers theft and fire.",col:["insurance policy","policy holder"],t:"Banque & assurance"},
+ {w:"claim",ipa:"/kleɪm/",fr:"déclaration de sinistre",ex:"The customer filed a claim.",col:["insurance claim","claim form","claim settlement"],t:"Banque & assurance"},
+ {w:"compensation",ipa:"/ˌkɒm.penˈseɪ.ʃən/",fr:"indemnisation",ex:"Compensation was granted.",col:["financial compensation","compensation package"],t:"Banque & assurance"},
+ {w:"coverage",ipa:"/ˈkʌv.ər.ɪdʒ/",fr:"couverture",ex:"The policy offers full coverage.",col:["insurance coverage","full coverage"],t:"Banque & assurance"},
+ {w:"policyholder",ipa:"/ˈpɒl.ə.siˌhəʊl.dər/",fr:"assuré",ex:"The policyholder contacted the insurer.",col:["policyholder information","policyholder benefits"],t:"Banque & assurance"},
+ {w:"beneficiary",ipa:"/ˌben.ɪˈfɪʃ.ər.i/",fr:"bénéficiaire",ex:"The beneficiary received payment.",col:["designated beneficiary","beneficiary information"],t:"Banque & assurance"},
+ {w:"interest",ipa:"/ˈɪn.trəst/",fr:"intérêt",ex:"The account earns interest.",col:["interest rate","compound interest"],t:"Banque & assurance"},
+ {w:"credit",ipa:"/ˈkred.ɪt/",fr:"crédit",ex:"The bank approved the credit application.",col:["credit card","credit limit","credit score"],t:"Banque & assurance"},
+ {w:"debit",ipa:"/ˈdeb.ɪt/",fr:"débit",ex:"The debit appeared on the statement.",col:["debit card","direct debit"],t:"Banque & assurance"},
+ {w:"statement",ipa:"/ˈsteɪt.mənt/",fr:"relevé",ex:"The monthly statement is available online.",col:["bank statement","account statement"],t:"Banque & assurance"},
+ {w:"fraud",ipa:"/frɔːd/",fr:"fraude",ex:"The bank detected fraud.",col:["credit card fraud","fraud investigation"],t:"Banque & assurance"},
+ {w:"financial adviser",ipa:"/faɪˈnæn.ʃəl ədˈvaɪ.zər/",fr:"conseiller financier",ex:"The financial adviser reviewed the portfolio.",col:["independent financial adviser","financial advice"],t:"Banque & assurance"},
+ {w:"portfolio",ipa:"/pɔːtˈfəʊ.li.əʊ/",fr:"portefeuille d'investissements",ex:"The portfolio performed well.",col:["investment portfolio","diversified portfolio","TOEIC SUPER COLLOCATIONS","open a bank account"],t:"Banque & assurance"},
+ {w:"accurate",ipa:"/ˈæk.jə.rət/",fr:"précis, exact",ex:"The report contains accurate information.",col:["accurate data","accurate information"],t:"Adjectifs"},
+ {w:"appropriate",ipa:"/əˈprəʊ.pri.ət/",fr:"approprié",ex:"Please wear appropriate clothing.",col:["appropriate action","appropriate response"],t:"Adjectifs"},
+ {w:"beneficial",ipa:"/ˌben.ɪˈfɪʃ.əl/",fr:"bénéfique",ex:"The changes were beneficial.",col:["beneficial effect","mutually beneficial"],t:"Adjectifs"},
+ {w:"capable",ipa:"/ˈkeɪ.pə.bəl/",fr:"capable",ex:"She is capable of managing the project.",col:["capable employee","fully capable"],t:"Adjectifs"},
+ {w:"consistent",ipa:"/kənˈsɪs.tənt/",fr:"constant, cohérent",ex:"Sales showed consistent growth.",col:["consistent quality","consistent performance"],t:"Adjectifs"},
+ {w:"current",ipa:"/ˈkʌr.ənt/",fr:"actuel",ex:"Please provide your current address.",col:["current employee","current situation"],t:"Adjectifs"},
+ {w:"diverse",ipa:"/daɪˈvɜːs/",fr:"diversifié",ex:"The company has a diverse workforce.",col:["diverse team","diverse background"],t:"Adjectifs"},
+ {w:"durable",ipa:"/ˈdjʊə.rə.bəl/",fr:"durable, résistant",ex:"The equipment is highly durable.",col:["durable product","durable materials"],t:"Adjectifs"},
+ {w:"essential",ipa:"/ɪˈsen.ʃəl/",fr:"essentiel",ex:"Communication skills are essential.",col:["essential requirement","essential information"],t:"Adjectifs"},
+ {w:"external",ipa:"/ɪkˈstɜː.nəl/",fr:"externe",ex:"External consultants were hired.",col:["external supplier","external audit"],t:"Adjectifs"},
+ {w:"internal",ipa:"/ɪnˈtɜː.nəl/",fr:"interne",ex:"The vacancy was filled internally.",col:["internal communication","internal policy"],t:"Adjectifs"},
+ {w:"mandatory",ipa:"/ˈmæn.də.tər.i/",fr:"obligatoire",ex:"Attendance is mandatory.",col:["mandatory training","mandatory requirement"],t:"Adjectifs"},
+ {w:"mutual",ipa:"/ˈmjuː.tʃu.əl/",fr:"mutuel",ex:"The agreement was mutually beneficial.",col:["mutual agreement","mutual understanding"],t:"Adjectifs"},
+ {w:"nationwide",ipa:"/ˌneɪ.ʃənˈwaɪd/",fr:"à l'échelle nationale",ex:"The campaign was launched nationwide.",col:["nationwide service","nationwide network"],t:"Adjectifs"},
+ {w:"outstanding",ipa:"/aʊtˈstæn.dɪŋ/",fr:"en attente, impayé",ex:"Several outstanding invoices remain unpaid.",col:["outstanding balance","outstanding invoice","⚠️ Deuxième sens très fréquent au TOEIC."],t:"Adjectifs"},
+ {w:"potential",ipa:"/pəˈten.ʃəl/",fr:"potentiel",ex:"The company contacted potential clients.",col:["potential customer","potential risk"],t:"Adjectifs"},
+ {w:"previous",ipa:"/ˈpriː.vi.əs/",fr:"précédent",ex:"Please refer to our previous email.",col:["previous experience","previous version"],t:"Adjectifs"},
+ {w:"relevant",ipa:"/ˈrel.ə.vənt/",fr:"pertinent",ex:"Please provide relevant information.",col:["relevant experience","relevant skills"],t:"Adjectifs"},
+ {w:"secure",ipa:"/sɪˈkjʊər/",fr:"sécurisé",ex:"The system is secure.",col:["secure payment","secure access"],t:"Adjectifs"},
+ {w:"unique",ipa:"/juːˈniːk/",fr:"unique",ex:"The company offers a unique service.",col:["unique opportunity","unique feature","TOEIC SUPER COLLOCATIONS","accurate information"],t:"Adjectifs"},
+ {w:"because",ipa:"/bɪˈkɒz/",fr:"parce que",ex:"The meeting was cancelled because the manager was ill.",t:"Prépositions & connecteurs"},
+ {w:"because of",ipa:"/bɪˈkɒz əv/",fr:"à cause de",ex:"The meeting was cancelled because of the storm.",t:"Prépositions & connecteurs"},
+ {w:"although",ipa:"/ɔːlˈðəʊ/",fr:"bien que",ex:"Although sales declined, profits remained stable.",t:"Prépositions & connecteurs"},
+ {w:"however",ipa:"/haʊˈev.ər/",fr:"cependant",ex:"Sales declined. However, profits remained stable.",t:"Prépositions & connecteurs"},
+ {w:"despite",ipa:"/dɪˈspaɪt/",fr:"malgré",ex:"Despite the delay, the project succeeded.",t:"Prépositions & connecteurs"},
+ {w:"in spite of",ipa:"/ɪn spaɪt əv/",fr:"malgré",ex:"In spite of the rain, the event continued.",t:"Prépositions & connecteurs"},
+ {w:"therefore",ipa:"/ˈðeə.fɔːr/",fr:"par conséquent",ex:"Demand increased; therefore, production was expanded.",t:"Prépositions & connecteurs"},
+ {w:"consequently",ipa:"/ˈkɒn.sɪ.kwənt.li/",fr:"par conséquent",ex:"Costs rose. Consequently, prices increased.",t:"Prépositions & connecteurs"},
+ {w:"furthermore",ipa:"/ˌfɜː.ðəˈmɔːr/",fr:"de plus",ex:"The proposal is cost-effective. Furthermore, it is easy to implement.",t:"Prépositions & connecteurs"},
+ {w:"moreover",ipa:"/mɔːˈrəʊ.vər/",fr:"de plus",ex:"The product is affordable. Moreover, it is durable.",t:"Prépositions & connecteurs"},
+ {w:"whereas",ipa:"/weərˈæz/",fr:"alors que",ex:"Sales increased, whereas costs decreased.",t:"Prépositions & connecteurs"},
+ {w:"while",ipa:"/waɪl/",fr:"alors que, pendant que",ex:"While profits increased, expenses remained stable.",t:"Prépositions & connecteurs"},
+ {w:"during",ipa:"/ˈdjʊə.rɪŋ/",fr:"pendant",ex:"The incident occurred during the meeting.",t:"Prépositions & connecteurs"},
+ {w:"since",ipa:"/sɪns/",fr:"depuis / puisque",ex:"She has worked here since 2022.",t:"Prépositions & connecteurs"},
+ {w:"for",ipa:"/fɔːr/",fr:"pendant",ex:"She has worked here for three years.",t:"Prépositions & connecteurs"},
+ {w:"by",ipa:"/baɪ/",fr:"d'ici",ex:"Please submit the report by Friday.",t:"Prépositions & connecteurs"},
+ {w:"until",ipa:"/ənˈtɪl/",fr:"jusqu'à",ex:"The office will remain closed until Monday.",t:"Prépositions & connecteurs"},
+ {w:"due to",ipa:"/djuː tuː/",fr:"en raison de",ex:"The flight was delayed due to bad weather.",t:"Prépositions & connecteurs"},
+ {w:"owing to",ipa:"/ˈəʊ.ɪŋ tuː/",fr:"en raison de",ex:"The event was cancelled owing to technical issues.",t:"Prépositions & connecteurs"},
+ {w:"carry out",ipa:"/ˈkæri aʊt/",fr:"effectuer, mener à bien",ex:"The company carried out a survey.",col:["carry out research","carry out an audit","carry out an investigation"],t:"Phrasal verbs"},
+ {w:"set up",ipa:"/set ʌp/",fr:"mettre en place",ex:"The IT department set up the new system.",col:["set up a meeting","set up an account","set up equipment"],t:"Phrasal verbs"},
+ {w:"take over",ipa:"/teɪk ˈəʊvə/",fr:"reprendre, racheter",ex:"A larger company took over the business.",col:["take over a company","take over responsibilities"],t:"Phrasal verbs"},
+ {w:"put off",ipa:"/pʊt ɒf/",fr:"reporter",ex:"The meeting was put off until next week.",col:["put off a meeting","put off a decision"],t:"Phrasal verbs"},
+ {w:"fill out",ipa:"/fɪl aʊt/",fr:"remplir (un formulaire)",ex:"Please fill out the application form.",col:["fill out a form","fill out an application"],t:"Phrasal verbs"},
+ {w:"hand in",ipa:"/hænd ɪn/",fr:"remettre",ex:"Employees must hand in expense reports.",col:["hand in a report","hand in an application"],t:"Phrasal verbs"},
+ {w:"follow up",ipa:"/ˈfɒləʊ ʌp/",fr:"faire un suivi",ex:"The sales team followed up with the client.",col:["follow up on a request","follow up with a customer"],t:"Phrasal verbs"},
+ {w:"look into",ipa:"/lʊk ˈɪntuː/",fr:"examiner",ex:"Management will look into the complaint.",col:["look into a problem","look into an issue"],t:"Phrasal verbs"},
+ {w:"turn down",ipa:"/tɜːn daʊn/",fr:"refuser",ex:"She turned down the job offer.",col:["turn down an offer","turn down a proposal"],t:"Phrasal verbs"},
+ {w:"go over",ipa:"/ɡəʊ ˈəʊvə/",fr:"passer en revue",ex:"Let's go over the report together.",col:["go over a document","go over details"],t:"Phrasal verbs"},
+ {w:"bring up",ipa:"/brɪŋ ʌp/",fr:"aborder un sujet",ex:"The issue was brought up during the meeting.",col:["bring up a concern","bring up an issue"],t:"Phrasal verbs"},
+ {w:"call off",ipa:"/kɔːl ɒf/",fr:"annuler",ex:"The event was called off.",col:["call off a meeting","call off negotiations"],t:"Phrasal verbs"},
+ {w:"find out",ipa:"/faɪnd aʊt/",fr:"découvrir",ex:"We found out about the delay yesterday.",col:["find out information","find out why"],t:"Phrasal verbs"},
+ {w:"work out",ipa:"/wɜːk aʊt/",fr:"résoudre, fonctionner",ex:"We worked out a solution.",col:["work out a problem","work out details","⚠️ Peut aussi signifier \"faire du sport\"."],t:"Phrasal verbs"},
+ {w:"point out",ipa:"/pɔɪnt aʊt/",fr:"signaler",ex:"The auditor pointed out several issues.",col:["point out a mistake","point out a problem"],t:"Phrasal verbs"},
+ {w:"take on",ipa:"/teɪk ɒn/",fr:"prendre en charge",ex:"The department will take on new responsibilities.",col:["take on staff","take on a project"],t:"Phrasal verbs"},
+ {w:"back up",ipa:"/bæk ʌp/",fr:"sauvegarder",ex:"Please back up all files.",col:["back up data","back up information"],t:"Phrasal verbs"},
+ {w:"check in",ipa:"/tʃek ɪn/",fr:"s'enregistrer",ex:"Passengers must check in online.",col:["check in at a hotel","check in for a flight"],t:"Phrasal verbs"},
+ {w:"check out",ipa:"/tʃek aʊt/",fr:"quitter / vérifier",ex:"Guests must check out by noon.",col:["check out of a hotel","check out a website"],t:"Phrasal verbs"},
+ {w:"log in",ipa:"/lɒɡ ɪn/",fr:"se connecter",ex:"Users must log in to access the system.",col:["log in to an account","log in securely","TOEIC MASTER TABLE","Phrasal VerbMeaning"],t:"Phrasal verbs"},
+ {w:"resume",ipa:"/\u02c8rez.\u0259.me\u026a/",fr:"CV",ex:"Please attach your resume to the form.",col:["update a resume","submit a resume"],t:"RH & recrutement"},
+ {w:"purchase order",ipa:"/\u02c8p\u025c\u02d0.t\u0283\u0259s \u02cc\u0254\u02d0.d\u0259r/",fr:"bon de commande",ex:"The supplier received the purchase order yesterday.",col:["issue a purchase order"],t:"Logistique"},
+ {w:"hand over",ipa:"/h\u00e6nd \u02c8\u0259\u028av\u0259/",fr:"remettre, transmettre",ex:"He handed over the documents.",col:["hand over responsibilities"],t:"Phrasal verbs"},
+ {w:"deal with",ipa:"/di\u02d0l w\u026a\u00f0/",fr:"g\u00e9rer, traiter",ex:"Customer service deals with complaints.",col:["deal with a problem"],t:"Phrasal verbs"},
+ {w:"come up with",ipa:"/k\u028cm \u028cp w\u026a\u00f0/",fr:"trouver (une id\u00e9e)",ex:"The team came up with a solution.",col:["come up with an idea"],t:"Phrasal verbs"},
+ {w:"run out of",ipa:"/r\u028cn a\u028at \u0259v/",fr:"\u00eatre \u00e0 court de",ex:"The store ran out of stock.",col:["run out of time","run out of stock"],t:"Phrasal verbs"},
+ {w:"pick up",ipa:"/p\u026ak \u028cp/",fr:"r\u00e9cup\u00e9rer",ex:"I will pick up the package.",col:["pick up an order"],t:"Phrasal verbs"},
+ {w:"drop off",ipa:"/dr\u0252p \u0252f/",fr:"d\u00e9poser",ex:"The driver dropped off the goods.",col:["drop off a parcel"],t:"Phrasal verbs"},
+ {w:"step down",ipa:"/step da\u028an/",fr:"d\u00e9missionner (d'un poste)",ex:"The CEO stepped down.",col:["step down as director"],t:"Phrasal verbs"},
+ {w:"sign up for",ipa:"/sa\u026an \u028cp f\u0254\u02d0/",fr:"s'inscrire \u00e0",ex:"Staff signed up for workshops.",col:["sign up for a course"],t:"Phrasal verbs"},
+ {w:"look forward to",ipa:"/l\u028ak \u02c8f\u0254\u02d0.w\u0259d tu\u02d0/",fr:"avoir h\u00e2te de",ex:"We look forward to hearing from you.",col:["look forward to your reply"],t:"Phrasal verbs"},
+ {w:"get back to",ipa:"/\u0261et b\u00e6k tu\u02d0/",fr:"recontacter",ex:"We will get back to you soon.",col:["get back to a client"],t:"Phrasal verbs"},
+ {w:"ambiguous",fr:"ambigu",ex:"The instructions were ambiguous.",t:"Vocabulaire avanc\u00e9"},
+ {w:"benchmark",fr:"r\u00e9f\u00e9rence, \u00e9talon",ex:"The company became an industry benchmark.",t:"Vocabulaire avanc\u00e9"},
+ {w:"compensate",fr:"compenser, indemniser",ex:"Employees were compensated for overtime.",t:"Vocabulaire avanc\u00e9"},
+ {w:"confidential",fr:"confidentiel",ex:"This information is confidential.",t:"Vocabulaire avanc\u00e9"},
+ {w:"constraint",fr:"contrainte",ex:"Budget constraints limited expansion.",t:"Vocabulaire avanc\u00e9"},
+ {w:"deteriorate",fr:"se d\u00e9t\u00e9riorer",ex:"Market conditions deteriorated.",t:"Vocabulaire avanc\u00e9"},
+ {w:"drawback",fr:"inconv\u00e9nient",ex:"One drawback is the high cost.",t:"Vocabulaire avanc\u00e9"},
+ {w:"endorse",fr:"approuver, soutenir",ex:"The proposal was endorsed by management.",t:"Vocabulaire avanc\u00e9"},
+ {w:"forecast",fr:"pr\u00e9vision ; pr\u00e9voir",ex:"Analysts forecast higher sales.",t:"Vocabulaire avanc\u00e9"},
+ {w:"hinder",fr:"entraver",ex:"Delays hindered progress.",t:"Vocabulaire avanc\u00e9"},
+ {w:"leverage",fr:"tirer parti de",ex:"We can leverage our experience.",t:"Vocabulaire avanc\u00e9"},
+ {w:"offset",fr:"compenser",ex:"Savings offset increased costs.",t:"Vocabulaire avanc\u00e9"},
+ {w:"outsource",fr:"externaliser",ex:"The company outsourced IT services.",t:"Vocabulaire avanc\u00e9"},
+ {w:"redundancy",fr:"suppression de poste",ex:"Several redundancies were announced.",t:"Vocabulaire avanc\u00e9"},
+ {w:"viable",fr:"viable",ex:"The proposal is financially viable.",t:"Vocabulaire avanc\u00e9"},
+ {w:"alleviate",fr:"att\u00e9nuer",ex:"Measures alleviated concerns.",t:"Vocabulaire avanc\u00e9"},
+ {w:"apparent",fr:"\u00e9vident",ex:"The problem became apparent.",t:"Vocabulaire avanc\u00e9"},
+ {w:"backlog",fr:"arri\u00e9r\u00e9, retard accumul\u00e9",ex:"The company reduced its backlog.",t:"Vocabulaire avanc\u00e9"},
+ {w:"compelling",fr:"convaincant",ex:"The report presents compelling evidence.",t:"Vocabulaire avanc\u00e9"},
+ {w:"controversial",fr:"controvers\u00e9",ex:"The decision was controversial.",t:"Vocabulaire avanc\u00e9"},
+ {w:"deficit",fr:"d\u00e9ficit",ex:"The budget showed a deficit.",t:"Vocabulaire avanc\u00e9"},
+ {w:"surplus",fr:"exc\u00e9dent",ex:"The company reported a surplus.",t:"Vocabulaire avanc\u00e9"},
+ {w:"diversify",fr:"diversifier",ex:"The company diversified its activities.",t:"Vocabulaire avanc\u00e9"},
+ {w:"eliminate",fr:"supprimer",ex:"The company eliminated inefficiencies.",t:"Vocabulaire avanc\u00e9"},
+ {w:"emerge",fr:"\u00e9merger, appara\u00eetre",ex:"New competitors emerged.",t:"Vocabulaire avanc\u00e9"},
+ {w:"exclusive",fr:"exclusif",ex:"Exclusive benefits are offered.",t:"Vocabulaire avanc\u00e9"},
+ {w:"franchise",fr:"franchise",ex:"The restaurant operates as a franchise.",t:"Vocabulaire avanc\u00e9"},
+ {w:"implementation",fr:"mise en \u0153uvre",ex:"Implementation will begin next month.",t:"Vocabulaire avanc\u00e9"},
+ {w:"inevitable",fr:"in\u00e9vitable",ex:"Some delays were inevitable.",t:"Vocabulaire avanc\u00e9"},
+ {w:"innovative",fr:"innovant",ex:"The company launched an innovative product.",t:"Vocabulaire avanc\u00e9"},
+ {w:"insight",fr:"analyse, \u00e9clairage",ex:"The survey provided valuable insights.",t:"Vocabulaire avanc\u00e9"},
+ {w:"lucrative",fr:"lucratif",ex:"It was a lucrative contract.",t:"Vocabulaire avanc\u00e9"},
+ {w:"minimise",fr:"minimiser",ex:"The goal is to minimise costs.",t:"Vocabulaire avanc\u00e9"},
+ {w:"monopoly",fr:"monopole",ex:"The company held a monopoly.",t:"Vocabulaire avanc\u00e9"},
+ {w:"obstacle",fr:"obstacle",ex:"Funding was a major obstacle.",t:"Vocabulaire avanc\u00e9"},
+ {w:"optimise",fr:"optimiser",ex:"The software optimises performance.",t:"Vocabulaire avanc\u00e9"},
+ {w:"prestigious",fr:"prestigieux",ex:"She works for a prestigious firm.",t:"Vocabulaire avanc\u00e9"},
+ {w:"sustainable",fr:"durable",ex:"The company adopted sustainable practices.",t:"Vocabulaire avanc\u00e9"},
+ {w:"compliance",fr:"conformit\u00e9 (r\u00e9glementaire)",ex:"The company remains fully compliant.",t:"Vocabulaire avanc\u00e9"},
+ {w:"stakeholder",fr:"partie prenante",ex:"All stakeholders were consulted.",t:"Vocabulaire avanc\u00e9"},
+ {w:"turnover",fr:"rotation du personnel ; chiffre d'affaires",ex:"Employee turnover has decreased.",t:"Vocabulaire avanc\u00e9"},
+ {w:"streamline",fr:"rationaliser",ex:"The company streamlined its operations.",t:"Vocabulaire avanc\u00e9"},
+ {w:"waiver",fr:"renonciation, d\u00e9rogation",ex:"Participants signed a waiver.",t:"Vocabulaire avanc\u00e9"},
+ {w:"agenda",ipa:"/əˈdʒen.də/",fr:"ordre du jour",ex:"Please review the agenda before the meeting.",col:["meeting agenda","agenda item"],t:"Bureau & réunions"},
+ {w:"minutes",ipa:"/ˈmɪn.ɪts/",fr:"compte rendu (de réunion)",ex:"The secretary took the minutes.",col:["meeting minutes","take the minutes"],t:"Bureau & réunions"},
+ {w:"venue",ipa:"/ˈven.juː/",fr:"lieu (d'un événement)",ex:"The venue was changed at the last minute.",col:["conference venue","change the venue"],t:"Bureau & réunions"},
+ {w:"adjourn",ipa:"/əˈdʒɜːn/",fr:"lever la séance",ex:"The meeting was adjourned until Monday.",col:["adjourn a meeting"],t:"Bureau & réunions"},
+ {w:"keynote",ipa:"/ˈkiː.nəʊt/",fr:"discours principal",ex:"She gave the keynote speech.",col:["keynote speaker","keynote address"],t:"Bureau & réunions"},
+ {w:"handout",ipa:"/ˈhænd.aʊt/",fr:"document distribué",ex:"Handouts were given to all participants.",col:["distribute handouts"],t:"Bureau & réunions"},
+ {w:"attendee",ipa:"/əˌtenˈdiː/",fr:"participant·e",ex:"All attendees received a badge.",col:["conference attendee"],t:"Bureau & réunions"},
+ {w:"schedule",ipa:"/ˈʃed.juːl/",fr:"planning, emploi du temps",ex:"The schedule is very tight this week.",col:["busy schedule","ahead of schedule"],t:"Bureau & réunions"},
+ {w:"postpone",ipa:"/pəˈspəʊn/",fr:"reporter",ex:"The launch was postponed.",col:["postpone a meeting","postpone a decision"],t:"Bureau & réunions"},
+ {w:"chair",ipa:"/tʃeər/",fr:"présider",ex:"She chaired the committee.",col:["chair a meeting"],t:"Bureau & réunions"},
+ {w:"itinerary",ipa:"/aɪˈtɪn.ər.ər.i/",fr:"itinéraire",ex:"The travel itinerary was sent by email.",col:["travel itinerary"],t:"Voyages d'affaires"},
+ {w:"boarding pass",ipa:"/ˈbɔː.dɪŋ pɑːs/",fr:"carte d'embarquement",ex:"Please have your boarding pass ready.",col:["print a boarding pass"],t:"Voyages d'affaires"},
+ {w:"layover",ipa:"/ˈleɪˌəʊ.vər/",fr:"escale",ex:"There is a two-hour layover in Frankfurt.",col:["short layover"],t:"Voyages d'affaires"},
+ {w:"reimbursement",ipa:"/ˌriː.ɪmˈbɜːs.mənt/",fr:"remboursement (de frais)",ex:"Submit receipts for reimbursement.",col:["expense reimbursement"],t:"Voyages d'affaires"},
+ {w:"accommodation",ipa:"/əˌkɒm.əˈdeɪ.ʃən/",fr:"hébergement",ex:"Accommodation is provided for staff.",col:["hotel accommodation"],t:"Voyages d'affaires"},
+ {w:"fare",ipa:"/feər/",fr:"tarif (transport)",ex:"The train fare increased.",col:["train fare","airfare"],t:"Voyages d'affaires"},
+ {w:"reservation",ipa:"/ˌrez.əˈveɪ.ʃən/",fr:"réservation",ex:"I would like to make a reservation.",col:["hotel reservation","cancel a reservation"],t:"Voyages d'affaires"},
+ {w:"departure",ipa:"/dɪˈpɑː.tʃər/",fr:"départ",ex:"The departure was delayed.",col:["departure time","departure gate"],t:"Voyages d'affaires"},
+ {w:"luggage",ipa:"/ˈlʌɡ.ɪdʒ/",fr:"bagages",ex:"Please collect your luggage.",col:["hand luggage","luggage allowance"],t:"Voyages d'affaires"},
+ {w:"brand",ipa:"/brænd/",fr:"marque",ex:"The brand is well known.",col:["brand awareness","brand image"],t:"Marketing & ventes"},
+ {w:"campaign",ipa:"/kæmˈpeɪn/",fr:"campagne",ex:"The advertising campaign was successful.",col:["marketing campaign","launch a campaign"],t:"Marketing & ventes"},
+ {w:"discount",ipa:"/ˈdɪs.kaʊnt/",fr:"remise, réduction",ex:"Customers receive a 10% discount.",col:["offer a discount","discount price"],t:"Marketing & ventes"},
+ {w:"retail",ipa:"/ˈriː.teɪl/",fr:"vente au détail",ex:"The product is sold at retail price.",col:["retail store","retail price"],t:"Marketing & ventes"},
+ {w:"wholesale",ipa:"/ˈhəʊl.seɪl/",fr:"vente en gros",ex:"They buy at wholesale prices.",col:["wholesale price"],t:"Marketing & ventes"},
+ {w:"launch",ipa:"/lɔːntʃ/",fr:"lancement ; lancer",ex:"The product launch is next month.",col:["product launch","launch date"],t:"Marketing & ventes"},
+ {w:"quota",ipa:"/ˈkwəʊ.tə/",fr:"quota, objectif",ex:"The sales team met its quota.",col:["sales quota","meet a quota"],t:"Marketing & ventes"},
+ {w:"target market",ipa:"/ˈtɑː.ɡɪt ˈmɑː.kɪt/",fr:"marché cible",ex:"Young adults are our target market.",col:["identify a target market"],t:"Marketing & ventes"},
+ {w:"market share",ipa:"/ˈmɑː.kɪt ʃeər/",fr:"part de marché",ex:"The company gained market share.",col:["increase market share"],t:"Marketing & ventes"},
+ {w:"software",ipa:"/ˈsɒft.weər/",fr:"logiciel",ex:"The software needs an update.",col:["software update","accounting software"],t:"Technologie"},
+ {w:"hardware",ipa:"/ˈhɑːd.weər/",fr:"matériel informatique",ex:"The hardware is outdated.",col:["computer hardware"],t:"Technologie"},
+ {w:"upgrade",ipa:"/ˈʌp.ɡreɪd/",fr:"mise à niveau",ex:"We upgraded the system.",col:["software upgrade","upgrade a plan"],t:"Technologie"},
+ {w:"password",ipa:"/ˈpɑːs.wɜːd/",fr:"mot de passe",ex:"Please reset your password.",col:["strong password","reset a password"],t:"Technologie"},
+ {w:"database",ipa:"/ˈdeɪ.tə.beɪs/",fr:"base de données",ex:"Customer data is stored in a database.",col:["customer database","update a database"],t:"Technologie"},
+ {w:"downtime",ipa:"/ˈdaʊn.taɪm/",fr:"temps d'arrêt",ex:"The maintenance caused some downtime.",col:["server downtime","scheduled downtime"],t:"Technologie"},
+ {w:"breakdown",ipa:"/ˈbreɪk.daʊn/",fr:"panne",ex:"A breakdown delayed production.",col:["equipment breakdown"],t:"Technologie"},
+ {w:"install",ipa:"/ɪnˈstɔːl/",fr:"installer",ex:"Please install the latest version.",col:["install software"],t:"Technologie"},
+ {w:"defect",ipa:"/ˈdiː.fekt/",fr:"défaut",ex:"The product had a defect.",col:["manufacturing defect","defect rate"],t:"Production & qualité"},
+ {w:"quality control",ipa:"/ˈkwɒl.ə.ti kənˈtrəʊl/",fr:"contrôle qualité",ex:"Quality control rejected the batch.",col:["quality control check"],t:"Production & qualité"},
+ {w:"maintenance",ipa:"/ˈmeɪn.tən.əns/",fr:"entretien, maintenance",ex:"Regular maintenance is required.",col:["routine maintenance","maintenance costs"],t:"Production & qualité"},
+ {w:"manufacturer",ipa:"/ˌmæn.jəˈfæk.tʃər.ər/",fr:"fabricant",ex:"The manufacturer issued a recall.",col:["leading manufacturer"],t:"Production & qualité"},
+ {w:"warranty",ipa:"/ˈwɒr.ən.ti/",fr:"garantie",ex:"The product comes with a warranty.",col:["under warranty","extend a warranty"],t:"Production & qualité"},
+ {w:"recall",ipa:"/rɪˈkɔːl/",fr:"rappel (produit)",ex:"The company issued a product recall.",col:["product recall","issue a recall"],t:"Production & qualité"},
+ {w:"output",ipa:"/ˈaʊt.pʊt/",fr:"production, rendement",ex:"Output increased this quarter.",col:["increase output","production output"],t:"Production & qualité"},
+ {w:"specification",ipa:"/ˌspes.ɪ.fɪˈkeɪ.ʃən/",fr:"cahier des charges, spécification",ex:"The product meets all specifications.",col:["technical specifications"],t:"Production & qualité"},
+ {w:"contract",ipa:"/ˈkɒn.trækt/",fr:"contrat",ex:"Both parties signed the contract.",col:["sign a contract","contract terms"],t:"Droit & contrats"},
+ {w:"clause",ipa:"/klɔːz/",fr:"clause",ex:"The contract contains a confidentiality clause.",col:["contract clause"],t:"Droit & contrats"},
+ {w:"agreement",ipa:"/əˈɡriː.mənt/",fr:"accord",ex:"They reached an agreement.",col:["reach an agreement","trade agreement"],t:"Droit & contrats"},
+ {w:"breach",ipa:"/briːtʃ/",fr:"rupture, violation",ex:"This is a breach of contract.",col:["breach of contract"],t:"Droit & contrats"},
+ {w:"liable",ipa:"/ˈlaɪ.ə.bəl/",fr:"responsable (juridiquement)",ex:"The company is liable for damages.",col:["liable for damages"],t:"Droit & contrats"},
+ {w:"terminate",ipa:"/ˈtɜː.mɪ.neɪt/",fr:"résilier, mettre fin à",ex:"Either party may terminate the agreement.",col:["terminate a contract"],t:"Droit & contrats"},
+ {w:"renew",ipa:"/rɪˈnjuː/",fr:"renouveler",ex:"We renewed the contract for a year.",col:["renew a contract","renew a subscription"],t:"Droit & contrats"},
+ {w:"amendment",ipa:"/əˈmend.mənt/",fr:"avenant, modification",ex:"An amendment was added to the contract.",col:["make an amendment"],t:"Droit & contrats"},
+ {w:"obligation",ipa:"/ˌɒb.lɪˈɡeɪ.ʃən/",fr:"obligation",ex:"Both sides met their obligations.",col:["legal obligation","meet an obligation"],t:"Droit & contrats"},
+ {w:"valid",ipa:"/ˈvæl.ɪd/",fr:"valable, valide",ex:"The offer is valid until Friday.",col:["valid until","valid contract"],t:"Droit & contrats"},
+ {w:"feedback",ipa:"/ˈfiːd.bæk/",fr:"retour, avis",ex:"We welcome customer feedback.",col:["customer feedback","positive feedback"],t:"Service client"},
+ {w:"loyalty",ipa:"/ˈlɔɪ.əl.ti/",fr:"fidélité",ex:"The program rewards customer loyalty.",col:["customer loyalty","loyalty program"],t:"Service client"},
+ {w:"assistance",ipa:"/əˈsɪs.təns/",fr:"aide, assistance",ex:"Thank you for your assistance.",col:["technical assistance","provide assistance"],t:"Service client"},
+ {w:"representative",ipa:"/ˌrep.rɪˈzen.tə.tɪv/",fr:"représentant·e",ex:"A sales representative will call you.",col:["sales representative","customer representative"],t:"Service client"},
+ {w:"resolve",ipa:"/rɪˈzɒlv/",fr:"résoudre",ex:"We resolved the issue quickly.",col:["resolve an issue","resolve a complaint"],t:"Service client"},
+ {w:"satisfaction",ipa:"/ˌsæt.ɪsˈfæk.ʃən/",fr:"satisfaction",ex:"Customer satisfaction is our priority.",col:["customer satisfaction"],t:"Service client"},
+ {w:"courteous",ipa:"/ˈkɜː.ti.əs/",fr:"courtois, poli",ex:"The staff were very courteous.",col:["courteous service"],t:"Service client"},
+ {w:"emissions",ipa:"/ɪˈmɪʃ.ənz/",fr:"émissions",ex:"The company reduced its emissions.",col:["carbon emissions","reduce emissions"],t:"Environnement & RSE"},
+ {w:"waste",ipa:"/weɪst/",fr:"déchets ; gaspiller",ex:"The factory reduced its waste.",col:["waste management","reduce waste"],t:"Environnement & RSE"},
+ {w:"recycling",ipa:"/ˌriːˈsaɪ.klɪŋ/",fr:"recyclage",ex:"The office introduced a recycling program.",col:["recycling program"],t:"Environnement & RSE"},
+ {w:"renewable",ipa:"/rɪˈnjuː.ə.bəl/",fr:"renouvelable",ex:"They invested in renewable energy.",col:["renewable energy"],t:"Environnement & RSE"},
+ {w:"carbon footprint",ipa:"/ˈkɑː.bən ˈfʊt.prɪnt/",fr:"empreinte carbone",ex:"We aim to reduce our carbon footprint.",col:["reduce a carbon footprint"],t:"Environnement & RSE"},
+ {w:"conservation",ipa:"/ˌkɒn.səˈveɪ.ʃən/",fr:"préservation, économie",ex:"Energy conservation saves money.",col:["energy conservation"],t:"Environnement & RSE"},
+ {w:"premises",ipa:"/ˈprem.ɪs.ɪz/",fr:"locaux",ex:"Smoking is not allowed on the premises.",col:["business premises","on the premises"],t:"Immobilier & locaux"},
+ {w:"lease",ipa:"/liːs/",fr:"bail ; louer",ex:"The company signed a five-year lease.",col:["sign a lease","commercial lease"],t:"Immobilier & locaux"},
+ {w:"tenant",ipa:"/ˈten.ənt/",fr:"locataire",ex:"The tenant pays rent monthly.",col:["commercial tenant"],t:"Immobilier & locaux"},
+ {w:"rent",ipa:"/rent/",fr:"loyer ; louer",ex:"The monthly rent increased.",col:["pay rent","rent an office"],t:"Immobilier & locaux"},
+ {w:"facility",ipa:"/fəˈsɪl.ə.ti/",fr:"installation, établissement",ex:"The new facility opens in June.",col:["production facility","sports facility"],t:"Immobilier & locaux"},
+ {w:"relocate",ipa:"/ˌriːˈləʊ.keɪt/",fr:"déménager (une entreprise)",ex:"The company relocated to Lyon.",col:["relocate offices"],t:"Immobilier & locaux"},
+ {w:"safety",ipa:"/ˈseɪf.ti/",fr:"sécurité",ex:"Safety is everyone's responsibility.",col:["safety regulations","workplace safety"],t:"Santé & sécurité"},
+ {w:"hazard",ipa:"/ˈhæz.əd/",fr:"danger, risque",ex:"Report any safety hazard.",col:["fire hazard","health hazard"],t:"Santé & sécurité"},
+ {w:"precaution",ipa:"/prɪˈkɔː.ʃən/",fr:"précaution",ex:"Take all necessary precautions.",col:["safety precaution","take precautions"],t:"Santé & sécurité"},
+ {w:"emergency",ipa:"/ɪˈmɜː.dʒən.si/",fr:"urgence",ex:"Know the emergency exits.",col:["emergency exit","emergency procedure"],t:"Santé & sécurité"},
+ {w:"evacuation",ipa:"/ɪˌvæk.juˈeɪ.ʃən/",fr:"évacuation",ex:"An evacuation drill is scheduled.",col:["evacuation plan"],t:"Santé & sécurité"},
+ {w:"injury",ipa:"/ˈɪn.dʒər.i/",fr:"blessure",ex:"Report any workplace injury.",col:["workplace injury","prevent injury"],t:"Santé & sécurité"},
+ {w:"regulation",ipa:"/ˌreɡ.jəˈleɪ.ʃən/",fr:"réglementation",ex:"New safety regulations apply.",col:["safety regulations","comply with regulations"],t:"Santé & sécurité"},
+ {w:"inspection",ipa:"/ɪnˈspek.ʃən/",fr:"inspection, contrôle",ex:"The facility passed inspection.",col:["safety inspection","routine inspection"],t:"Santé & sécurité"},
+ {w:"implement",ipa:"/ˈɪm.plɪ.ment/",fr:"mettre en œuvre",ex:"We implemented a new policy.",col:["implement a policy","implement changes"],t:"Verbes fréquents"},
+ {w:"ensure",ipa:"/ɪnˈʃɔːr/",fr:"garantir, s'assurer",ex:"Please ensure all forms are signed.",col:["ensure quality","ensure compliance"],t:"Verbes fréquents"},
+ {w:"provide",ipa:"/prəˈvaɪd/",fr:"fournir",ex:"We provide training to new staff.",col:["provide support","provide information"],t:"Verbes fréquents"},
+ {w:"obtain",ipa:"/əbˈteɪn/",fr:"obtenir",ex:"You must obtain approval first.",col:["obtain approval","obtain a licence"],t:"Verbes fréquents"},
+ {w:"maintain",ipa:"/meɪnˈteɪn/",fr:"maintenir, entretenir",ex:"We maintain high standards.",col:["maintain equipment","maintain standards"],t:"Verbes fréquents"},
+ {w:"conduct",ipa:"/kənˈdʌkt/",fr:"mener, réaliser",ex:"We conducted a survey.",col:["conduct research","conduct an interview"],t:"Verbes fréquents"},
+ {w:"submit",ipa:"/səbˈmɪt/",fr:"soumettre, remettre",ex:"Please submit your application online.",col:["submit a report","submit a request"],t:"Verbes fréquents"},
+ {w:"approve",ipa:"/əˈpruːv/",fr:"approuver",ex:"The budget was approved.",col:["approve a request","approve a budget"],t:"Verbes fréquents"},
+ {w:"exceed",ipa:"/ɪkˈsiːd/",fr:"dépasser",ex:"Sales exceeded expectations.",col:["exceed expectations","exceed a limit"],t:"Verbes fréquents"},
+ {w:"negotiate",ipa:"/nɪˈɡəʊ.ʃi.eɪt/",fr:"négocier",ex:"They negotiated a better price.",col:["negotiate a contract","negotiate terms"],t:"Verbes fréquents"},
+ {w:"purchase",ipa:"/ˈpɜː.tʃəs/",fr:"acheter ; achat",ex:"The company purchased new equipment.",col:["purchase order","make a purchase"],t:"Verbes fréquents"},
+ {w:"distribute",ipa:"/dɪˈstrɪb.juːt/",fr:"distribuer",ex:"Brochures were distributed to clients.",col:["distribute documents"],t:"Verbes fréquents"},
+ {w:"approximately",ipa:"/əˈprɒk.sɪ.mət.li/",fr:"environ, approximativement",ex:"The flight takes approximately two hours.",col:["approximately equal"],t:"Adverbes & adjectifs"},
+ {w:"recently",ipa:"/ˈriːsnt.li/",fr:"récemment",ex:"The policy was recently updated.",col:["recently hired"],t:"Adverbes & adjectifs"},
+ {w:"temporarily",ipa:"/ˈtem.pər.ər.ə.li/",fr:"temporairement",ex:"The service is temporarily unavailable.",col:["temporarily closed"],t:"Adverbes & adjectifs"},
+ {w:"significantly",ipa:"/sɪɡˈnɪf.ɪ.kənt.li/",fr:"de façon significative",ex:"Sales increased significantly.",col:["significantly higher"],t:"Adverbes & adjectifs"},
+ {w:"eligible",ipa:"/ˈel.ɪ.dʒə.bəl/",fr:"admissible, éligible",ex:"Employees are eligible for a bonus.",col:["eligible for","eligible candidate"],t:"Adverbes & adjectifs"},
+ {w:"prompt",ipa:"/prɒmpt/",fr:"rapide, ponctuel",ex:"Thank you for your prompt reply.",col:["prompt response","prompt payment"],t:"Adverbes & adjectifs"},
+ {w:"reasonable",ipa:"/ˈriː.zən.ə.bəl/",fr:"raisonnable",ex:"The price is reasonable.",col:["reasonable price","reasonable request"],t:"Adverbes & adjectifs"},
+ {w:"sufficient",ipa:"/səˈfɪʃ.ənt/",fr:"suffisant",ex:"We have sufficient supplies.",col:["sufficient funds","sufficient time"],t:"Adverbes & adjectifs"},
+ {w:"reluctant",ipa:"/rɪˈlʌk.tənt/",fr:"réticent",ex:"Customers were reluctant to change.",col:["reluctant to accept"],t:"Adverbes & adjectifs"},
+ {w:"willing",ipa:"/ˈwɪl.ɪŋ/",fr:"disposé, prêt à",ex:"She is willing to relocate.",col:["willing to help"],t:"Adverbes & adjectifs"}
+];
+
+const TRAPS = [
+ {w:"actually",ipa:"/ˈæk.tʃu.ə.li/",bad:"actuellement",good:"en fait, en réalité",ex:"Actually, the meeting starts at 3 p.m.",pair:"currently = actuellement"},
+ {w:"eventually",ipa:"/ɪˈven.tʃu.ə.li/",bad:"éventuellement",good:"finalement, au bout du compte",ex:"The project was eventually completed.",pair:"possibly = éventuellement"},
+ {w:"sensible",ipa:"/ˈsen.sə.bəl/",bad:"sensible",good:"raisonnable, sensé",ex:"That seems like a sensible decision.",pair:"sensitive = sensible"},
+ {w:"library",ipa:"/ˈlaɪ.brər.i/",bad:"librairie",good:"bibliothèque",ex:"The university library is open late.",pair:"bookstore = librairie"},
+ {w:"attend",ipa:"/əˈtend/",bad:"attendre",good:"assister à",ex:"I attended the conference.",pair:"wait = attendre"},
+ {w:"location",ipa:"/ləʊˈkeɪ.ʃən/",bad:"location",good:"emplacement",ex:"The office location is ideal.",pair:"rental = location (d'un bien)"},
+ {w:"lecture",ipa:"/ˈlek.tʃər/",bad:"lecture",good:"cours magistral",ex:"The lecture begins at 10.",pair:"reading = lecture"},
+ {w:"advertisement",ipa:"/ədˈvɜː.tɪs.mənt/",bad:"avertissement",good:"publicité",ex:"The advertisement appeared online.",pair:"warning = avertissement"},
+ {w:"opportunity",ipa:"/ˌɒp.əˈtjuː.nə.ti/",bad:"opportunité (péj.)",good:"occasion (favorable)",ex:"This is a great opportunity.",pair:"—"},
+ {w:"comprehensive",ipa:"/ˌkɒm.prɪˈhen.sɪv/",bad:"compréhensif",good:"complet, exhaustif",ex:"The report is comprehensive.",pair:"understanding = compréhensif"},
+ {w:"resume",ipa:"/ˈrez.ə.meɪ/",bad:"résumer",good:"CV",ex:"Please attach your resume.",pair:"summary = résumé"},
+ {w:"fabric",ipa:"/ˈfæb.rɪk/",bad:"fabrique",good:"tissu",ex:"The fabric is durable.",pair:"factory = fabrique, usine"}
+];
+
+/* Diagnostic + practice questions (skill-tagged, from the bank) */
+const QUESTIONS = [
+ {id:"A01-001",dom:"Grammaire",skill:"Subject-Verb Agreement",stem:"The manager ____ responsible for the project.",opts:["are","were","is","have been"],a:2,why:"« Manager » est un sujet singulier → verbe singulier → is."},
+ {id:"A01-003",dom:"Grammaire",skill:"Subject-Verb Agreement",stem:"The list of applicants ____ available online.",opts:["are","were","have","is"],a:3,why:"Le sujet est « the list » (singulier), pas « applicants » → is."},
+ {id:"A03-001",dom:"Grammaire",skill:"Each / Every",stem:"Each employee ____ a company badge.",opts:["have","has","are having","having"],a:1,why:"« Each » est singulier → has."},
+ {id:"A05-002",dom:"Grammaire",skill:"The number of",stem:"The number of complaints ____ increasing.",opts:["are","were","have been","is"],a:3,why:"« The number of… » prend un verbe singulier → is."},
+ {id:"B01-001",dom:"Grammaire",skill:"Gérondif après préposition",stem:"Thank you for ____ the meeting.",opts:["attend","attended","attending","attends"],a:2,why:"Après une préposition (for), on utilise le gérondif → attending."},
+ {id:"B05-001",dom:"Grammaire",skill:"Infinitif après decide",stem:"The company decided ____ a new supplier.",opts:["hire","hiring","to hire","hired"],a:2,why:"« decide » est suivi de l'infinitif → to hire."},
+ {id:"C01-001",dom:"Grammaire",skill:"Voix passive",stem:"The report ____ yesterday.",opts:["submitted","was submitted","submitting","has submit"],a:1,why:"Action subie au passé → was submitted."},
+ {id:"C02-001",dom:"Grammaire",skill:"Modal passif",stem:"The form must ____ before Friday.",opts:["complete","completed","be completed","be complete"],a:2,why:"Après un modal, passif = be + participe → be completed."},
+ {id:"D03-001",dom:"Connecteurs",skill:"By vs Until",stem:"Please submit your application ____ Friday.",opts:["until","during","by","since"],a:2,why:"« by » = au plus tard (date limite) ; « until » = jusqu'à."},
+ {id:"D05-001",dom:"Connecteurs",skill:"Despite vs Although",stem:"____ the delay, the project was completed.",opts:["Although","Despite","Because","While"],a:1,why:"« Despite » est suivi d'un nom → Despite the delay."},
+ {id:"D06-001",dom:"Connecteurs",skill:"Because vs Because of",stem:"The flight was cancelled ____ bad weather.",opts:["because","although","because of","while"],a:2,why:"« because of » + nom ; « because » + sujet et verbe."},
+ {id:"E04-001",dom:"Collocations",skill:"Meetings",stem:"The board will ____ a meeting next week.",opts:["hold","catch","realise","support"],a:0,why:"Collocation correcte : hold a meeting."},
+ {id:"E08-001",dom:"Collocations",skill:"Logistique",stem:"The shipment arrived ahead of ____.",opts:["planning","schedule","organisation","programme"],a:1,why:"Expression figée : ahead of schedule (en avance)."},
+ {id:"E09-001",dom:"Collocations",skill:"Service client",stem:"A customer submitted a ____.",opts:["complaint","accusation","dissatisfaction","regret"],a:0,why:"On dit submit/file a complaint."},
+ {id:"F04-001",dom:"Phrasal verbs",skill:"Put off",stem:"The meeting was ____ until next week.",opts:["carried out","put off","looked into","set up"],a:1,why:"put off = reporter."},
+ {id:"F05-001",dom:"Phrasal verbs",skill:"Call off",stem:"The conference was ____ due to bad weather.",opts:["backed up","called off","filled out","logged in"],a:1,why:"call off = annuler."},
+ {id:"G06-001",dom:"Synonymes",skill:"Paraphrases",stem:"« shipment » est le plus proche de :",opts:["delivery","payment","supplier","invoice"],a:0,why:"shipment ≈ delivery (le TOEIC adore reformuler)."},
+ {id:"G10-001",dom:"Synonymes",skill:"Paraphrases",stem:"« The event has been postponed » signifie :",opts:["cancelled","delayed","organised","reduced"],a:1,why:"postpone ≈ delay (reporter), pas annuler."},
+ {id:"H01-001",dom:"Faux amis",skill:"False friends",stem:"« I attended the meeting » signifie :",opts:["j'ai attendu la réunion","j'ai assisté à la réunion","j'ai annulé la réunion","j'ai organisé la réunion"],a:1,why:"attend = assister à (≠ attendre = wait)."},
+ {id:"H02-001",dom:"Faux amis",skill:"False friends",stem:"« Actually » se traduit par :",opts:["actuellement","en fait","finalement","éventuellement"],a:1,why:"actually = en fait (≠ actuellement = currently)."},
+ {id:"I08-001",dom:"Listening",skill:"Réponses indirectes",stem:"« Is the report finished? » → meilleure réponse :",opts:["It's already on her desk.","Yes, the report.","On the desk every day.","She is a manager."],a:0,why:"Réponse indirecte = oui implicite (il est déjà sur le bureau)."},
+ {id:"J03-002",dom:"Reading",skill:"Inférence",stem:"« We apologise for any inconvenience caused. » On peut déduire :",opts:["The company changed ownership.","A problem occurred.","Prices increased.","A new manager was hired."],a:1,why:"Une excuse implique qu'un problème a eu lieu."},
+ {id:"C07-001",dom:"Grammaire",skill:"Premier conditionnel",stem:"If demand increases, production ____.",opts:["increased","would increase","will increase","increasing"],a:2,why:"1er conditionnel : if + présent, … will + base verbale."},
+ {id:"L08-001",dom:"Stratégie",skill:"Devinette",stem:"Une question sans réponse au TOEIC rapporte :",opts:["25%","50%","0%","75%"],a:2,why:"Réponse vide = 0 %. Au hasard = 25 %. Réponds toujours."},
+ {id:"C04-001",dom:"Grammaire",skill:"Relative whose",stem:"The employee ____ application was accepted has already started work.",opts:["who","whose","which","where"],a:1,why:"« whose » marque la possession (dont la candidature)."},
+ {id:"B02-001",dom:"Grammaire",skill:"Gérondif après recommend",stem:"The company recommends ____ safety procedures carefully.",opts:["follow","followed","following","to follow"],a:2,why:"« recommend » est suivi du gérondif → following."},
+ {id:"C03-001",dom:"Grammaire",skill:"Relative réduite -ing",stem:"Employees ____ in the workshop must register online.",opts:["participating","participated","participate","participation"],a:0,why:"Relative réduite active → participle en -ing."},
+ {id:"C05-001",dom:"Grammaire",skill:"Participe -ed/-ing",stem:"Customers were ____ by the delay.",opts:["frustrating","frustrated","frustrate","frustration"],a:1,why:"La personne ressent l'émotion → -ed (frustrated)."},
+ {id:"C06-001",dom:"Grammaire",skill:"Participe -ed/-ing",stem:"The delay was ____.",opts:["frustrating","frustrated","frustrate","frustration"],a:0,why:"La chose provoque l'émotion → -ing (frustrating)."},
+ {id:"C08-001",dom:"Grammaire",skill:"2e conditionnel",stem:"If I were the manager, I ____ the proposal.",opts:["approve","approved","would approve","will approve"],a:2,why:"2e conditionnel : if + prétérit, … would + base verbale."},
+ {id:"C09-001",dom:"Grammaire",skill:"3e conditionnel",stem:"If they had prepared better, they ____ the contract.",opts:["win","would win","would have won","won"],a:2,why:"3e conditionnel : if + plus-que-parfait, … would have + participe."},
+ {id:"P01-001",dom:"Connecteurs",skill:"Préposition comply",stem:"Employees must comply ____ company policy.",opts:["in","with","on","at"],a:1,why:"comply with (se conformer à)."},
+ {id:"P02-001",dom:"Connecteurs",skill:"Préposition agree",stem:"The customer agreed ____ the new terms.",opts:["with","on","to","for"],a:2,why:"agree to + proposition ; agree with + personne."},
+ {id:"A06-001",dom:"Grammaire",skill:"Familles de mots",stem:"The report was completed ____.",opts:["success","successful","successfully","succeed"],a:2,why:"Après le verbe, il faut un adverbe → successfully."},
+ {id:"D10-001",dom:"Connecteurs",skill:"Between vs Among",stem:"The prize was divided ____ the three winners.",opts:["between","among","beside","across"],a:1,why:"among pour plus de deux ; between pour deux."},
+ {id:"D11-001",dom:"Connecteurs",skill:"Since vs For",stem:"She has worked here ____ 2021.",opts:["for","since","during","by"],a:1,why:"since + point de départ (2021) ; for + durée."},
+ {id:"V01-001",dom:"Vocabulaire",skill:"Vocabulaire en contexte",stem:"We need to ____ the meeting to next week.",opts:["postpone","attend","assist","resume"],a:0,why:"postpone = reporter ; attend = assister à."},
+ {id:"V02-001",dom:"Vocabulaire",skill:"Vocabulaire en contexte",stem:"Please ____ the attached document carefully.",opts:["assist","review","regard","attend"],a:1,why:"review = examiner / relire."},
+ {id:"D12-001",dom:"Connecteurs",skill:"Due to",stem:"The flight was delayed ____ a storm.",opts:["because","due to","although","despite"],a:1,why:"due to + nom ; because + sujet et verbe."},
+ {id:"A07-001",dom:"Grammaire",skill:"Comparatif",stem:"This model is ____ than the previous one.",opts:["efficient","more efficient","most efficient","efficiently"],a:1,why:"Adjectif long → more + adjectif."},
+ {id:"A08-001",dom:"Grammaire",skill:"Superlatif",stem:"It is the ____ option available.",opts:["affordable","more affordable","most affordable","affordably"],a:2,why:"Superlatif → the most + adjectif long."},
+ {id:"A09-001",dom:"Grammaire",skill:"Much / Many",stem:"We don't have ____ time before the deadline.",opts:["many","much","few","a number of"],a:1,why:"time est indénombrable → much."},
+ {id:"A10-001",dom:"Grammaire",skill:"Few / Little",stem:"____ employees attended the optional session.",opts:["Few","Little","Much","A little"],a:0,why:"employees est dénombrable → Few."},
+ {id:"C10-001",dom:"Grammaire",skill:"Present perfect",stem:"She ____ here for five years.",opts:["works","worked","has worked","is working"],a:2,why:"Durée jusqu'à maintenant (for five years) → present perfect."},
+ {id:"C11-001",dom:"Grammaire",skill:"Discours rapporté",stem:"He said he ____ finish by Friday.",opts:["will","would","is","has"],a:1,why:"Discours rapporté au passé : will → would."},
+ {id:"C12-001",dom:"Grammaire",skill:"Relative which",stem:"The product, ____ was launched in May, sold well.",opts:["who","which","whose","where"],a:1,why:"Pour une chose, on utilise which."},
+ {id:"P03-001",dom:"Connecteurs",skill:"Préposition responsible",stem:"She is responsible ____ the new project.",opts:["of","for","to","with"],a:1,why:"responsible for (responsable de)."},
+ {id:"A11-001",dom:"Grammaire",skill:"So / Such",stem:"It was ____ a busy day that we skipped lunch.",opts:["so","such","very","too"],a:1,why:"such + (a) + nom ; so + adjectif seul."},
+ {id:"A12-001",dom:"Grammaire",skill:"Enough",stem:"The candidate was experienced ____ for the role.",opts:["enough","too","very","much"],a:0,why:"adjectif + enough (assez expérimenté)."},
+ {id:"V03-001",dom:"Vocabulaire",skill:"Vocabulaire en contexte",stem:"All employees are ____ to attend the training.",opts:["required","requested","acquired","inquired"],a:0,why:"be required to = être tenu de."}
+];
+
+/* Pronunciation content */
+const STRESS = [
+ {pair:["REcord","reCORD"],note:"REcord (nom : un enregistrement) / reCORD (verbe : enregistrer)",say:["record","record"]},
+ {pair:["PERmit","perMIT"],note:"PERmit (nom : un permis) / perMIT (verbe : autoriser)",say:["permit","permit"]},
+ {pair:["CONtract","conTRACT"],note:"CONtract (nom : un contrat) / conTRACT (verbe : contracter)",say:["contract","contract"]},
+ {pair:["EXport","exPORT"],note:"EXport (nom : exportation) / exPORT (verbe : exporter)",say:["export","export"]}
+];
+const REDUCTIONS = [
+ {f:"going to",s:"gonna",ex:"We're gonna launch the product."},
+ {f:"want to",s:"wanna",ex:"Do you wanna attend?"},
+ {f:"got to",s:"gotta",ex:"We've gotta finish today."},
+ {f:"let me",s:"lemme",ex:"Lemme check."}
+];
+const NUMBERS = [
+ {a:"thirteen",b:"thirty",note:"-teen → accent à la fin (thirTEEN) ; -ty → accent au début (THIRty)"},
+ {a:"fourteen",b:"forty",note:"Attention : forty, pas « fourty »."},
+ {a:"fifteen",b:"fifty",note:"Écoute la syllabe accentuée pour distinguer."}
+];
+
+const LISTENING = [
+ {prompt:"Where is the nearest post office?",opts:["It's on Main Street.","Yesterday afternoon.","By express mail."],a:0,why:"Une question en Where attend un lieu."},
+ {prompt:"When does the meeting start?",opts:["In the conference room.","At ten o'clock.","With the manager."],a:1,why:"Une question en When attend un moment."},
+ {prompt:"Could you send me the report?",opts:["Sure, I'll do it now.","It's a long report.","No, thank you."],a:0,why:"À une demande polie, on répond par l'acceptation."},
+ {prompt:"Why was the shipment delayed?",opts:["To the warehouse.","Because of the weather.","Yes, it was."],a:1,why:"Une question en Why attend une raison (because of...)."},
+ {prompt:"Who's giving the presentation?",opts:["In about an hour.","Our new manager.","At the office."],a:1,why:"Une question en Who attend une personne."},
+ {prompt:"How was the conference?",opts:["Very informative.","On Tuesday.","In Paris."],a:0,why:"How was...? attend une appréciation."},
+ {prompt:"Would you like coffee or tea?",opts:["Tea, please.","Yes, I would.","At the café."],a:0,why:"Question alternative (A ou B) → on choisit une option."},
+ {prompt:"Isn't the deadline tomorrow?",opts:["Actually, it's Friday.","A new project.","On the desk."],a:0,why:"Question négative : on confirme ou on corrige l'information."},
+ {prompt:"The printer isn't working again.",opts:["I'll call technical support.","It's a new printer.","Yes, please."],a:0,why:"Face à un problème, la bonne réponse propose une solution."},
+ {prompt:"Do you know where Mr. Tanaka is?",opts:["He's in a meeting.","At three o'clock.","It's his office."],a:0,why:"Where + personne → on indique où elle se trouve."}
+];
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+const TABS = [
+ {id:"home",label:"Accueil",gly:"&#127968;"},
+ {id:"diagnostic",label:"Diagnostic",gly:"&#129504;"},
+ {id:"practice",label:"Exercices",gly:"&#9999;&#65039;"},
+ {id:"chrono",label:"Examen",gly:"&#9201;&#65039;"},
+ {id:"vocab",label:"Vocab",gly:"&#128218;"},
+ {id:"pron",label:"Prononciation",gly:"&#128483;&#65039;"},
+ {id:"listening",label:"Écoute",gly:"&#127911;"},
+ {id:"traps",label:"Faux amis",gly:"&#9888;&#65039;"},
+ {id:"mywords",label:"My Words",gly:"&#11088;"},
+ {id:"dashboard",label:"Progrès",gly:"&#128202;"},
+ {id:"examday",label:"Jour J",gly:"&#127919;"},
+ {id:"resources",label:"Ressources",gly:"&#128279;"}
+];
+function buildTabs(){
+  const bar = $("#tabBar");
+  TABS.forEach(t=>{
+    const b = el("button",{class:"tab","data-nav":t.id,"aria-label":t.label});
+    b.innerHTML = '<span class="gly" aria-hidden="true">'+t.gly+'</span>'+t.label;
+    bar.appendChild(b);
+  });
+}
+function go(id){
+  $$(".view").forEach(v=>v.classList.toggle("active", v.id===id));
+  $$("#tabBar .tab").forEach(t=> t.setAttribute("aria-current", t.getAttribute("data-nav")===id ? "page":"false"));
+  window.scrollTo({top:0,behavior: prefersReduced()?"auto":"smooth"});
+  if(id==="dashboard") renderDashboard();
+  if(id==="mywords") renderMyWords();
+  if(id==="chrono") renderChronoMenu();
+  if(id==="listening") startListen();
+  if(id!=="chrono" && typeof exam!=="undefined" && exam) stopExam();
+  $("#main").focus && $("#main").setAttribute("tabindex","-1");
+  // mark daily streak on any navigation into learning
+  if(["diagnostic","practice","vocab","pron","traps","mywords","listening","chrono"].includes(id)) touchStreak();
+}
+function prefersReduced(){ return document.documentElement.getAttribute("data-motion")==="reduced" || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+
+document.addEventListener("click",e=>{
+  const n = e.target.closest("[data-nav]");
+  if(n){ e.preventDefault(); go(n.getAttribute("data-nav")); }
+});
+
+/* ============================================================
+   Accessibility settings
+   ============================================================ */
+function applyA11y(){
+  const s = Store.get("a11y",{});
+  const r = document.documentElement;
+  r.setAttribute("data-text", s.text||"normal");
+  if(s.contrast) r.setAttribute("data-contrast","high"); else r.removeAttribute("data-contrast");
+  if(s.dys) r.setAttribute("data-dys","on"); else r.removeAttribute("data-dys");
+  if(s.motion) r.setAttribute("data-motion","reduced"); else r.removeAttribute("data-motion");
+  if(s.focus) r.setAttribute("data-focus","on"); else r.removeAttribute("data-focus");
+  // reflect controls
+  $$("#segText button").forEach(b=> b.setAttribute("aria-pressed", String(b.getAttribute("data-text")===(s.text||"normal"))));
+  $("#swContrast").setAttribute("aria-pressed", String(!!s.contrast));
+  $("#swDys").setAttribute("aria-pressed", String(!!s.dys));
+  $("#swMotion").setAttribute("aria-pressed", String(!!s.motion));
+  $("#swFocus").setAttribute("aria-pressed", String(!!s.focus));
+}
+function setA11y(k,v){ const s=Store.get("a11y",{}); s[k]=v; Store.set("a11y",s); applyA11y(); }
+function openPanel(){ $("#panelBg").classList.add("open"); const p=$("#panel"); p.hidden=false; requestAnimationFrame(()=>p.classList.add("open")); $("#closePanel").focus(); }
+function closePanel(){ const p=$("#panel"); p.classList.remove("open"); $("#panelBg").classList.remove("open"); setTimeout(()=>p.hidden=true,300); $("#openSettings").focus(); }
+$("#openSettings").addEventListener("click",openPanel);
+$("#aboutA11y") && $("#aboutA11y").addEventListener("click",openPanel);
+$("#closePanel").addEventListener("click",closePanel);
+$("#panelBg").addEventListener("click",closePanel);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("#panel").classList.contains("open")) closePanel(); });
+$$("#segText button").forEach(b=> b.addEventListener("click",()=> setA11y("text", b.getAttribute("data-text"))));
+[["swContrast","contrast"],["swDys","dys"],["swMotion","motion"],["swFocus","focus"]].forEach(([id,key])=>{
+  $("#"+id).addEventListener("click",()=>{ const cur=$("#"+id).getAttribute("aria-pressed")==="true"; setA11y(key,!cur); });
+});
+
+/* ============================================================
+   Stats / streak / skills
+   ============================================================ */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function touchStreak(){
+  const s = Store.get("streak",{last:null,count:0});
+  const t = todayStr();
+  if(s.last===t) return;
+  const yest = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  s.count = (s.last===yest) ? s.count+1 : 1;
+  s.last = t; Store.set("streak",s);
+}
+function recordAnswer(skill, ok){
+  const st = Store.get("skills",{});
+  if(!st[skill]) st[skill]={ok:0,n:0};
+  st[skill].n++; if(ok) st[skill].ok++;
+  Store.set("skills",st);
+  const g = Store.get("global",{ok:0,n:0}); g.n++; if(ok) g.ok++; Store.set("global",g);
+  const t=todayStr(); const d=Store.get("daily",{date:t,count:0}); if(d.date!==t){ d.date=t; d.count=0; } d.count++; Store.set("daily",d);
+}
+function levelOf(pct){
+  if(pct<50) return {k:"red",label:"À travailler"};
+  if(pct<70) return {k:"orange",label:"À renforcer"};
+  if(pct<85) return {k:"yellow",label:"Bonne maîtrise"};
+  return {k:"green",label:"Excellence"};
+}
+
+/* ============================================================
+   Score estimation
+   ============================================================ */
+function estimateScore(){
+  const g = Store.get("global",{ok:0,n:0});
+  if(g.n<1) return null;
+  const pct = g.ok/g.n;
+  const score = Math.round((300 + pct*620)/5)*5; // 300..920, arrondi à 5
+  const conf = g.n>=24 ? "élevé" : g.n>=12 ? "moyen" : "faible";
+  return {score:Math.min(990,score), pct:Math.round(pct*100), conf, n:g.n};
+}
+
+/* ============================================================
+   Diagnostic
+   ============================================================ */
+let diagState=null;
+$("#startDiag").addEventListener("click",()=>{
+  diagState={i:0, answers:[], items:QUESTIONS.slice()};
+  $("#diagIntro").hidden=true; $("#diagResult").hidden=true; $("#diagRun").hidden=false;
+  renderDiagQ();
+});
+function renderDiagQ(){
+  const c=$("#diagRun"); const q=diagState.items[diagState.i]; const n=diagState.items.length;
+  c.innerHTML="";
+  const head=el("div",null,'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="pill blue">Question '+(diagState.i+1)+" / "+n+'</span><span class="chip">'+esc(q.dom)+'</span></div><div class="progress" aria-hidden="true"><i style="width:'+Math.round(diagState.i/n*100)+'%"></i></div>');
+  c.appendChild(head);
+  const card=el("div",{class:"card"});
+  card.appendChild(el("div",{class:"q-stem"}, formatStem(q.stem)));
+  const opts=el("div",{class:"opts",role:"group","aria-label":"Réponses"});
+  q.opts.forEach((o,idx)=>{
+    const b=el("button",{class:"opt","data-i":idx,"aria-pressed":"false"});
+    b.innerHTML='<span class="key">'+"ABCD"[idx]+'</span><span>'+esc(o)+"</span>";
+    b.addEventListener("click",()=>{
+      $$(".opt",opts).forEach(x=>x.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true");
+      $("#diagNext").disabled=false; diagState._sel=idx;
+    });
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+  const next=el("button",{class:"btn primary block",id:"diagNext",style:"margin-top:16px"}, diagState.i===n-1?"Voir mon résultat":"Question suivante");
+  next.disabled=true;
+  next.addEventListener("click",()=>{
+    const ok = diagState._sel===q.a;
+    diagState.answers.push({q, sel:diagState._sel, ok});
+    recordAnswer(q.skill+" ("+q.dom+")", ok);
+    diagState._sel=undefined; diagState.i++;
+    if(diagState.i>=n) showDiagResult(); else renderDiagQ();
+  });
+  card.appendChild(next);
+  c.appendChild(card);
+  $(".opt",opts).focus();
+}
+function formatStem(s){ return esc(s).replace(/____/g,'<span class="blank">_____</span>'); }
+function showDiagResult(){
+  $("#diagRun").hidden=true;
+  // per-domain
+  const byDom={};
+  diagState.answers.forEach(a=>{ const d=a.q.dom; (byDom[d]=byDom[d]||{ok:0,n:0}); byDom[d].n++; if(a.ok) byDom[d].ok++; });
+  Store.set("lastDiag",{when:todayStr(), byDom});
+  const est=estimateScore();
+  const c=$("#diagResult"); c.hidden=false; c.innerHTML="";
+  const head=el("div",{class:"card",style:"text-align:center"});
+  head.innerHTML='<span class="pill teal">Score TOEIC estimé</span><div class="gauge" id="resGauge"></div><p class="disclaimer">Estimation — indice de confiance : '+(est?est.conf:"—")+'. Ce n\'est pas un score officiel.</p>';
+  c.appendChild(head);
+  const weak=Object.entries(byDom).sort((a,b)=>(a[1].ok/a[1].n)-(b[1].ok/b[1].n));
+  const list=el("div",{class:"card",style:"margin-top:16px"});
+  list.innerHTML="<h3>Par domaine</h3>";
+  Object.entries(byDom).forEach(([d,v])=>{
+    const pct=Math.round(v.ok/v.n*100); const lv=levelOf(pct);
+    list.appendChild(el("div",{class:"skill"},'<div class="h"><span>'+esc(d)+' <span class="lvl-tag lvl-'+lv.k+'">'+lv.label+'</span></span><span class="v">'+pct+'%</span></div><div class="bar"><i class="fill-'+lv.k+'" style="width:'+pct+'%"></i></div>'));
+  });
+  c.appendChild(list);
+  const reco=el("div",{class:"banner",style:"margin-top:16px"});
+  const w=weak[0];
+  reco.innerHTML='<span aria-hidden="true">&#127919;</span> Ta priorité : <strong>&nbsp;'+esc(w?w[0]:"l'entraînement régulier")+'</strong>';
+  c.appendChild(reco);
+  const cta=el("div",{style:"display:flex;gap:12px;flex-wrap:wrap;margin-top:16px"});
+  cta.innerHTML='<button class="btn primary" data-nav="dashboard">Voir mon tableau de bord</button><button class="btn ghost" data-nav="practice">M\'entraîner maintenant</button>';
+  c.appendChild(cta);
+  if(est) drawGauge($("#resGauge"), est.score);
+  c.scrollIntoView({behavior: prefersReduced()?"auto":"smooth"});
+}
+
+/* ============================================================
+   Gauge drawing
+   ============================================================ */
+function drawGauge(node, score){
+  const pct = Math.max(0, Math.min(1, (score-300)/(990-300)));
+  const R=84, C=2*Math.PI*R;
+  const col = score>=785?"var(--green)": score>=600?"var(--yellow)": score>=450?"var(--orange)":"var(--coral)";
+  node.innerHTML='<svg width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Score estimé '+score+' sur 990">'
+   +'<circle cx="100" cy="100" r="'+R+'" fill="none" stroke="var(--bg2)" stroke-width="16"/>'
+   +'<circle cx="100" cy="100" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pct))+'"/>'
+   +'</svg><div class="val"><div class="n">'+score+'</div><div class="l">/ 990 estimé</div></div>';
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+function renderDashboard(){
+  const est=estimateScore();
+  const has = !!est;
+  $("#dashEmpty").hidden=has; $("#dashFull").hidden=!has;
+  if(!has) return;
+  drawGauge($("#scoreGauge"), est.score);
+  $("#confLine").textContent="Estimation — indice de confiance : "+est.conf+" ("+est.n+" réponses)";
+  // target + journey
+  const target=Store.get("target",800);
+  $("#targetInput").value=target;
+  updateJourney(est.score, target);
+  {const goal=Store.get("dailyGoal",10); const dd=Store.get("daily",{date:todayStr(),count:0}); const done=(dd.date===todayStr()?dd.count:0); const gi=$("#goalInput"); if(gi) gi.value=goal; const gb=$("#goalBar"); if(gb) gb.style.width=Math.min(100,Math.round(done/goal*100))+"%"; const gl=$("#goalLine"); if(gl) gl.textContent= done>=goal ? ("Objectif atteint : "+done+" / "+goal+" aujourd'hui. Bravo !") : (done+" / "+goal+" aujourd'hui — encore "+Math.max(0,goal-done)+" pour y arriver."); }
+  // mini stats
+  $("#stStreak").textContent=Store.get("streak",{count:0}).count||0;
+  $("#stAnswered").textContent=Store.get("global",{n:0}).n||0;
+  $("#stWords").textContent=(Store.get("mywords",[])||[]).length;
+  $("#stAcc").textContent=est.pct+"%";
+  // skills
+  const st=Store.get("skills",{});
+  const bars=$("#skillBars"); bars.innerHTML="";
+  const arr=Object.entries(st).map(([k,v])=>({k,pct:Math.round(v.ok/v.n*100),n:v.n})).sort((a,b)=>a.pct-b.pct);
+  if(!arr.length){ bars.innerHTML='<p>Fais quelques exercices pour voir tes compétences se remplir ici.</p>'; }
+  arr.forEach(s=>{
+    const lv=levelOf(s.pct);
+    bars.appendChild(el("div",{class:"skill"},'<div class="h"><span>'+esc(s.k)+' <span class="lvl-tag lvl-'+lv.k+'">'+lv.label+'</span></span><span class="v">'+s.pct+'%</span></div><div class="bar"><i class="fill-'+lv.k+'" style="width:'+s.pct+'%"></i></div>'));
+  });
+  const next=arr[0];
+  $("#nextStepLine").innerHTML = next ? ('Prochaine étape conseillée : <strong>'+esc(next.k)+'</strong>.') : "Continue comme ça, ta progression se construit.";
+}
+function updateJourney(cur,target){
+  const lo=Math.min(cur,300), hi=Math.max(target,cur,500);
+  const span=Math.max(1,hi-lo);
+  const curP=Math.round((cur-lo)/span*100), tgtP=Math.round((target-lo)/span*100);
+  $("#trackFill").style.width=Math.min(curP,100)+"%";
+  $("#dotCur").style.left=Math.min(Math.max(curP,2),98)+"%";
+  $("#dotTgt").style.left=Math.min(Math.max(tgtP,2),98)+"%";
+  $("#labCur").textContent="Toi : "+cur;
+  $("#labTgt").textContent="Objectif : "+target;
+  const gap=target-cur;
+  $("#gapLine").textContent = gap>0 ? ("Plus que "+gap+" points pour atteindre ton objectif.") : "Objectif atteint — vise un peu plus haut !";
+}
+$("#saveTarget").addEventListener("click",()=>{
+  let v=parseInt($("#targetInput").value,10); if(isNaN(v)) v=800; v=Math.max(300,Math.min(990,v));
+  Store.set("target",v); renderDashboard(); toast("Objectif enregistré");
+});
+$("#resetData").addEventListener("click",()=>{
+  if(confirm("Effacer toute ta progression sur cet appareil ? Cette action est définitive.")){
+    const a=Store.get("a11y",{}); Store.clear(); Store.set("a11y",a); renderDashboard(); toast("Progression réinitialisée"); go("home");
+  }
+});
+
+/* ============================================================
+   Practice
+   ============================================================ */
+const PRAC_SETS=[
+ {id:"gram",label:"Grammaire & conjugaison",pill:"blue",doms:["Grammaire"]},
+ {id:"conn",label:"Connecteurs logiques",pill:"teal",doms:["Connecteurs"]},
+ {id:"coll",label:"Collocations",pill:"green",doms:["Collocations"]},
+ {id:"phr",label:"Phrasal verbs",pill:"coral",doms:["Phrasal verbs"]},
+ {id:"syn",label:"Synonymes & paraphrases",pill:"blue",doms:["Synonymes"]},
+ {id:"mix",label:"Tout mélangé",pill:"teal",doms:null}
+];
+function renderPracMenu(){
+  const m=$("#pracMenu"); m.innerHTML="";
+  PRAC_SETS.forEach(s=>{
+    const n = (s.doms? QUESTIONS.filter(q=>s.doms.includes(q.dom)) : QUESTIONS).length;
+    const b=el("button",{class:"card",style:"text-align:left;cursor:pointer"});
+    b.innerHTML='<span class="pill '+s.pill+'">'+n+' question'+(n>1?'s':'')+'</span><h3 style="margin:12px 0 4px">'+esc(s.label)+'</h3><p style="margin:0">Correction expliquée après chaque réponse.</p>';
+    b.addEventListener("click",()=>startPrac(s));
+    m.appendChild(b);
+  });
+}
+let pracState=null;
+function startPrac(set){
+  const pool=(set.doms? QUESTIONS.filter(q=>set.doms.includes(q.dom)):QUESTIONS).slice();
+  shuffle(pool);
+  pracState={set,pool,i:0,ok:0};
+  $("#pracMenu").hidden=true; $("#pracRun").hidden=false;
+  renderPracQ();
+}
+function renderPracQ(){
+  const c=$("#pracRun"); const q=pracState.pool[pracState.i]; const n=pracState.pool.length;
+  c.innerHTML="";
+  c.appendChild(el("div",null,'<div style="display:flex;justify-content:space-between;align-items:center"><span class="pill blue">'+esc(pracState.set.label)+'</span><span class="chip">'+(pracState.i+1)+" / "+n+'</span></div><div class="progress"><i style="width:'+Math.round(pracState.i/n*100)+'%"></i></div>'));
+  const card=el("div",{class:"card"});
+  card.appendChild(el("div",{class:"q-stem"}, formatStem(q.stem)));
+  const opts=el("div",{class:"opts"});
+  q.opts.forEach((o,idx)=>{
+    const b=el("button",{class:"opt","data-i":idx});
+    b.innerHTML='<span class="key">'+"ABCD"[idx]+'</span><span>'+esc(o)+"</span>";
+    b.addEventListener("click",()=>answerPrac(idx,opts,card,q));
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+  c.appendChild(card);
+  $(".opt",opts).focus();
+}
+function answerPrac(idx,opts,card,q){
+  const ok=idx===q.a;
+  $$(".opt",opts).forEach((b,i)=>{ b.disabled=true; b.style.cursor="default";
+    if(i===q.a){ b.classList.add("correct"); b.insertAdjacentHTML("beforeend",'<span class="res" aria-hidden="true">&#10003;</span>'); }
+    if(i===idx && !ok){ b.classList.add("wrong"); b.insertAdjacentHTML("beforeend",'<span class="res" aria-hidden="true">&#10007;</span>'); }
+  });
+  recordAnswer(q.skill+" ("+q.dom+")", ok); if(ok) pracState.ok++;
+  const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
+  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bien vu':'<span aria-hidden="true">&#10007;</span> Pas encore')+' — '+esc(q.skill)+'</h4><p>'+esc(q.why)+'</p>';
+  card.appendChild(fb);
+  const next=el("button",{class:"btn primary block",style:"margin-top:14px"}, pracState.i===pracState.pool.length-1?"Voir le bilan":"Continuer");
+  next.addEventListener("click",()=>{ pracState.i++; if(pracState.i>=pracState.pool.length) pracDone(); else renderPracQ(); });
+  card.appendChild(next);
+  next.focus();
+}
+function pracDone(){
+  const c=$("#pracRun"); const pct=Math.round(pracState.ok/pracState.pool.length*100); const lv=levelOf(pct);
+  c.innerHTML='<div class="card" style="text-align:center"><span class="pill '+(pct>=70?'green':'coral')+'">Bilan</span>'
+   +'<div class="num" style="font-size:3rem;margin:10px 0">'+pracState.ok+' / '+pracState.pool.length+'</div>'
+   +'<p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Cette compétence est sous contrôle.":pct>=70?"Tu progresses bien, continue.":"Encore un peu de travail — c'est en forgeant qu'on progresse.")+'</p>'
+   +'<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px"><button class="btn primary" id="pracAgain">Recommencer</button><button class="btn ghost" data-nav="dashboard">Voir mes progrès</button></div></div>';
+  $("#pracAgain").addEventListener("click",()=>{ $("#pracRun").hidden=true; $("#pracMenu").hidden=false; renderPracMenu(); });
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ============================================================
+   Vocabulary + My Words
+   ============================================================ */
+function vocThemes(){ return Array.from(new Set(VOCAB.map(v=>v.t))); }
+let vocFilter="Tous"; let vocQuery="";
+function renderVocFilters(){
+  const f=$("#vocFilters"); f.innerHTML="";
+  ["Tous","★ Mes mots"].concat(vocThemes()).forEach(t=>{
+    const b=el("button",{class:"filter","aria-pressed":String(t===vocFilter)}, esc(t));
+    b.addEventListener("click",()=>{ vocFilter=t; renderVocFilters(); renderVocList(); });
+    f.appendChild(b);
+  });
+}
+function isSaved(w){ return (Store.get("mywords",[])||[]).some(x=>x.w===w); }
+function renderVocList(){
+  const list=$("#vocList"); list.innerHTML="";
+  const savedSet=new Set((Store.get("mywords",[])||[]).map(x=>x.w));
+  const items=VOCAB.filter(v=>{
+    const themeOk = vocFilter==="Tous" ? true : (vocFilter==="★ Mes mots" ? savedSet.has(v.w) : v.t===vocFilter);
+    const q=vocQuery;
+    const qOk = !q || v.w.toLowerCase().includes(q) || (v.fr||"").toLowerCase().includes(q) || (v.ex||"").toLowerCase().includes(q) || (v.col||[]).join(" ").toLowerCase().includes(q);
+    return themeOk && qOk;
+  });
+  items.forEach(v=> list.appendChild(vocCard(v)));
+  const cnt=$("#vocCount"); if(cnt) cnt.textContent=items.length+" mot"+(items.length>1?"s":"");
+  if(!items.length){ list.innerHTML='<div class="note">Aucun mot ne correspond. Essaie un autre terme ou un autre th\u00e8me.</div>'; }
+  if(!Speech.ok){ const wv=$("#voiceWarn"); wv.hidden=false; wv.textContent="L'audio n'est pas disponible sur ce navigateur. Tout le reste fonctionne normalement."; }
+}
+function vocCard(v){
+  const card=el("div",{class:"card word"});
+  const saved=isSaved(v.w);
+  card.innerHTML=
+   '<div class="top"><button class="audio-btn" aria-label="Écouter '+esc(v.w)+'">&#128266;</button>'
+   +'<div><div class="w">'+esc(v.w)+'</div>'+(v.ipa?'<div class="ipa">'+esc(v.ipa)+'</div>':'')+'</div>'
+   +'<button class="btn ghost save-w" style="min-height:42px;padding:0 12px">'+(saved?"&#11088; Enregistré":"+ My Words")+'</button></div>'
+   +'<div class="fr">'+esc(v.fr)+'</div>'
+   +'<div class="ex">&laquo; '+esc(v.ex)+' &raquo;</div>'
+   +((v.col&&v.col.length)?'<div class="chips" aria-label="collocations">'+v.col.map(c=>'<span class="chip">'+esc(c)+'</span>').join("")+'</div>':'');
+  $(".audio-btn",card).addEventListener("click",e=>Speech.say(v.w,e.currentTarget));
+  $(".save-w",card).addEventListener("click",()=>toggleWord(v,card));
+  return card;
+}
+function toggleWord(v,card){
+  let mw=Store.get("mywords",[])||[];
+  if(mw.some(x=>x.w===v.w)){ mw=mw.filter(x=>x.w!==v.w); toast("Retiré de My Words"); }
+  else { mw.push({w:v.w,ipa:v.ipa,fr:v.fr,ex:v.ex,col:v.col,t:v.t,box:1,added:todayStr()}); toast("Ajouté à My Words"); }
+  Store.set("mywords",mw);
+  if(card){ const btn=$(".save-w",card); btn.innerHTML=isSaved(v.w)?"&#11088; Enregistré":"+ My Words"; }
+}
+function renderMyWords(){
+  const mw=Store.get("mywords",[])||[];
+  $("#mwEmpty").hidden=mw.length>0; $("#mwList").hidden=mw.length===0;
+  const list=$("#mwList"); list.innerHTML="";
+  mw.forEach(v=>{
+    const card=vocCard(v);
+    // add a "revised" control for spaced repetition lite
+    const rev=el("button",{class:"btn ghost",style:"min-height:42px;margin-top:6px"},"&#10003; Je le connais");
+    rev.addEventListener("click",()=>{ let arr=Store.get("mywords",[]); const it=arr.find(x=>x.w===v.w); if(it){ it.box=Math.min(5,(it.box||1)+1); it.last=todayStr(); } Store.set("mywords",arr); toast("Bien ! On l'espacera davantage."); });
+    card.appendChild(rev);
+    list.appendChild(card);
+  });
+}
+
+/* ============================================================
+   Pronunciation
+   ============================================================ */
+function renderPron(){
+  const c=$("#pronBody"); c.innerHTML="";
+  // word stress
+  const s1=el("div",{class:"card"}); s1.innerHTML="<h3>L'accent qui change le sens</h3><p>Même mot, sens différent selon la syllabe accentuée.</p>";
+  STRESS.forEach(p=>{
+    const row=el("div",{class:"linkrow",style:"justify-content:space-between;border-top:1px solid var(--line);padding:12px 0"});
+    row.innerHTML='<div><strong>'+esc(p.pair[0])+'</strong> &nbsp;/&nbsp; <strong>'+esc(p.pair[1])+'</strong><br><small style="color:var(--ink-soft)">'+esc(p.note)+'</small></div>';
+    const b=el("button",{class:"audio-btn","aria-label":"Écouter "+p.say[0]},"&#128266;");
+    b.addEventListener("click",e=>Speech.say(p.say[0],e.currentTarget));
+    row.appendChild(b); s1.appendChild(row);
+  });
+  c.appendChild(s1);
+  // reductions
+  const s2=el("div",{class:"card",style:"margin-top:16px"}); s2.innerHTML="<h3>Les formes réduites de l'oral</h3><p>À l'écoute, ces formes courantes piègent souvent.</p>";
+  REDUCTIONS.forEach(r=>{
+    const row=el("div",{class:"linkrow",style:"justify-content:space-between;border-top:1px solid var(--line);padding:12px 0"});
+    row.innerHTML='<div><strong>'+esc(r.f)+'</strong> &rarr; <em>'+esc(r.s)+'</em><br><small style="color:var(--ink-soft)">&laquo; '+esc(r.ex)+' &raquo;</small></div>';
+    const b=el("button",{class:"audio-btn","aria-label":"Écouter "+r.ex},"&#128266;");
+    b.addEventListener("click",e=>Speech.say(r.ex,e.currentTarget));
+    row.appendChild(b); s2.appendChild(row);
+  });
+  c.appendChild(s2);
+  // numbers
+  const s3=el("div",{class:"card",style:"margin-top:16px"}); s3.innerHTML="<h3>Les nombres qui piègent</h3><p>-teen contre -ty : écoute la syllabe accentuée.</p>";
+  NUMBERS.forEach(nm=>{
+    const row=el("div",{class:"linkrow",style:"justify-content:space-between;border-top:1px solid var(--line);padding:12px 0"});
+    row.innerHTML='<div><strong>'+esc(nm.a)+'</strong> &nbsp;/&nbsp; <strong>'+esc(nm.b)+'</strong><br><small style="color:var(--ink-soft)">'+esc(nm.note)+'</small></div>';
+    const wrap=el("div",{class:"linkrow"});
+    const b1=el("button",{class:"audio-btn","aria-label":"Écouter "+nm.a},"&#128266;"); b1.addEventListener("click",e=>Speech.say(nm.a,e.currentTarget));
+    const b2=el("button",{class:"audio-btn","aria-label":"Écouter "+nm.b},"&#128266;"); b2.addEventListener("click",e=>Speech.say(nm.b,e.currentTarget));
+    wrap.appendChild(b1); wrap.appendChild(b2); row.appendChild(wrap); s3.appendChild(row);
+  });
+  c.appendChild(s3);
+}
+
+/* ============================================================
+   Traps
+   ============================================================ */
+function renderTraps(){
+  const list=$("#trapList"); list.innerHTML="";
+  TRAPS.forEach(t=>{
+    const card=el("div",{class:"card word"});
+    card.innerHTML=
+     '<div class="top"><button class="audio-btn" aria-label="Écouter '+esc(t.w)+'">&#128266;</button>'
+     +'<div><div class="w">'+esc(t.w)+'</div><div class="ipa">'+esc(t.ipa)+'</div></div></div>'
+     +'<div><span class="lvl-tag lvl-red">&#10007; '+esc(t.bad)+'</span> &nbsp; <span class="lvl-tag lvl-green">&#10003; '+esc(t.good)+'</span></div>'
+     +'<div class="ex">&laquo; '+esc(t.ex)+' &raquo;</div>'
+     +(t.pair!=="—"?'<div class="chips"><span class="chip">Ne pas confondre : '+esc(t.pair)+'</span></div>':"");
+    $(".audio-btn",card).addEventListener("click",e=>Speech.say(t.w,e.currentTarget));
+    list.appendChild(card);
+  });
+}
+
+/* ============================================================
+   Timed exam mode (100% client-side — works on Netlify)
+   ============================================================ */
+let exam=null;
+function fmtTime(s){ s=Math.max(0,s); const m=Math.floor(s/60), x=s%60; return m+":"+(x<10?"0":"")+x; }
+function renderChronoMenu(){
+  const r=$("#chronoRun"); if(r) r.hidden=true; const rr=$("#chronoResult"); if(rr) rr.hidden=true;
+  const m=$("#chronoMenu"); m.hidden=false; m.innerHTML="";
+  const opts=[{n:10,s:300,label:"Rapide"},{n:15,s:480,label:"Standard"},{n:24,s:720,label:"Complet"}];
+  const grid=el("div",{class:"grid g3"});
+  opts.forEach(o=>{
+    const nn=Math.min(o.n,QUESTIONS.length);
+    const b=el("button",{class:"card",style:"text-align:left;cursor:pointer"});
+    b.innerHTML='<span class="pill blue">'+o.label+'</span><h3 style="margin:12px 0 4px">'+nn+' questions</h3><p style="margin:0">'+Math.round(o.s/60)+' minutes \u00b7 minuteur visible</p>';
+    b.addEventListener("click",()=>startExam(nn,o.s));
+    grid.appendChild(b);
+  });
+  m.appendChild(grid);
+  m.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:14px">Le minuteur tourne m\u00eame si tu changes de question. \u00c0 z\u00e9ro, l\'examen se termine automatiquement.</div>');
+}
+function startExam(n,secs){
+  const pool=shuffle(QUESTIONS.slice()).slice(0,n);
+  exam={pool,i:0,sel:new Array(pool.length).fill(null),left:secs,timer:null,w60:false,w10:false};
+  $("#chronoMenu").hidden=true; $("#chronoResult").hidden=true; $("#chronoRun").hidden=false;
+  exam.timer=setInterval(tickExam,1000);
+  renderExamQ();
+}
+function stopExam(){ if(exam&&exam.timer) clearInterval(exam.timer); exam=null; const r=$("#chronoRun"); if(r) r.hidden=true; const m=$("#chronoMenu"); if(m) m.hidden=false; }
+function tickExam(){
+  if(!exam) return;
+  exam.left--;
+  const t=$("#examTimer"); if(t){ t.textContent=fmtTime(exam.left); t.style.color=exam.left<=60?"var(--coral)":"var(--ink)"; }
+  if(exam.left===60 && !exam.w60){ exam.w60=true; toast("1 minute restante"); }
+  if(exam.left===10 && !exam.w10){ exam.w10=true; toast("10 secondes !"); }
+  if(exam.left<=0){ clearInterval(exam.timer); finishExam(true); }
+}
+function renderExamQ(){
+  const c=$("#chronoRun"); const q=exam.pool[exam.i]; const n=exam.pool.length;
+  c.innerHTML="";
+  c.appendChild(el("div",null,'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="pill coral">Examen \u00b7 '+(exam.i+1)+" / "+n+'</span><span class="num" id="examTimer" aria-live="off" style="font-size:1.4rem">'+fmtTime(exam.left)+'</span></div><div class="progress"><i style="width:'+Math.round(exam.i/n*100)+'%"></i></div>'));
+  const card=el("div",{class:"card"});
+  card.appendChild(el("div",{class:"q-stem"}, formatStem(q.stem)));
+  const opts=el("div",{class:"opts"});
+  q.opts.forEach((o,idx)=>{
+    const b=el("button",{class:"opt","aria-pressed":String(exam.sel[exam.i]===idx)});
+    b.innerHTML='<span class="key">'+"ABCD"[idx]+'</span><span>'+esc(o)+'</span>';
+    b.addEventListener("click",()=>{ exam.sel[exam.i]=idx; $$(".opt",opts).forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); });
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+  const row=el("div",{style:"display:flex;gap:10px;margin-top:16px"});
+  if(exam.i>0){ const p=el("button",{class:"btn ghost"},"Pr\u00e9c\u00e9dent"); p.addEventListener("click",()=>{ exam.i--; renderExamQ(); }); row.appendChild(p); }
+  const nx=el("button",{class:"btn primary",style:"flex:1"}, exam.i===n-1?"Terminer l'examen":"Suivant");
+  nx.addEventListener("click",()=>{ if(exam.i===n-1) finishExam(false); else { exam.i++; renderExamQ(); } });
+  row.appendChild(nx);
+  card.appendChild(row);
+  c.appendChild(card);
+}
+function finishExam(timedOut){
+  if(!exam) return;
+  if(exam.timer) clearInterval(exam.timer);
+  let ok=0; const byDom={}; const review=[]; const pool=exam.pool, sel=exam.sel;
+  pool.forEach((q,idx)=>{
+    const good=sel[idx]===q.a; if(good) ok++;
+    recordAnswer(q.skill+" ("+q.dom+")", good);
+    (byDom[q.dom]=byDom[q.dom]||{ok:0,n:0}); byDom[q.dom].n++; if(good) byDom[q.dom].ok++;
+    if(!good) review.push({q,sel:sel[idx]});
+  });
+  const total=pool.length; const pct=Math.round(ok/total*100);
+  exam=null;
+  $("#chronoRun").hidden=true; const r=$("#chronoResult"); r.hidden=false; r.innerHTML="";
+  const est=estimateScore();
+  const head=el("div",{class:"card",style:"text-align:center"});
+  head.innerHTML=(timedOut?'<span class="pill coral">Temps \u00e9coul\u00e9</span>':'<span class="pill green">Examen termin\u00e9</span>')
+   +'<div class="num" style="font-size:3rem;margin:10px 0">'+ok+' / '+total+'</div>'
+   +'<p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Excellent rythme et pr\u00e9cision.":pct>=70?"Bon travail, tu y es presque.":"Continue : la r\u00e9gularit\u00e9 paie.")+'</p>'
+   +(est?'<p class="disclaimer">Score TOEIC estim\u00e9 actuel : <strong>'+est.score+'</strong> (estimation).</p>':'');
+  r.appendChild(head);
+  const dl=el("div",{class:"card",style:"margin-top:16px"}); dl.innerHTML="<h3>Par domaine</h3>";
+  Object.entries(byDom).forEach(([d,v])=>{ const p=Math.round(v.ok/v.n*100); const lv=levelOf(p); dl.appendChild(el("div",{class:"skill"},'<div class="h"><span>'+esc(d)+'</span><span class="v">'+p+'%</span></div><div class="bar"><i class="fill-'+lv.k+'" style="width:'+p+'%"></i></div>')); });
+  r.appendChild(dl);
+  if(review.length){
+    const rv=el("div",{class:"card",style:"margin-top:16px"}); rv.innerHTML="<h3>\u00c0 revoir ("+review.length+")</h3>";
+    review.forEach(x=>{ rv.appendChild(el("div",{style:"border-top:1px solid var(--line);padding:12px 0"},'<div class="q-stem" style="font-size:1rem;margin:0 0 6px">'+formatStem(x.q.stem)+'</div><p style="margin:.2em 0;color:var(--green);font-weight:600">\u2713 '+esc(x.q.opts[x.q.a])+'</p><p style="margin:0">'+esc(x.q.why)+'</p>')); });
+    r.appendChild(rv);
+  }
+  const cta=el("div",{style:"display:flex;gap:12px;flex-wrap:wrap;margin-top:16px"});
+  cta.innerHTML='<button class="btn primary" id="examAgain">Refaire un examen</button><button class="btn ghost" data-nav="dashboard">Voir mes progr\u00e8s</button>';
+  r.appendChild(cta);
+  $("#examAgain").addEventListener("click",renderChronoMenu);
+  r.scrollIntoView({behavior: prefersReduced()?"auto":"smooth"});
+}
+
+/* ============================================================
+   Listening Lab (Part 2) — synthèse vocale, 100% statique
+   ============================================================ */
+let listenState=null;
+function startListen(){
+  if(!Speech.ok){ const w=$("#voiceWarn2"); if(w){ w.hidden=false; w.textContent="L'audio n'est pas disponible sur ce navigateur. Tu peux quand même lire les questions et t'entraîner."; } }
+  listenState={pool:shuffle(LISTENING.slice()),i:0,ok:0}; renderListen();
+}
+function renderListen(){
+  const c=$("#listenBody"); const q=listenState.pool[listenState.i]; const n=listenState.pool.length;
+  c.innerHTML="";
+  c.appendChild(el("div",null,'<div style="display:flex;justify-content:space-between;align-items:center"><span class="pill teal">'+(listenState.i+1)+" / "+n+'</span><span class="chip">Part 2</span></div><div class="progress"><i style="width:'+Math.round(listenState.i/n*100)+'%"></i></div>'));
+  const card=el("div",{class:"card"});
+  const play=el("button",{class:"btn primary"}); play.innerHTML='<span aria-hidden="true">&#128266;</span> Écouter la question';
+  play.addEventListener("click",e=>Speech.say(q.prompt,e.currentTarget));
+  card.appendChild(play);
+  card.appendChild(el("p",{class:"disclaimer",style:"margin:10px 0 12px"},"Choisis la meilleure réponse. La transcription s'affiche après."));
+  const opts=el("div",{class:"opts"});
+  q.opts.forEach((o,idx)=>{
+    const b=el("button",{class:"opt"});
+    b.innerHTML='<span class="key">'+"ABC"[idx]+'</span><span style="flex:1">'+esc(o)+'</span>';
+    const ab=el("span",{class:"audio-btn","role":"button","tabindex":"0","aria-label":"Écouter la réponse "+"ABC"[idx]},"&#128266;");
+    const speak=ev=>{ ev.stopPropagation(); Speech.say(o,ab); };
+    ab.addEventListener("click",speak);
+    ab.addEventListener("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); speak(ev); } });
+    b.appendChild(ab);
+    b.addEventListener("click",()=>answerListen(idx,opts,card,q));
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+  c.appendChild(card);
+  setTimeout(()=>{ try{ Speech.say(q.prompt,play); }catch(e){} }, 300);
+}
+function answerListen(idx,opts,card,q){
+  const ok=idx===q.a;
+  $$(".opt",opts).forEach((b,i)=>{ b.disabled=true; b.style.cursor="default";
+    if(i===q.a) b.classList.add("correct");
+    if(i===idx && !ok) b.classList.add("wrong");
+  });
+  recordAnswer("Écoute (Part 2)", ok); if(ok) listenState.ok++;
+  const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
+  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bonne réponse':'<span aria-hidden="true">&#10007;</span> Pas tout à fait')+'</h4><p><strong>Question :</strong> '+esc(q.prompt)+'<br><strong>Bonne réponse :</strong> '+esc(q.opts[q.a])+'<br>'+esc(q.why)+'</p>';
+  card.appendChild(fb);
+  const next=el("button",{class:"btn primary block",style:"margin-top:14px"}, listenState.i===listenState.pool.length-1?"Voir le bilan":"Question suivante");
+  next.addEventListener("click",()=>{ listenState.i++; if(listenState.i>=listenState.pool.length) listenDone(); else renderListen(); });
+  card.appendChild(next); next.focus();
+}
+function listenDone(){
+  const c=$("#listenBody"); const pct=Math.round(listenState.ok/listenState.pool.length*100);
+  c.innerHTML='<div class="card" style="text-align:center"><span class="pill '+(pct>=70?"green":"coral")+'">Bilan</span><div class="num" style="font-size:3rem;margin:10px 0">'+listenState.ok+' / '+listenState.pool.length+'</div><p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Ton oreille progresse vraiment !":pct>=70?"Bon travail, continue.":"L\'écoute se muscle avec la régularité.")+'</p><button class="btn primary" id="listenAgain">Recommencer</button></div>';
+  $("#listenAgain").addEventListener("click",startListen);
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+buildTabs();
+applyA11y();
+renderVocFilters(); renderVocList();
+renderPracMenu();
+renderPron();
+renderTraps();
+renderChronoMenu();
+const vs=$("#vocSearch"); if(vs) vs.addEventListener("input",e=>{ vocQuery=e.target.value.trim().toLowerCase(); renderVocList(); });
+const sg=$("#saveGoal"); if(sg) sg.addEventListener("click",()=>{ let v=parseInt($("#goalInput").value,10); if(isNaN(v)) v=10; v=Math.max(3,Math.min(100,v)); Store.set("dailyGoal",v); renderDashboard(); toast("Objectif quotidien mis à jour"); });
+const pb=$("#printBilan"); if(pb) pb.addEventListener("click",()=>window.print());
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+go("home");
+</script>
+</body>
+</html>
