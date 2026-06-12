@@ -1,5 +1,5 @@
 /* Homemade TOEIC Trainer — service worker (mode hors-ligne) */
-const CACHE = "homemade-toeic-v5";
+const CACHE = "homemade-toeic-v6";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e => {
