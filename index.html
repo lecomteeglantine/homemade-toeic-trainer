@@ -725,6 +725,16 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
     </span>
   </div>
   <div class="setrow">
+    <span class="lab"><b>Accent audio</b><small>Voix utilisée pour lire l'anglais</small></span>
+    <span class="seg" id="segAccent" role="group" aria-label="Accent audio">
+      <button data-acc="en-US" aria-pressed="true" title="Américain">🇺🇸</button>
+      <button data-acc="en-GB" aria-pressed="false" title="Britannique">🇬🇧</button>
+      <button data-acc="en-AU" aria-pressed="false" title="Australien">🇦🇺</button>
+      <button data-acc="en-CA" aria-pressed="false" title="Canadien">🇨🇦</button>
+    </span>
+  </div>
+  <p class="disclaimer" id="accentNote" style="margin:-6px 0 4px">Les accents disponibles dépendent des voix installées sur ton appareil.</p>
+  <div class="setrow">
     <span class="lab"><b>Contraste élevé</b><small>Couleurs et bordures renforcées</small></span>
     <button class="switch" id="swContrast" role="switch" aria-pressed="false" aria-label="Contraste élevé"></button>
   </div>
@@ -779,21 +789,36 @@ function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;"
 const Speech = (function(){
   const ok = ("speechSynthesis" in window);
   let voices = [];
+  const ORDER = ["en-US","en-GB","en-AU","en-CA"];
+  let accent = localStorage.getItem("ht_accent") || "en-US";
   function refresh(){ try{ voices = window.speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
   if(ok){ refresh(); try{ window.speechSynthesis.onvoiceschanged = refresh; }catch(e){} }
+  // meilleure voix pour un code d'accent précis (ex. "en-AU")
+  function voiceFor(acc){
+    const a = (acc||"").toLowerCase();
+    let v = voices.find(v=> (v.lang||"").replace("_","-").toLowerCase() === a);
+    if(v) return v;
+    return voices.find(v=> (v.lang||"").replace("_","-").toLowerCase().indexOf(a) === 0) || null;
+  }
+  function availableAccents(){ return ORDER.filter(a=> !!voiceFor(a)); }
+  // voix retenue : accent choisi, sinon repli sur un accent dispo, sinon n'importe quel anglais
   function pick(){
-    const want = ["en-GB","en_GB","en-US","en_US","en"];
-    for(const w of want){ const v = voices.find(v=> (v.lang||"").replace("_","-").toLowerCase().startsWith(w.toLowerCase().slice(0,5)) || (v.lang||"").toLowerCase().startsWith(w.toLowerCase().slice(0,2))); if(v) return v; }
-    return voices.find(v=>(v.lang||"").toLowerCase().startsWith("en")) || voices[0] || null;
+    return voiceFor(accent)
+      || ORDER.map(voiceFor).find(Boolean)
+      || voices.find(v=>(v.lang||"").toLowerCase().startsWith("en"))
+      || voices[0] || null;
   }
   return {
     ok,
+    getAccent(){ return accent; },
+    setAccent(a){ accent = a; try{ localStorage.setItem("ht_accent", a); }catch(e){} },
+    availableAccents,
     say(text, btn){
       if(!ok){ toast("Audio non disponible sur ce navigateur"); return; }
       try{
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        const v = pick(); if(v){ u.voice=v; u.lang=v.lang; } else { u.lang="en-GB"; }
+        const v = pick(); if(v){ u.voice=v; u.lang=v.lang; } else { u.lang=accent||"en-US"; }
         u.rate = .92; u.pitch = 1;
         if(btn){ btn.classList.add("speaking"); u.onend=u.onerror=()=>btn.classList.remove("speaking"); }
         window.speechSynthesis.speak(u);
@@ -1594,7 +1619,7 @@ function applyA11y(){
   $("#swFocus").setAttribute("aria-pressed", String(!!s.focus));
 }
 function setA11y(k,v){ const s=Store.get("a11y",{}); s[k]=v; Store.set("a11y",s); applyA11y(); }
-function openPanel(){ $("#panelBg").classList.add("open"); const p=$("#panel"); p.hidden=false; requestAnimationFrame(()=>p.classList.add("open")); $("#closePanel").focus(); }
+function openPanel(){ $("#panelBg").classList.add("open"); const p=$("#panel"); p.hidden=false; requestAnimationFrame(()=>p.classList.add("open")); refreshAccentSeg(); $("#closePanel").focus(); }
 function closePanel(){ const p=$("#panel"); p.classList.remove("open"); $("#panelBg").classList.remove("open"); setTimeout(()=>p.hidden=true,300); $("#openSettings").focus(); }
 $("#openSettings").addEventListener("click",openPanel);
 $("#aboutA11y") && $("#aboutA11y").addEventListener("click",openPanel);
@@ -1602,6 +1627,43 @@ $("#closePanel").addEventListener("click",closePanel);
 $("#panelBg").addEventListener("click",closePanel);
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("#panel").classList.contains("open")) closePanel(); });
 $$("#segText button").forEach(b=> b.addEventListener("click",()=> setA11y("text", b.getAttribute("data-text"))));
+
+/* ---------- Accent audio ---------- */
+function refreshAccentSeg(){
+  if(!$("#segAccent")) return;
+  const avail = (Speech.ok ? Speech.availableAccents() : []);
+  let cur = Speech.getAccent();
+  if(avail.length && avail.indexOf(cur)<0){ cur = avail[0]; Speech.setAccent(cur); }
+  $$("#segAccent button").forEach(b=>{
+    const a = b.getAttribute("data-acc");
+    const ok = avail.indexOf(a) >= 0;
+    b.disabled = !ok;
+    b.style.opacity = ok ? "" : ".35";
+    b.setAttribute("aria-pressed", String(ok && a===cur));
+  });
+  const note = $("#accentNote");
+  if(note){
+    if(!Speech.ok){ note.textContent = "Audio non disponible sur ce navigateur."; }
+    else if(!avail.length){ note.textContent = "Voix anglaises en cours de chargement…"; }
+    else {
+      const miss = ["en-US","en-GB","en-AU","en-CA"].filter(a=> avail.indexOf(a)<0)
+        .map(a=>({"en-US":"US","en-GB":"UK","en-AU":"AU","en-CA":"CA"}[a]));
+      note.textContent = miss.length
+        ? "Accents indisponibles sur cet appareil : "+miss.join(", ")+"."
+        : "Les quatre accents sont disponibles sur cet appareil.";
+    }
+  }
+}
+if($("#segAccent")){
+  $$("#segAccent button").forEach(b=> b.addEventListener("click",()=>{
+    if(b.disabled) return;
+    Speech.setAccent(b.getAttribute("data-acc"));
+    refreshAccentSeg();
+    Speech.say("This is the selected accent.", b);
+  }));
+}
+try{ if("speechSynthesis" in window) window.speechSynthesis.addEventListener("voiceschanged", refreshAccentSeg); }catch(e){}
+setTimeout(refreshAccentSeg, 400); setTimeout(refreshAccentSeg, 1400);
 [["swContrast","contrast"],["swDys","dys"],["swMotion","motion"],["swFocus","focus"]].forEach(([id,key])=>{
   $("#"+id).addEventListener("click",()=>{ const cur=$("#"+id).getAttribute("aria-pressed")==="true"; setA11y(key,!cur); });
 });
