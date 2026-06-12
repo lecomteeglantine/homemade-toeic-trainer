@@ -1243,42 +1243,156 @@ const FULLMOCK = {
   ]}
  ],
  reading: [
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou la forme qui complète correctement la phrase.", qs:[{stem:"All employees must ____ their badges at the entrance.", opts:["show","shows","showing","to show"], a:0, why:"Après must, on emploie la base verbale."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The new policy will take effect ____ January 1st.", opts:["in","on","at","by"], a:1, why:"on + date précise."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The report was ____ by the finance department.", opts:["prepare","prepared","preparing","prepares"], a:1, why:"Voix passive : was + participe passé."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"We received ____ applications than last year.", opts:["many","much","more","most"], a:2, why:"Comparatif : more ... than."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"Please contact us if you have any ____.", opts:["question","questions","questioning","questioned"], a:1, why:"any + nom pluriel dénombrable."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The manager asked the team to work ____.", opts:["efficient","efficiency","efficiently","efficiencies"], a:2, why:"Un adverbe modifie le verbe : efficiently."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"Sales have increased ____ the new campaign.", opts:["because","because of","although","despite"], a:1, why:"because of + nom."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"____ the manager nor the assistant was available.", opts:["Either","Neither","Both","Whether"], a:1, why:"Neither ... nor ..."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The documents need to ____ before Friday.", opts:["submit","submitted","be submitted","submitting"], a:2, why:"Passif après need to : be + participe."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"If demand increases, we ____ production.", opts:["increase","increased","will increase","would increase"], a:2, why:"1er conditionnel : if + présent, will + base."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"She has worked here ____ five years.", opts:["since","for","during","by"], a:1, why:"for + durée."}]},
-  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis la bonne réponse.", qs:[{stem:"The conference will be held ____ the main hall.", opts:["in","on","at","of"], a:0, why:"in + grand espace clos."}]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou le groupe de mots qui complète correctement la phrase.", qs:[
+    {stem:"The committee will ____ the proposal at next week's meeting.", opts:["review","reviews","reviewing","reviewed"], a:0, why:"Après l'auxiliaire « will », on emploie la base verbale."},
+    {stem:"All employees must submit their reports ____ Friday.", opts:["by","until","since","during"], a:0, why:"« by » = au plus tard à (une échéance)."},
+    {stem:"The new software is much ____ than the previous version.", opts:["easy","easier","easiest","more easy"], a:1, why:"Comparatif court : easy → easier."},
+    {stem:"Ms. Tan, ____ joined the company last year, was promoted.", opts:["who","which","whose","whom"], a:0, why:"« who » : pronom relatif sujet pour une personne."},
+    {stem:"The shipment arrived ____ than expected.", opts:["early","earlier","earliest","more early"], a:1, why:"Comparatif : early → earlier."},
+    {stem:"Please make sure the door is locked ____ you leave.", opts:["before","during","about","among"], a:0, why:"« before » + proposition : avant que tu partes."}
+  ]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou le groupe de mots qui complète correctement la phrase.", qs:[
+    {stem:"The manager asked the team to work ____.", opts:["efficient","efficiently","efficiency","efficiencies"], a:1, why:"Un adverbe modifie le verbe « work »."},
+    {stem:"Our company has ____ offices in five countries.", opts:["open","opened","opening","opens"], a:1, why:"« has » + participe passé (present perfect)."},
+    {stem:"The conference room is located ____ the third floor.", opts:["in","at","on","to"], a:2, why:"« on the third floor » : on + étage."},
+    {stem:"Neither the manager ____ the assistant was available.", opts:["or","nor","and","but"], a:1, why:"Corrélation « neither … nor »."},
+    {stem:"The report must be ____ by the end of the day.", opts:["complete","completed","completing","completion"], a:1, why:"Passif : be + participe passé."},
+    {stem:"____ the rain, the outdoor event was held as planned.", opts:["Despite","Although","Because","However"], a:0, why:"« Despite » + nom (malgré la pluie)."}
+  ]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou le groupe de mots qui complète correctement la phrase.", qs:[
+    {stem:"Employees are encouraged to ____ in the training program.", opts:["participate","participation","participant","participating"], a:0, why:"Après « to », base verbale (to participate)."},
+    {stem:"The new policy will take ____ next month.", opts:["affect","effect","effective","effectively"], a:1, why:"Expression « take effect » (entrer en vigueur)."},
+    {stem:"The products are shipped directly ____ the manufacturer.", opts:["from","of","for","with"], a:0, why:"« from » : en provenance de."},
+    {stem:"If you ____ any questions, please contact us.", opts:["have","has","having","had"], a:0, why:"« you have » au présent."},
+    {stem:"The presentation was ____ informative and engaging.", opts:["both","either","neither","each"], a:0, why:"« both … and » (à la fois … et)."},
+    {stem:"The company is committed ____ improving customer service.", opts:["to","for","with","on"], a:0, why:"« be committed to » + V-ing."}
+  ]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou le groupe de mots qui complète correctement la phrase.", qs:[
+    {stem:"Sales have increased ____ over the past year.", opts:["significant","significance","significantly","signify"], a:2, why:"Un adverbe modifie le verbe « increased »."},
+    {stem:"The technician will repair the machine ____ possible.", opts:["as soon as","as long as","as far as","as well as"], a:0, why:"« as soon as possible » : dès que possible."},
+    {stem:"Each of the candidates ____ a strong résumé.", opts:["have","has","having","to have"], a:1, why:"« each » est singulier : has."},
+    {stem:"The store offers a wide ____ of products.", opts:["variety","various","vary","variously"], a:0, why:"« a wide variety of » (un nom après l'article)."},
+    {stem:"The meeting was postponed ____ next Tuesday.", opts:["until","by","since","from"], a:0, why:"« until » : jusqu'à (report)."},
+    {stem:"Customers can return items ____ 30 days of purchase.", opts:["within","between","among","along"], a:0, why:"« within 30 days » : dans un délai de 30 jours."}
+  ]},
+  {part:"Partie 5 — Phrases à compléter (réel : 30 questions)", instr:"Choisis le mot ou le groupe de mots qui complète correctement la phrase.", qs:[
+    {stem:"The new employee adapted ____ to the work environment.", opts:["quick","quickly","quickness","quicker"], a:1, why:"Adverbe modifiant « adapted »."},
+    {stem:"The director will be ____ for the final decision.", opts:["responsible","responsibly","responsibility","respond"], a:0, why:"« be responsible for » : adjectif."},
+    {stem:"They decided to ____ the launch until further notice.", opts:["delay","delays","delayed","delaying"], a:0, why:"Après « to », base verbale."},
+    {stem:"The instructions were clear and ____ to follow.", opts:["ease","easy","easily","easier"], a:1, why:"Adjectif après « and » (clear and easy)."},
+    {stem:"____ working here, she has earned several awards.", opts:["Since","During","While","For"], a:0, why:"« Since » + V-ing : depuis qu'elle travaille ici."},
+    {stem:"We need to complete the project ____ the deadline.", opts:["before","ago","yet","still"], a:0, why:"« before the deadline » : avant l'échéance."}
+  ]},
 
-  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis le courriel et choisis le mot qui convient pour chaque espace.", passage:"Dear Mr. Lee,\nThank you for your interest in our services. We are pleased to (1)____ that your application has been approved. Your account will be (2)____ within 24 hours. If you have any questions, please do not (3)____ to contact our support team. We look forward to (4)____ with you.\nBest regards, Customer Service", qs:[
-    {stem:"Espace (1)", opts:["confirm","confirms","confirming","confirmed"], a:0, why:"to confirm : base verbale après to."},
-    {stem:"Espace (2)", opts:["activate","activated","activating","activates"], a:1, why:"will be + participe (passif) : activated."},
-    {stem:"Espace (3)", opts:["hesitate","hesitated","hesitating","hesitation"], a:0, why:"do not hesitate to contact."},
-    {stem:"Espace (4)", opts:["work","worked","working","works"], a:2, why:"look forward to + V-ing : working."}
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis le courriel et choisis ce qui convient pour chaque espace.", passage:"Dear Ms. Carter,\nWe are pleased to (1)____ you the position of Marketing Assistant. Your start date will be June 1. Please (2)____ the attached contract and return it by May 20. (3)____ We believe you will be a valuable addition to our team and look forward (4)____ working with you.\nSincerely, HR Department", qs:[
+    {stem:"(1)", opts:["offer","offers","offered","offering"], a:0, why:"Après « to », base verbale (to offer)."},
+    {stem:"(2)", opts:["review","reviews","reviewing","reviewed"], a:0, why:"Impératif : base verbale."},
+    {stem:"(3) Choisis la phrase qui convient.", opts:["If you have any questions, feel free to contact us.","The office will be closed on Monday.","We regret to inform you of a delay.","Thank you for your recent purchase."], a:0, why:"Seule cette phrase s'insère logiquement dans une offre d'emploi."},
+    {stem:"(4)", opts:["to","for","with","at"], a:0, why:"« look forward to » + V-ing."}
   ]},
-  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis la note et choisis le mot qui convient pour chaque espace.", passage:"Please be advised that the office will be closed for maintenance on Saturday. All staff are (1)____ to save their work before leaving on Friday. The elevators will also be (2)____ during this period, so please use the stairs. We (3)____ for any inconvenience this may cause. Normal operations will (4)____ on Monday.", qs:[
-    {stem:"Espace (1)", opts:["ask","asked","asking","asks"], a:1, why:"are asked (passif) : être prié de."},
-    {stem:"Espace (2)", opts:["unavailable","available","avail","availability"], a:0, why:"hors service : will be unavailable."},
-    {stem:"Espace (3)", opts:["apologize","apologizes","apologized","apologizing"], a:0, why:"We apologize for ..."},
-    {stem:"Espace (4)", opts:["resume","resumed","resuming","resumes"], a:0, why:"will + base verbale : resume."}
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis l'annonce et choisis ce qui convient pour chaque espace.", passage:"Please be (1)____ that our office will relocate to a new address on March 15. The new location offers (2)____ parking and is closer to public transportation. (3)____ All mail should be sent to the new address (4)____ March 10.\nThank you for your cooperation.", qs:[
+    {stem:"(1)", opts:["advise","advised","advising","advisable"], a:1, why:"« be advised that » (soyez informés que)."},
+    {stem:"(2)", opts:["additional","addition","add","additionally"], a:0, why:"Adjectif devant « parking »."},
+    {stem:"(3) Choisis la phrase qui convient.", opts:["A map will be provided to all employees.","The sale ends on Friday.","Please pay your invoice today.","The flight has been delayed."], a:0, why:"Phrase cohérente avec un déménagement de bureau."},
+    {stem:"(4)", opts:["starting","started","starts","start"], a:0, why:"« starting March 10 » : à partir du 10 mars."}
+  ]},
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis la publicité et choisis ce qui convient pour chaque espace.", passage:"Join FitLife Gym today and (1)____ from our special offer! For a (2)____ time, new members pay no registration fee. Our facilities include modern equipment, group classes, and (3)____ trainers. (4)____ Sign up online or visit us in person.", qs:[
+    {stem:"(1)", opts:["benefit","benefits","benefited","benefiting"], a:0, why:"Impératif coordonné : base verbale."},
+    {stem:"(2)", opts:["limit","limited","limiting","limitation"], a:1, why:"« a limited time » : adjectif."},
+    {stem:"(3)", opts:["experience","experienced","experiencing","experiences"], a:1, why:"Adjectif (entraîneurs expérimentés)."},
+    {stem:"(4) Choisis la phrase qui convient.", opts:["Membership can be cancelled at any time.","The store closes at 9 p.m.","Your order has shipped.","We apologize for the delay."], a:0, why:"Phrase pertinente dans une publicité d'abonnement."}
+  ]},
+  {part:"Partie 6 — Textes à compléter (réel : 16 questions)", instr:"Lis la note de service et choisis ce qui convient pour chaque espace.", passage:"To all staff: Starting next month, we will (1)____ a new system for requesting time off. Requests must be submitted (2)____ at least two weeks in advance. Your manager will (3)____ each request within three days. (4)____ We appreciate your understanding during this transition.", qs:[
+    {stem:"(1)", opts:["introduce","introduces","introduced","introducing"], a:0, why:"Après « will », base verbale."},
+    {stem:"(2)", opts:["electronic","electronically","electronics","electronical"], a:1, why:"Adverbe modifiant « submitted »."},
+    {stem:"(3)", opts:["review","reviews","reviewing","reviewed"], a:0, why:"Après « will », base verbale."},
+    {stem:"(4) Choisis la phrase qui convient.", opts:["Further details will be shared in a follow-up email.","The parking lot will be repaved.","Tickets are now on sale.","The product is out of stock."], a:0, why:"Phrase cohérente avec l'annonce d'un nouveau système."}
   ]},
 
-  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'annonce, puis réponds aux questions.", passage:"GREENLEAF OFFICE SUPPLIES — Spring Sale!\nFor the entire month of April, enjoy 20% off all paper products and 15% off office furniture. Orders over $100 qualify for free delivery within the city. Visit our store on Oak Street or order online at greenleaf-supplies.com. Members of our loyalty program receive an additional 5% discount. Hurry — these offers end April 30!", qs:[
-    {stem:"What is being advertised?", opts:["A grand opening.","A seasonal sale.","A job opening.","A new store location."], a:1, why:"C'est une promotion de printemps (Spring Sale)."},
-    {stem:"How can a customer get free delivery?", opts:["By visiting the store.","By spending over $100.","By joining the loyalty program.","By ordering furniture."], a:1, why:"Livraison gratuite au-delà de 100 $."},
-    {stem:"What do loyalty members receive?", opts:["Free furniture.","An extra 5% discount.","Free membership.","A longer sale."], a:1, why:"Une réduction supplémentaire de 5 %."}
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis la publicité, puis réponds aux questions.", passage:"TECHWORLD ANNUAL SALE\nFrom June 1 to June 15, save up to 40% on laptops, tablets, and accessories. Buy any laptop and receive a free carrying case. Online orders over $50 ship free. Loyalty members get early access on May 31. Visit techworld.com or any of our 12 store locations.", qs:[
+    {stem:"What is being advertised?", opts:["A sale on electronics.","A new store opening.","A repair service.","A job opening."], a:0, why:"Une promotion sur du matériel électronique."},
+    {stem:"What do customers receive when buying a laptop?", opts:["A free tablet.","A free carrying case.","Free installation.","A discount coupon."], a:1, why:"« receive a free carrying case »."},
+    {stem:"What is true for loyalty members?", opts:["They pay no tax.","They get free laptops.","They can shop one day early.","They get a longer warranty."], a:2, why:"« early access on May 31 »."}
   ]},
-  {part:"Partie 7 — Compréhension, double texte (réel : 54 questions)", instr:"Lis les deux courriels, puis réponds aux questions.", passage:"COURRIEL 1\nTo: bookings@harborhotel.com — Subject: Reservation request\nHello, I would like to book a single room for three nights, from May 5 to May 8. I will be attending a conference nearby and would prefer a quiet room away from the elevator. Could you also confirm whether breakfast is included? Thank you, Marc Olsen\n\nCOURRIEL 2 (réponse)\nDear Mr. Olsen, Thank you for your request. We have reserved a single room on the fifth floor, away from the elevator, for the dates you mentioned. Breakfast is included and served from 7 to 10 a.m. Please note that check-in begins at 2 p.m. We look forward to welcoming you. Best regards, Harbor Hotel", qs:[
-    {stem:"Why is Mr. Olsen traveling?", opts:["For a holiday.","To attend a conference.","To visit family.","For a job interview."], a:1, why:"Il assiste à une conférence à proximité."},
-    {stem:"What did Mr. Olsen request?", opts:["A room near the elevator.","A quiet room.","A double room.","A late checkout."], a:1, why:"Il demande une chambre calme, loin de l'ascenseur."},
-    {stem:"What is included with the room?", opts:["Parking.","Breakfast.","Airport transfer.","A gym pass."], a:1, why:"Le petit-déjeuner est inclus."},
-    {stem:"When can Mr. Olsen check in?", opts:["At 7 a.m.","At 2 p.m.","At 10 a.m.","At noon."], a:1, why:"L'arrivée (check-in) commence à 14 h."}
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis le courriel, puis réponds aux questions.", passage:"To: staff@brightcorp.com\nSubject: Parking changes\nDear all, Beginning Monday, the north parking lot will be closed for repaving for two weeks. During this time, please use the south lot or the public garage on Elm Street. The company will reimburse garage fees with a receipt. We apologize for the inconvenience. — Facilities Team", qs:[
+    {stem:"Why is the north lot closing?", opts:["For repaving.","For a private event.","Because of an accident.","To add more spaces."], a:0, why:"« closed for repaving »."},
+    {stem:"How long will it be closed?", opts:["One day.","One week.","Two weeks.","One month."], a:2, why:"« for two weeks »."},
+    {stem:"What must employees keep to be reimbursed?", opts:["A receipt.","A parking permit.","An ID card.","An email."], a:0, why:"« reimburse garage fees with a receipt »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'avis, puis réponds aux questions.", passage:"NOTICE: The library will close early at 5 p.m. on Friday for a staff event. Books due Friday may be returned on Monday without penalty. The online catalog remains available 24 hours a day.", qs:[
+    {stem:"Why will the library close early?", opts:["For a holiday.","For a staff event.","For repairs.","For cleaning."], a:1, why:"« for a staff event »."},
+    {stem:"What happens to books due on Friday?", opts:["They are cancelled.","They can be returned Monday without penalty.","They must be renewed online.","A fee applies."], a:1, why:"« returned on Monday without penalty »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'article, puis réponds aux questions.", passage:"LOCAL BAKERY EXPANDS\nSweet Crumb Bakery, a favorite in Riverside for ten years, announced it will open a second location downtown in September. Owner Lena Ortiz said growing demand inspired the expansion, which will create fifteen new jobs. The new shop will feature a seating area and a coffee bar, unlike the original takeaway-only store. Hiring begins in July.", qs:[
+    {stem:"What did Sweet Crumb Bakery announce?", opts:["A new menu.","A second location.","A closure.","A price increase."], a:1, why:"« open a second location »."},
+    {stem:"Why is the bakery expanding?", opts:["Growing demand.","Lower rent.","A new owner.","An award."], a:0, why:"« growing demand inspired the expansion »."},
+    {stem:"How will the new shop differ from the original?", opts:["It will be takeaway only.","It will have a seating area.","It will be smaller.","It will close earlier."], a:1, why:"« a seating area … unlike the original takeaway-only store »."},
+    {stem:"When does hiring begin?", opts:["In July.","In September.","In ten years.","Immediately."], a:0, why:"« Hiring begins in July »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis la note de service, puis réponds aux questions.", passage:"MEMO — To: Sales Team; From: R. Patel; Re: Quarterly targets\nGreat work last quarter. We exceeded our goal by 12%. For Q3, each representative should aim for 20 new client meetings per month. Weekly check-ins will move to Tuesday mornings. Please update your pipelines in the shared system by Friday.", qs:[
+    {stem:"What is the purpose of the memo?", opts:["To announce layoffs.","To set quarterly targets.","To cancel meetings.","To request payment."], a:1, why:"Il fixe les objectifs du trimestre."},
+    {stem:"When will check-ins take place?", opts:["Monday afternoons.","Tuesday mornings.","Friday evenings.","Every day."], a:1, why:"« move to Tuesday mornings »."},
+    {stem:"What should representatives do by Friday?", opts:["Update their pipelines.","Submit expenses.","Book a room.","Call clients."], a:0, why:"« update your pipelines … by Friday »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis les messages, puis réponds aux questions.", passage:"Maria (9:02): Hi Tom, are the samples ready for the client?\nTom (9:05): Almost — just waiting on the printer. Should be done by 11.\nMaria (9:06): Great. The client moved the meeting to 1 p.m., so that works.\nTom (9:07): Perfect. I'll bring them to your office before then.", qs:[
+    {stem:"What are Maria and Tom discussing?", opts:["Samples for a client.","A printer repair.","A lunch order.","A new hire."], a:0, why:"« samples for the client »."},
+    {stem:"At 9:05, why does Tom mention 11?", opts:["The meeting starts then.","The samples will be ready then.","The client arrives then.","The office closes then."], a:1, why:"« Should be done by 11 »."},
+    {stem:"What will Tom do?", opts:["Email the client.","Repair the printer.","Bring the samples to Maria.","Reschedule the meeting."], a:2, why:"« I'll bring them to your office »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'avis, puis réponds aux questions.", passage:"TRAIN SERVICE UPDATE\nDue to track maintenance, the 7:15 a.m. express to Central Station will not run this weekend. Passengers should take the 7:00 a.m. local, which adds about 20 minutes to the journey. Normal service resumes on Monday.", qs:[
+    {stem:"What is the problem?", opts:["A train is cancelled for maintenance.","Tickets are sold out.","The station is closed.","Prices have increased."], a:0, why:"L'express ne circule pas (maintenance)."},
+    {stem:"What is the disadvantage of the alternative?", opts:["It is more expensive.","It takes about 20 minutes longer.","It has no seats.","It leaves from another city."], a:1, why:"« adds about 20 minutes »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis la lettre, puis réponds aux questions.", passage:"Dear Valued Customer,\nThank you for being a member for five years. As a token of our appreciation, we are upgrading your account to Premium at no extra cost for one year. Premium includes free shipping and priority support. No action is required; the upgrade is automatic on your next billing date. — Customer Loyalty Team", qs:[
+    {stem:"Why was this letter sent?", opts:["To request payment.","To announce a free account upgrade.","To report a problem.","To cancel a membership."], a:1, why:"Surclassement offert pour fidélité."},
+    {stem:"What is one benefit of Premium?", opts:["Free shipping.","A free gift card.","A new phone.","Cash back."], a:0, why:"« free shipping and priority support »."},
+    {stem:"What must the customer do?", opts:["Call support.","Pay a fee.","Nothing; it is automatic.","Sign a form."], a:2, why:"« No action is required »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis l'avis client, puis réponds aux questions.", passage:"★★★★☆ Riverside Café\nGreat spot for breakfast. The coffee is excellent and the staff are friendly. I ordered the avocado toast, which was fresh and generous. My only complaint is that it gets crowded after 9 a.m., so arrive early. I'll definitely return. — Posted by J. Kim", qs:[
+    {stem:"What did the reviewer like?", opts:["The coffee and the staff.","The prices.","The parking.","The music."], a:0, why:"« coffee is excellent and the staff are friendly »."},
+    {stem:"What is the reviewer's only complaint?", opts:["The food was cold.","It gets crowded.","It was expensive.","It closed early."], a:1, why:"« it gets crowded after 9 a.m. »."},
+    {stem:"What does the reviewer recommend?", opts:["Arriving early.","Ordering online.","Booking a table.","Bringing cash."], a:0, why:"« so arrive early »."}
+  ]},
+  {part:"Partie 7 — Compréhension, texte simple (réel : 54 questions)", instr:"Lis les instructions, puis réponds aux questions.", passage:"SETTING UP YOUR ROUTER\n1. Connect the power cable and wait for the green light.\n2. Plug the network cable into the port labeled WAN.\n3. On your device, select the network named SETUP and enter the password printed on the bottom of the router.\n4. Follow the on-screen steps to create your own network name.\nIf the light stays red, contact support.", qs:[
+    {stem:"What should you do first?", opts:["Connect the power cable.","Plug in the network cable.","Create a network name.","Call support."], a:0, why:"L'étape 1 : brancher l'alimentation."},
+    {stem:"Where is the password?", opts:["In the manual.","On the bottom of the router.","On the screen.","In an email."], a:1, why:"« printed on the bottom of the router »."},
+    {stem:"What should you do if the light stays red?", opts:["Restart the device.","Wait one hour.","Contact support.","Buy a new router."], a:2, why:"« If the light stays red, contact support »."}
+  ]},
+
+  {part:"Partie 7 — Compréhension, textes multiples (réel : 54 questions)", instr:"Lis les deux courriels, puis réponds aux questions.", passage:"EMAIL 1\nTo: events@maplehall.com — Subject: Venue inquiry\nHello, I'm organizing a company workshop for about 40 people on October 12. Do you have a room available that day, and does it include a projector and Wi-Fi? We would also need coffee for the morning. — D. Foster\n\nEMAIL 2 (reply)\nDear Mr. Foster, Yes, our Maple Room seats up to 50 and includes a projector, Wi-Fi, and a sound system at no extra charge. Morning coffee service is available for $6 per person. The room is free on October 12. To confirm, a 20% deposit is required. — Maple Hall Events", qs:[
+    {stem:"Why did Mr. Foster write the first email?", opts:["To inquire about a venue.","To cancel a booking.","To complain.","To apply for a job."], a:0, why:"Il se renseigne sur une salle."},
+    {stem:"How many people will attend the workshop?", opts:["About 20.","About 40.","Exactly 50.","Over 100."], a:1, why:"« about 40 people »."},
+    {stem:"What is included at no extra charge?", opts:["Coffee.","Lunch.","Projector, Wi-Fi and sound system.","Parking."], a:2, why:"« at no extra charge »."},
+    {stem:"What costs extra?", opts:["The Wi-Fi.","The morning coffee.","The projector.","The room."], a:1, why:"« coffee service … $6 per person »."},
+    {stem:"What is required to confirm the booking?", opts:["A signed contract.","A 20% deposit.","Full payment.","An ID card."], a:1, why:"« a 20% deposit is required »."}
+  ]},
+  {part:"Partie 7 — Compréhension, textes multiples (réel : 54 questions)", instr:"Lis la publicité et le courriel, puis réponds aux questions.", passage:"ADVERTISEMENT\nQUICKPRINT — Professional printing for businesses. Business cards, flyers, banners. 10% off your first order. Free design review. Orders placed before noon ship the same day. Visit quickprint.com.\n\nEMAIL\nTo: orders@quickprint.com — Subject: First order\nHello, I'd like 500 business cards and 100 flyers. This is my first order, so I'd like the discount. Can they ship today if I order now (10 a.m.)? Also, could someone review my design before printing? — S. Reyes", qs:[
+    {stem:"What does QuickPrint provide?", opts:["Printing services.","Web design.","Office furniture.","Delivery only."], a:0, why:"« Professional printing for businesses »."},
+    {stem:"What discount can Ms. Reyes receive?", opts:["No discount.","10% off her first order.","20% off banners.","Free shipping only."], a:1, why:"« 10% off your first order » + premier achat."},
+    {stem:"Can her order ship today?", opts:["No, never.","Yes, because she ordered before noon.","Only next week.","Only if she pays extra."], a:1, why:"Commande à 10h, avant midi → expédition le jour même."},
+    {stem:"What free service does she ask about?", opts:["A design review.","Free banners.","Free delivery.","A refund."], a:0, why:"« could someone review my design »."},
+    {stem:"What is suggested about Ms. Reyes?", opts:["She is a new customer.","She owns QuickPrint.","She wants a refund.","She is an employee."], a:0, why:"« This is my first order »."}
+  ]},
+  {part:"Partie 7 — Compréhension, textes multiples (réel : 54 questions)", instr:"Lis les trois documents, puis réponds aux questions.", passage:"DOCUMENT 1 — NOTICE\nThe annual Staff Training Day will be held on November 8. All employees must attend one morning session and one afternoon session. Lunch is provided.\n\nDOCUMENT 2 — EMAIL\nTo: all staff — Subject: Session sign-up\nPlease sign up for your sessions by November 1. Spaces are limited to 25 per session. If your first choice is full, you will be placed in your second choice. — Training Office\n\nDOCUMENT 3 — SCHEDULE\nMorning: A) Time Management (Room 1), B) Public Speaking (Room 2)\nAfternoon: C) Spreadsheets (Room 1), D) Customer Service (Room 2)", qs:[
+    {stem:"When is Training Day?", opts:["November 1.","November 8.","October 25.","December 8."], a:1, why:"« held on November 8 »."},
+    {stem:"How many sessions must each employee attend?", opts:["One.","Two.","Three.","Four."], a:1, why:"Une le matin, une l'après-midi."},
+    {stem:"What is the sign-up deadline?", opts:["November 1.","November 8.","October 31.","No deadline."], a:0, why:"« sign up … by November 1 »."},
+    {stem:"What happens if a session is full?", opts:["You wait until next year.","You are placed in your second choice.","You attend online.","You pay a fee."], a:1, why:"« placed in your second choice »."},
+    {stem:"Which is an afternoon session?", opts:["Time Management.","Public Speaking.","Customer Service.","None."], a:2, why:"« Afternoon: … D) Customer Service »."}
+  ]},
+  {part:"Partie 7 — Compréhension, textes multiples (réel : 54 questions)", instr:"Lis les trois documents, puis réponds aux questions.", passage:"DOCUMENT 1 — ARTICLE\nGreenTech Wins Award\nGreenTech, a startup making energy-saving sensors, won the regional Innovation Prize. The prize includes funding and mentorship. CEO Amara Diaz credited the team and announced plans to hire engineers.\n\nDOCUMENT 2 — EMAIL\nTo: careers@greentech.com — Subject: Engineering position\nHello, I read about your award and your plans to hire. I'm an electrical engineer with five years of experience in sensors. I've attached my résumé. — P. Novak\n\nDOCUMENT 3 — FORM\nApplication received. Position: Engineer. Name: P. Novak. Status: Under review. Next step: Interview to be scheduled within two weeks.", qs:[
+    {stem:"Why did GreenTech win the prize?", opts:["For its energy-saving sensors.","For its low prices.","For its size.","For its location."], a:0, why:"« a startup making energy-saving sensors »."},
+    {stem:"What did the CEO announce?", opts:["A new product.","Plans to hire engineers.","A price cut.","A move abroad."], a:1, why:"« announced plans to hire engineers »."},
+    {stem:"Why is Mr. Novak a good fit?", opts:["He has experience with sensors.","He won the same prize.","He works for GreenTech.","He is a manager."], a:0, why:"« five years of experience in sensors »."},
+    {stem:"What did Mr. Novak attach to his email?", opts:["A photo.","His résumé.","A contract.","An invoice."], a:1, why:"« I've attached my résumé »."},
+    {stem:"What is the next step for his application?", opts:["A rejection.","An interview within two weeks.","A payment.","A second email."], a:1, why:"« Interview to be scheduled within two weeks »."}
+  ]},
+  {part:"Partie 7 — Compréhension, textes multiples (réel : 54 questions)", instr:"Lis les trois documents, puis réponds aux questions.", passage:"DOCUMENT 1 — ITINERARY\nFlight: City A to City B, departs 8:00 a.m., arrives 10:30 a.m., June 4. Hotel: Grand Plaza, June 4-6. Return flight: June 6, 6:00 p.m.\n\nDOCUMENT 2 — EMAIL\nTo: travel@corp.com — Subject: Change request\nHello, my meeting on June 6 was moved to the morning, so I need to fly back later that day, after 7 p.m. if possible. The hotel dates are fine. — L. Brand\n\nDOCUMENT 3 — INVOICE\nFlight (round trip): $420. Hotel (2 nights): $260. Change fee: $40. Total: $720.", qs:[
+    {stem:"When does the traveler arrive in City B?", opts:["8:00 a.m. on June 4.","10:30 a.m. on June 4.","6:00 p.m. on June 6.","Noon on June 6."], a:1, why:"« arrives 10:30 a.m., June 4 »."},
+    {stem:"What change does L. Brand request?", opts:["An earlier flight.","A later return flight on June 6.","A different hotel.","An extra night."], a:1, why:"« fly back later that day, after 7 p.m. »."},
+    {stem:"What does NOT need to change?", opts:["The hotel dates.","The return flight.","The meeting time.","The destination."], a:0, why:"« The hotel dates are fine »."},
+    {stem:"How much is the change fee?", opts:["$20.","$40.","$260.","$420."], a:1, why:"« Change fee: $40 »."},
+    {stem:"What is the total on the invoice?", opts:["$420.","$260.","$720.","$700."], a:2, why:"« Total: $720 »."}
   ]}
  ]
 };
@@ -1882,7 +1996,7 @@ let mock=null;
 function mockSections(){
   return [
     {name:"Écoute", icon:"&#127911;", note:"Parties 1 à 4 — au vrai test : environ 45 min, 100 questions.", secs:2700, blocks:FULLMOCK.listening},
-    {name:"Lecture", icon:"&#128214;", note:"Parties 5 à 7 — au vrai test : 75 min, 100 questions.", secs:1200, blocks:FULLMOCK.reading}
+    {name:"Lecture", icon:"&#128214;", note:"Parties 5 à 7 — au vrai test : 75 min, 100 questions.", secs:4500, blocks:FULLMOCK.reading}
   ];
 }
 function startMock(){
