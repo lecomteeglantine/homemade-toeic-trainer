@@ -78,6 +78,11 @@ header.top{
   background:color-mix(in srgb, var(--bg) 86%, transparent); border-bottom:1px solid var(--line);
 }
 .top-in{ display:flex; align-items:center; gap:14px; padding:12px 0; }
+.accentbar-in{ display:flex; align-items:center; gap:9px; padding:8px 0 10px; border-top:1px solid var(--line); flex-wrap:wrap; }
+.accentbar-in .acc-label{ font-weight:700; font-size:.82rem; color:var(--muted); }
+.accentbar-in .seg button{ min-height:32px; padding:0 9px; font-size:.85rem; }
+.accentbar-in .acc-note{ font-size:.72rem; color:var(--muted); margin-left:2px; }
+@media (max-width:560px){ .accentbar-in .acc-note{ display:none; } }
 .brand{ display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--ink); margin-right:auto; }
 .brand .mark{ width:42px; height:42px; border-radius:13px; background:linear-gradient(135deg,var(--blue),var(--teal)); display:grid; place-items:center; color:#fff; font-family:var(--num); font-weight:800; font-size:1.05rem; box-shadow:var(--shadow); flex:none; }
 .brand b{ font-family:var(--display); font-weight:700; font-size:1.06rem; display:block; line-height:1.1; }
@@ -281,6 +286,16 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
     </a>
     <button class="icon-btn" id="openSettings" aria-haspopup="dialog"><span class="gly" aria-hidden="true">&#9881;</span><span class="hide-sm">Accessibilité</span></button>
     <button class="icon-btn hide-sm" data-nav="about"><span class="gly" aria-hidden="true">&#9432;</span>À propos</button>
+  </div>
+  <div class="wrap accentbar-in">
+    <span class="acc-label" aria-hidden="true">🔊 Accent :</span>
+    <span class="seg" id="segAccent" role="group" aria-label="Accent audio (voix anglaise)">
+      <button data-acc="en-US" aria-pressed="true" title="Américain">🇺🇸 US</button>
+      <button data-acc="en-GB" aria-pressed="false" title="Britannique">🇬🇧 UK</button>
+      <button data-acc="en-AU" aria-pressed="false" title="Australien">🇦🇺 AU</button>
+      <button data-acc="en-CA" aria-pressed="false" title="Canadien">🇨🇦 CA</button>
+    </span>
+    <span class="acc-note" id="accentNote"></span>
   </div>
 </header>
 
@@ -724,16 +739,6 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
       <button data-text="xlarge" aria-pressed="false">A++</button>
     </span>
   </div>
-  <div class="setrow">
-    <span class="lab"><b>Accent audio</b><small>Voix utilisée pour lire l'anglais</small></span>
-    <span class="seg" id="segAccent" role="group" aria-label="Accent audio">
-      <button data-acc="en-US" aria-pressed="true" title="Américain">🇺🇸</button>
-      <button data-acc="en-GB" aria-pressed="false" title="Britannique">🇬🇧</button>
-      <button data-acc="en-AU" aria-pressed="false" title="Australien">🇦🇺</button>
-      <button data-acc="en-CA" aria-pressed="false" title="Canadien">🇨🇦</button>
-    </span>
-  </div>
-  <p class="disclaimer" id="accentNote" style="margin:-6px 0 4px">Les accents disponibles dépendent des voix installées sur ton appareil.</p>
   <div class="setrow">
     <span class="lab"><b>Contraste élevé</b><small>Couleurs et bordures renforcées</small></span>
     <button class="switch" id="swContrast" role="switch" aria-pressed="false" aria-label="Contraste élevé"></button>
