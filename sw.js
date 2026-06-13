@@ -1,57 +1,45 @@
-/* Homemade TOEIC Trainer — service worker (mode hors-ligne) */
-const CACHE = "homemade-toeic-v10";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
+/* Homemade TOEIC Trainer — service worker de RÉINITIALISATION
+ *
+ * But : effacer l'ancien cache hors-ligne qui restait "collé" sur les
+ * appareils et empêchait les nouveautés (dont l'onglet Grammaire) de
+ * s'afficher. Ce fichier supprime tous les caches, se désinstalle
+ * lui-même, puis recharge les onglets ouverts. Après son passage, le
+ * site se comporte comme un site web normal : il charge toujours la
+ * dernière version en ligne. (Le mode hors-ligne est désactivé, ce qui
+ * n'a aucun impact pour un usage normal.)
+ */
 
-self.addEventListener("install", e => {
+self.addEventListener("install", function (e) {
+  // Prendre la main immédiatement, sans attendre.
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", function (e) {
   e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-      .catch(() => {})
+    (async function () {
+      // 1) Effacer TOUS les caches existants (y compris les anciens).
+      try {
+        var keys = await caches.keys();
+        await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      } catch (err) {}
+
+      // 2) Se desinstaller : plus aucun service worker ne controlera le site.
+      try { await self.registration.unregister(); } catch (err) {}
+
+      // 3) Recharger les pages ouvertes pour qu'elles repartent du reseau.
+      try {
+        var clients = await self.clients.matchAll({ type: "window" });
+        clients.forEach(function (client) {
+          try { client.navigate(client.url); } catch (err) {}
+        });
+      } catch (err) {}
+    })()
   );
 });
 
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener("fetch", e => {
-  const req = e.request;
-  if (req.method !== "GET") return;
-
-  // La PAGE (HTML) : réseau d'abord → toujours à jour quand on est en ligne,
-  // repli sur le cache si hors-ligne. Plus besoin de changer la version
-  // du cache à chaque modif de contenu.
-  const isPage =
-    req.mode === "navigate" ||
-    (req.headers.get("accept") || "").includes("text/html");
-
-  if (isPage) {
-    e.respondWith(
-      fetch(req)
-        .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => { try { c.put(req, copy); } catch (_) {} }).catch(() => {});
-          return res;
-        })
-        .catch(() => caches.match(req).then(hit => hit || caches.match("./index.html")))
-    );
-    return;
-  }
-
-  // Les autres ressources (icônes, manifeste…) : cache d'abord, c'est suffisant.
-  e.respondWith(
-    caches.match(req).then(hit =>
-      hit ||
-      fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => { try { c.put(req, copy); } catch (_) {} }).catch(() => {});
-        return res;
-      }).catch(() => caches.match("./index.html"))
-    )
-  );
+// Pendant ce passage, ne rien servir depuis le cache : tout vient du reseau.
+self.addEventListener("fetch", function (e) {
+  e.respondWith(fetch(e.request).catch(function () {
+    return new Response("", { status: 504, statusText: "Hors ligne" });
+  }));
 });
