@@ -1,45 +1,76 @@
-/* Homemade TOEIC Trainer — service worker de RÉINITIALISATION
+/* Homemade TOEIC Trainer — service worker (mode hors-ligne, sans cache "collant")
  *
- * But : effacer l'ancien cache hors-ligne qui restait "collé" sur les
- * appareils et empêchait les nouveautés (dont l'onglet Grammaire) de
- * s'afficher. Ce fichier supprime tous les caches, se désinstalle
- * lui-même, puis recharge les onglets ouverts. Après son passage, le
- * site se comporte comme un site web normal : il charge toujours la
- * dernière version en ligne. (Le mode hors-ligne est désactivé, ce qui
- * n'a aucun impact pour un usage normal.)
+ * Principe :
+ *  - LA PAGE est servie "reseau d'abord" : en ligne, on a toujours la
+ *    derniere version (tes modifs s'affichent tout de suite) ; hors ligne,
+ *    on retombe sur la copie mise en cache.
+ *  - Les AUTRES fichiers (icone, manifeste) sont servis depuis le cache,
+ *    puis rafraichis en arriere-plan.
+ *  - A chaque mise a jour, les anciens caches sont supprimes automatiquement
+ *    et le nouveau service worker prend la main : plus de cache fantome.
+ *
+ * Pour une modif de CONTENU (index.html), rien a faire : la page est
+ * rechargee depuis le reseau et la copie hors-ligne se met a jour seule.
+ * Ne change le numero ci-dessous (v11 -> v12...) que si tu modifies la
+ * liste ASSETS ou que tu veux forcer un grand nettoyage.
  */
 
-self.addEventListener("install", function (e) {
-  // Prendre la main immédiatement, sans attendre.
-  self.skipWaiting();
-});
+const CACHE = "homemade-toeic-v11";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
-self.addEventListener("activate", function (e) {
+// Installation : on met la "coquille" du site en cache pour le hors-ligne.
+self.addEventListener("install", e => {
   e.waitUntil(
-    (async function () {
-      // 1) Effacer TOUS les caches existants (y compris les anciens).
-      try {
-        var keys = await caches.keys();
-        await Promise.all(keys.map(function (k) { return caches.delete(k); }));
-      } catch (err) {}
-
-      // 2) Se desinstaller : plus aucun service worker ne controlera le site.
-      try { await self.registration.unregister(); } catch (err) {}
-
-      // 3) Recharger les pages ouvertes pour qu'elles repartent du reseau.
-      try {
-        var clients = await self.clients.matchAll({ type: "window" });
-        clients.forEach(function (client) {
-          try { client.navigate(client.url); } catch (err) {}
-        });
-      } catch (err) {}
-    })()
+    caches.open(CACHE)
+      .then(c => c.addAll(ASSETS))
+      .then(() => self.skipWaiting())   // appliquer la mise a jour sans attendre
+      .catch(() => {})
   );
 });
 
-// Pendant ce passage, ne rien servir depuis le cache : tout vient du reseau.
-self.addEventListener("fetch", function (e) {
-  e.respondWith(fetch(e.request).catch(function () {
-    return new Response("", { status: 504, statusText: "Hors ligne" });
-  }));
+// Activation : suppression des anciens caches + prise de controle des onglets.
+self.addEventListener("activate", e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", e => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+
+  // On ne gere que les fichiers du site lui-meme (meme origine).
+  if (new URL(req.url).origin !== self.location.origin) return;
+
+  const isPage =
+    req.mode === "navigate" ||
+    (req.headers.get("accept") || "").includes("text/html");
+
+  if (isPage) {
+    // PAGE : reseau d'abord, cache en secours si hors ligne.
+    e.respondWith(
+      fetch(req)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(req).then(hit => hit || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // AUTRES FICHIERS : cache d'abord, rafraichi en arriere-plan.
+  e.respondWith(
+    caches.match(req).then(hit => {
+      const network = fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() => hit);
+      return hit || network;
+    })
+  );
 });
