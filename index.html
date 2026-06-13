@@ -3269,6 +3269,123 @@ go("home");
     flex:none;
   }
 </style>
+<script>
+(function () {
+  "use strict";
+
+  // Noms lisibles des écrans (pour le bouton « Reprendre »).
+  var LABELS = {
+    whatis:"Le TOEIC", diagnostic:"Diagnostic", practice:"Exercices",
+    chrono:"Examen blanc", vocab:"Vocabulaire", pron:"Prononciation",
+    listening:"Écoute", traps:"Faux amis", mywords:"My Words",
+    examday:"Le jour J", resources:"Ressources", grammar:"Grammaire",
+    about:"À propos"
+  };
+  // Écrans qu'on NE retient PAS comme « dernière activité ».
+  var SKIP = { home:1, dashboard:1 };
+  var LAST_KEY = "lastView";
+
+  var dock, resumeBtn, dashBtn;
+
+  function ce(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+  function getLast(){ try{ return (typeof Store!=="undefined" && Store.get(LAST_KEY,"")) || ""; }catch(e){ return ""; } }
+  function setLast(v){ try{ if(typeof Store!=="undefined") Store.set(LAST_KEY,v); }catch(e){} }
+  function activeViewId(){ var v=document.querySelector(".view.active"); return v?v.id:"home"; }
+
+  /* ---- On enrobe go() pour suivre la dernière activité, sans rien casser ---- */
+  function hookGo(){
+    if (typeof window.go !== "function" || window.go.__navHelpers) return;
+    var orig = window.go;
+    window.go = function(id){
+      var r = orig.apply(this, arguments);
+      try{
+        if (id && !SKIP[id]) setLast(id);
+        refresh(id || activeViewId());
+      }catch(e){}
+      return r;
+    };
+    window.go.__navHelpers = true;
+  }
+
+  /* ---- Affichage des deux boutons selon l'écran courant ---- */
+  function refresh(current){
+    current = current || activeViewId();
+    var lv = getLast();
+    if (dashBtn) dashBtn.style.display = (current === "dashboard") ? "none" : "inline-flex";
+    if (resumeBtn){
+      if (lv && LABELS[lv] && lv !== current){
+        resumeBtn.style.display = "inline-flex";
+        resumeBtn.innerHTML = '<span aria-hidden="true">&#9654;</span> Reprendre — ' + LABELS[lv];
+      } else {
+        resumeBtn.style.display = "none";
+      }
+    }
+    if (dock){
+      var bothHidden = dashBtn && resumeBtn &&
+        dashBtn.style.display === "none" && resumeBtn.style.display === "none";
+      dock.style.display = bothHidden ? "none" : "flex";
+    }
+  }
+
+  /* ---- Styles ---- */
+  function injectStyle(){
+    if (document.getElementById("nav-helpers-style")) return;
+    var css = ""
+      + ".nav-dock{position:fixed;right:16px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:10px}"
+      + ".nav-pill{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border:0;border-radius:999px;cursor:pointer;font:inherit;font-weight:600;font-size:.95rem;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.18)}"
+      + ".nav-pill.dash{background:var(--blue,#4F7CFF);color:#fff}"
+      + ".nav-pill.dash:hover{filter:brightness(1.06)}"
+      + ".nav-pill.resume{background:var(--bg,#fff);color:var(--ink,#22324B);border:1px solid var(--line,#ECE6DA)}"
+      + ".nav-pill.resume:hover{background:var(--bg2,#F8F4EC)}"
+      + ".nav-pill:focus-visible{outline:3px solid var(--ink,#22324B);outline-offset:2px}"
+      + "@media print{.nav-dock{display:none!important}}";
+    var st=document.createElement("style"); st.id="nav-helpers-style"; st.textContent=css;
+    document.head.appendChild(st);
+  }
+
+  /* ---- Le dock flottant (les deux boutons) ---- */
+  function injectDock(){
+    if (document.querySelector(".nav-dock")) { dock=document.querySelector(".nav-dock"); return; }
+    dock = ce("div","nav-dock");
+
+    resumeBtn = ce("button","nav-pill resume");
+    resumeBtn.type="button";
+    resumeBtn.setAttribute("aria-label","Reprendre où j’en étais");
+    resumeBtn.innerHTML='<span aria-hidden="true">&#9654;</span> Reprendre';
+    resumeBtn.addEventListener("click", function(){
+      var lv=getLast(); if(lv && typeof window.go==="function") window.go(lv);
+    });
+
+    dashBtn = ce("button","nav-pill dash");
+    dashBtn.type="button";
+    dashBtn.setAttribute("data-nav","dashboard");   // la navigation existante s'en charge
+    dashBtn.setAttribute("aria-label","Retour au tableau de bord");
+    dashBtn.innerHTML='<span aria-hidden="true">&#128202;</span> Tableau de bord';
+
+    dock.appendChild(resumeBtn);
+    dock.appendChild(dashBtn);
+    document.body.appendChild(dock);
+    positionDock();
+  }
+
+  /* ---- Place le dock juste au-dessus de la barre d'onglets ---- */
+  function positionDock(){
+    if (!dock) return;
+    var bar = document.querySelector("nav.tabs");
+    var h = (bar && bar.offsetHeight) ? bar.offsetHeight : 64;
+    dock.style.bottom = (h + 16) + "px";
+  }
+
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded",fn); }
+  ready(function(){
+    injectStyle();
+    injectDock();
+    hookGo();
+    refresh(activeViewId());
+    window.addEventListener("resize", positionDock);
+  });
+})();
+</script>
 
 </body>
 </html>
