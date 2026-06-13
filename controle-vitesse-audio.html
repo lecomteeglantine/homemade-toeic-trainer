@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrôle de vitesse audio — démo</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:640px;margin:40px auto;padding:0 20px;color:#1f2430;line-height:1.6}
+  h1{color:#4F7CFF}
+  .demo-word{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid #e3e7f0;border-radius:14px;margin:18px 0}
+  .demo-word button{font-size:1.4rem;background:#eef2ff;border:1px solid #4F7CFF;border-radius:10px;width:48px;height:48px;cursor:pointer}
+  .demo-word strong{font-size:1.25rem}
+  .note{background:#f6f8ff;border-left:4px solid #4F7CFF;padding:12px 16px;border-radius:8px;font-size:.95rem}
+  code{background:#eef2ff;padding:2px 6px;border-radius:5px;font-size:.9em}
+</style>
+</head>
+<body>
+
+  <h1>Démo — Ralentir les audios 🔊</h1>
+  <p>Choisis une vitesse, puis touche le bouton audio. La vitesse choisie s'applique
+  automatiquement à <em>toutes</em> les lectures du site.</p>
+
+  <!-- ===== Exemple : un mot comme dans ta section Vocabulaire ===== -->
+  <div class="demo-word">
+    <button type="button" aria-label="Écouter le mot agreement"
+            onclick="speakDemo('agreement')">🔊</button>
+    <strong>agreement</strong>
+  </div>
+  <div class="demo-word">
+    <button type="button" aria-label="Écouter la phrase"
+            onclick="speakDemo('The report must be completed by Friday.')">🔊</button>
+    <strong>The report must be completed by Friday.</strong>
+  </div>
+
+  <p class="note">Sur certaines voix, la vitesse « Très lent » peut sonner un peu robotique :
+  c'est normal, ça dépend de la voix installée sur l'appareil. <code>0,75×</code> est souvent
+  le meilleur compromis pour l'entraînement.</p>
+
+
+  <!-- =================================================================== -->
+  <!--  👇👇  À COPIER DANS TON SITE  👇👇                                  -->
+  <!--  Colle ce bloc juste avant la balise </body> de ton index.html.     -->
+  <!--  Il ne touche à AUCUNE de tes fonctions existantes.                  -->
+  <!-- =================================================================== -->
+
+  <!-- 1) Le sélecteur de vitesse (place-le où tu veux : ici, dans la
+          section Vocabulaire, ou en haut de page près de l'accent 🔊). -->
+  <div id="speedControl" role="group" aria-label="Vitesse de lecture audio"
+       style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+              padding:10px 14px;border:1px solid #e3e7f0;border-radius:999px;
+              width:max-content;max-width:100%;font-family:inherit;margin:18px 0">
+    <span aria-hidden="true" style="font-size:1.1rem">🐢</span>
+    <span style="font-size:.92rem;color:#444">Vitesse audio :</span>
+    <span style="display:inline-flex;gap:4px">
+      <button type="button" class="speed-btn" data-rate="1"    aria-pressed="true">Normal</button>
+      <button type="button" class="speed-btn" data-rate="0.75" aria-pressed="false">Lent</button>
+      <button type="button" class="speed-btn" data-rate="0.5"  aria-pressed="false">Très&nbsp;lent</button>
+    </span>
+  </div>
+
+  <style>
+    #speedControl .speed-btn{
+      font:inherit;font-size:.9rem;padding:6px 12px;border-radius:999px;
+      border:1px solid #c7d0e8;background:#fff;color:#2a3142;cursor:pointer;
+      transition:background .15s,border-color .15s,color .15s;
+    }
+    #speedControl .speed-btn:hover{border-color:#4F7CFF}
+    #speedControl .speed-btn[aria-pressed="true"]{
+      background:#4F7CFF;border-color:#4F7CFF;color:#fff;font-weight:600;
+    }
+    #speedControl .speed-btn:focus-visible{
+      outline:3px solid #4F7CFF;outline-offset:2px;
+    }
+    @media (prefers-reduced-motion:reduce){
+      #speedControl .speed-btn{transition:none}
+    }
+  </style>
+
+  <!-- 2) Le script : il applique la vitesse à tous les audios automatiquement. -->
+  <script>
+  (function () {
+    // Récupère la vitesse sauvegardée (reste sur l'appareil, comme le reste — RGPD ok)
+    var KEY = 'toeic-audio-rate';
+    var rate = parseFloat(localStorage.getItem(KEY)) || 1;
+
+    // --- A. Voix de l'appareil (Web Speech API) ---------------------------
+    // On "enveloppe" speechSynthesis.speak : chaque lecture est ralentie
+    // selon la vitesse choisie, sans modifier tes fonctions existantes.
+    if ('speechSynthesis' in window) {
+      var originalSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+      window.speechSynthesis.speak = function (utterance) {
+        try {
+          var base = (utterance && typeof utterance.rate === 'number') ? utterance.rate : 1;
+          utterance.rate = base * rate;
+        } catch (e) {}
+        return originalSpeak(utterance);
+      };
+    }
+
+    // --- B. Fichiers audio <audio>/<video> (au cas où tu en ajoutes) ------
+    // On garde le timbre naturel (pas de voix grave) quand c'est ralenti.
+    function applyToMedia(el) {
+      try {
+        el.preservesPitch = true;
+        el.mozPreservesPitch = true;
+        el.webkitPreservesPitch = true;
+        el.playbackRate = rate;
+      } catch (e) {}
+    }
+    document.addEventListener('play', function (e) {
+      if (e.target && (e.target.tagName === 'AUDIO' || e.target.tagName === 'VIDEO')) {
+        applyToMedia(e.target);
+      }
+    }, true);
+
+    // --- C. Les boutons Normal / Lent / Très lent -------------------------
+    var btns = document.querySelectorAll('#speedControl .speed-btn');
+    function setRate(newRate) {
+      rate = newRate;
+      localStorage.setItem(KEY, String(newRate));
+      btns.forEach(function (b) {
+        b.setAttribute('aria-pressed', parseFloat(b.dataset.rate) === newRate ? 'true' : 'false');
+      });
+      // applique tout de suite à un éventuel média en cours de lecture
+      document.querySelectorAll('audio, video').forEach(applyToMedia);
+    }
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { setRate(parseFloat(b.dataset.rate)); });
+    });
+    // Reflète la vitesse sauvegardée au chargement
+    setRate(rate);
+  })();
+  </script>
+  <!-- =================================================================== -->
+  <!--  👆👆  FIN DU BLOC À COPIER  👆👆                                    -->
+  <!-- =================================================================== -->
+
+
+  <!-- Petite fonction juste pour la démo (ton site a déjà la sienne) -->
+  <script>
+    function speakDemo(text){
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u); // <- passe par notre version "enveloppée"
+    }
+  </script>
+
+</body>
+</html>
