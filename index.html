@@ -3006,6 +3006,96 @@ go("home");
 
 })();
 </script>
+<script>
+(function () {
+  "use strict";
+
+  // On a besoin de l'objet Speech et de la barre d'accent du site.
+  if (typeof Speech === "undefined" || !document.getElementById("segAccent")) return;
+
+  var LABELS = {
+    "en-US": "Américain (US)",
+    "en-GB": "Britannique (UK)",
+    "en-AU": "Australien (AU)",
+    "en-CA": "Canadien (CA)"
+  };
+  var SHORT = { "en-US": "US", "en-GB": "UK", "en-AU": "AU", "en-CA": "CA" };
+
+  // 1) Couper l'ancien rafraîchissement qui re-désactive les boutons
+  //    quand les voix se chargent (best-effort, sans casser si absent).
+  try {
+    if (typeof refreshAccentSeg === "function") {
+      window.speechSynthesis.removeEventListener("voiceschanged", refreshAccentSeg);
+    }
+  } catch (e) {}
+
+  // 2) Remplacer chaque bouton par un clone : cela supprime les anciens
+  //    écouteurs de clic du site (qui bloquaient les accents indisponibles).
+  var seg = document.getElementById("segAccent");
+  var btns = Array.prototype.slice.call(seg.querySelectorAll("button")).map(function (b) {
+    var c = b.cloneNode(true);
+    b.parentNode.replaceChild(c, b);
+    return c;
+  });
+
+  function avail() {
+    try { return Speech.ok ? Speech.availableAccents() : []; }
+    catch (e) { return []; }
+  }
+
+  // 3) Affichage : tous les boutons cliquables ; léger grisé = « pas
+  //    installé sur cet appareil » ; message d'aide honnête.
+  function render() {
+    var a = avail();
+    var cur = Speech.getAccent();
+    btns.forEach(function (b) {
+      var acc = b.getAttribute("data-acc");
+      var here = a.indexOf(acc) >= 0;
+      b.disabled = false;                          // toujours sélectionnable
+      b.style.opacity = here ? "" : ".5";          // dim = voix absente localement
+      b.setAttribute("aria-pressed", String(acc === cur));
+      b.title = LABELS[acc] + (here ? "" : " — non installé sur cet appareil");
+    });
+    var note = document.getElementById("accentNote");
+    if (note) {
+      if (!Speech.ok) {
+        note.textContent = "Audio non disponible sur ce navigateur.";
+      } else if (!a.length) {
+        note.textContent = "Voix anglaises en cours de chargement…";
+      } else {
+        var miss = ["en-US", "en-GB", "en-AU", "en-CA"]
+          .filter(function (x) { return a.indexOf(x) < 0; })
+          .map(function (x) { return SHORT[x]; });
+        note.textContent = miss.length
+          ? "Accents " + miss.join(", ") + " non installés ici : lus avec la voix anglaise disponible (et fonctionnent sur les appareils qui les possèdent)."
+          : "Les quatre accents sont disponibles sur cet appareil.";
+      }
+    }
+  }
+
+  // 4) Clic : on mémorise l'accent choisi (même non installé), on lit, et on
+  //    prévient honnêtement si la voix exacte n'est pas présente ici.
+  btns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var acc = b.getAttribute("data-acc");
+      Speech.setAccent(acc);
+      render();
+      if (avail().indexOf(acc) < 0) {
+        try { toast("Accent " + SHORT[acc] + " non installé ici — lecture avec la voix anglaise disponible."); } catch (e) {}
+      }
+      Speech.say("This is the selected accent.", b);
+    });
+  });
+
+  // 5) Re-appliquer quand les voix arrivent, et après les minuteries du site,
+  //    pour que notre affichage l'emporte.
+  try { window.speechSynthesis.addEventListener("voiceschanged", render); } catch (e) {}
+  render();
+  setTimeout(render, 600);
+  setTimeout(render, 1600);
+  setTimeout(render, 2600);
+})();
+</script>
 
 </body>
 </html>
