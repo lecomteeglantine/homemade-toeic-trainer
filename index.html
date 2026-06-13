@@ -2321,6 +2321,691 @@ const sg=$("#saveGoal"); if(sg) sg.addEventListener("click",()=>{ let v=parseInt
 const pb=$("#printBilan"); if(pb) pb.addEventListener("click",()=>window.print());
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
 go("home");
+</script><script>
+(function () {
+  "use strict";
+
+  /* ---------- Contenu : 22 familles, 58 mini-leçons -------------------- */
+  /* answer : 0=A, 1=B, 2=C, 3=D. lesson/explain acceptent du HTML simple. */
+  var GRAMMAR = [
+
+  { title:"Temps verbaux", icon:"⏱️", lessons:[
+    { title:"Présent simple vs présent continu",
+      lesson:"<ul><li><b>Présent simple</b> : habitudes, vérités générales, horaires. <em>She works in finance. The train leaves at 8.</em></li><li><b>Présent continu</b> (be + -ing) : action en cours, situation temporaire, arrangement futur fixé. <em>He is working now.</em></li><li>Les <b>verbes d'état</b> ne se mettent pas au continu.</li></ul>",
+      example:{ sentence:"Ms. Tanaka usually ____ the monthly report on Fridays.", options:["write","writes","is writing","written"], answer:1, explain:"« usually » + 3<sup>e</sup> personne → présent simple avec -s." },
+      exercises:[
+        { q:"Right now, the technicians ____ the new server.", options:["install","installs","are installing","installed"], answer:2, explain:"« right now » → action en cours → présent continu." },
+        { q:"The store ____ at 9 a.m. every day.", options:["is opening","opens","open","opened"], answer:1, explain:"Habitude répétée → présent simple → opens." },
+        { q:"I ____ this proposal needs more detail.", options:["am thinking","think","thinks","thinking"], answer:1, explain:"« think » (opinion) est un verbe d'état → présent simple." }
+      ]},
+    { title:"Verbes d'état (stative verbs)",
+      lesson:"<ul><li>Ils décrivent un état, pas une action, et restent au <b>simple</b> : like, love, hate, want, need, prefer, know, understand, believe, mean, belong, own, seem.</li><li>Certains changent de sens : <em>have</em>, <em>think</em>.</li></ul>",
+      example:{ sentence:"I ____ what you mean.", options:["am understanding","understand","understands","understanding"], answer:1, explain:"« understand » est un verbe d'état → présent simple." },
+      exercises:[
+        { q:"She ____ three languages.", options:["is knowing","knows","know","knowing"], answer:1, explain:"« know » = état → pas de forme en -ing." },
+        { q:"This equipment ____ to the IT department.", options:["is belonging","belongs","belong","belonging"], answer:1, explain:"« belong » = état → présent simple." }
+      ]},
+    { title:"Past simple",
+      lesson:"<ul><li>Action <b>terminée</b> à un moment précis du passé. Réguliers : -ed ; irréguliers : go→went, take→took.</li><li>Négations et questions avec <b>did</b> + base verbale.</li><li>Marqueurs : yesterday, last week, in 2010, ago.</li></ul>",
+      example:{ sentence:"They ____ the contract last Monday.", options:["sign","signed","have signed","signing"], answer:1, explain:"« last Monday » = moment précis → past simple." },
+      exercises:[
+        { q:"We ____ your payment yesterday.", options:["didn't received","didn't receive","don't receive","not received"], answer:1, explain:"Négation au passé : did not + base verbale." },
+        { q:"____ you attend the conference last year?", options:["Did","Do","Have","Were"], answer:0, explain:"Question au passé → Did + sujet + base verbale." }
+      ]},
+    { title:"Past continuous",
+      lesson:"<ul><li>was/were + -ing : action <b>en cours</b> dans le passé, souvent interrompue par une action courte au past simple.</li><li><em>While I was writing, the power went out.</em></li></ul>",
+      example:{ sentence:"While I ____ the report, the power went out.", options:["wrote","was writing","write","have written"], answer:1, explain:"Action longue interrompue → past continuous." },
+      exercises:[
+        { q:"They were ____ when the manager arrived.", options:["meet","met","meeting","meets"], answer:2, explain:"were + -ing → meeting." },
+        { q:"What ____ you doing at 9 p.m. yesterday?", options:["were","was","did","are"], answer:0, explain:"« you » → were + -ing." }
+      ]},
+    { title:"Present perfect : usages & marqueurs",
+      lesson:"<ul><li>have/has + participe passé : expérience, événement récent, période non finie.</li><li><b>since</b> + point de départ ; <b>for</b> + durée ; <b>already</b> ; <b>yet</b> ; <b>just</b> ; <b>ever/never</b>.</li></ul>",
+      example:{ sentence:"Mr. Lee has worked here ____ five years.", options:["since","for","during","ago"], answer:1, explain:"« five years » = durée → for." },
+      exercises:[
+        { q:"Have you finished the report ____?", options:["already","yet","since","ago"], answer:1, explain:"Question → « yet » en fin de phrase." },
+        { q:"The shipment has ____ arrived — check the dock.", options:["yet","ever","just","since"], answer:2, explain:"Action toute récente → just." },
+        { q:"They have been partners ____ 2015.", options:["for","since","during","by"], answer:1, explain:"2015 = point de départ → since." }
+      ]},
+    { title:"Present perfect vs past simple",
+      lesson:"<ul><li><b>Past simple</b> : moment précis et terminé (yesterday, in 2019, ago).</li><li><b>Present perfect</b> : lien avec le présent, sans date précise (already, yet, recently, for, since).</li></ul>",
+      example:{ sentence:"The company ____ its headquarters to Lyon in 2021.", options:["has moved","moved","moves","has been moving"], answer:1, explain:"« in 2021 » = moment précis → past simple." },
+      exercises:[
+        { q:"She ____ the office an hour ago.", options:["has left","leaves","left","has been leaving"], answer:2, explain:"« an hour ago » → past simple." },
+        { q:"We have ____ signed the new contract.", options:["yet","already","ago","since"], answer:1, explain:"Affirmatif → « already » avec le present perfect." }
+      ]},
+    { title:"Present perfect continuous",
+      lesson:"<ul><li>have/has been + -ing : action commencée dans le passé qui <b>continue</b>, ou qui vient de s'arrêter avec un résultat visible.</li><li>Souvent avec <em>for, since, how long</em>.</li></ul>",
+      example:{ sentence:"I'm exhausted because I ____ all day.", options:["have worked","have been working","work","am working"], answer:1, explain:"Activité prolongée avec résultat présent → present perfect continu." },
+      exercises:[
+        { q:"How long ____ you been waiting?", options:["have","has","are","did"], answer:0, explain:"« you » → have been + -ing." },
+        { q:"They have been ____ on the project for weeks.", options:["work","worked","working","works"], answer:2, explain:"have been + -ing → working." }
+      ]},
+    { title:"Past perfect",
+      lesson:"<ul><li>had + participe passé : une action <b>antérieure</b> à une autre action passée.</li><li>Marqueurs : <em>by the time, before, after, already</em>.</li></ul>",
+      example:{ sentence:"By the time we arrived, the meeting ____ already started.", options:["has","had","was","have"], answer:1, explain:"Antériorité dans le passé → had + participe passé." },
+      exercises:[
+        { q:"She realized she ____ her badge at home.", options:["leaves","has left","had left","leaving"], answer:2, explain:"Action antérieure à « realized » → past perfect." },
+        { q:"After the client ____ the documents, we processed the order.", options:["sends","had sent","has sent","sending"], answer:1, explain:"Action accomplie avant l'autre → had sent." }
+      ]},
+    { title:"Futur : will vs going to",
+      lesson:"<ul><li><b>will</b> : décision spontanée, prédiction/opinion, promesse, offre.</li><li><b>be going to</b> : intention planifiée, ou prédiction fondée sur un indice présent.</li></ul>",
+      example:{ sentence:"I think the meeting ____ end before noon.", options:["is going to","will","ends","ending"], answer:1, explain:"« I think » + opinion → will." },
+      exercises:[
+        { q:"Look at the schedule — we ____ visit three clients tomorrow.", options:["will","are going to","would","visit"], answer:1, explain:"Programme déjà fixé → be going to." },
+        { q:"Don't worry, I ____ call you back in five minutes.", options:["am going to","will","would","call"], answer:1, explain:"Décision sur le moment / promesse → will." }
+      ]},
+    { title:"Autres formes du futur",
+      lesson:"<ul><li><b>Présent continu</b> pour un arrangement fixé : <em>I'm meeting the client at 3.</em></li><li><b>Future continuous</b> (will be + -ing) : action en cours à un moment futur.</li><li><b>Future perfect</b> (will have + pp) : action achevée avant un moment futur.</li></ul>",
+      example:{ sentence:"By the end of the year, the team ____ the project.", options:["will finish","will have finished","finishes","is finishing"], answer:1, explain:"Action achevée avant un point futur → future perfect." },
+      exercises:[
+        { q:"This time next week, I ____ on the beach.", options:["will relax","will be relaxing","relax","have relaxed"], answer:1, explain:"Action en cours à un moment futur → future continuous." },
+        { q:"I'm ____ the supplier tomorrow at noon.", options:["meet","meeting","met","meets"], answer:1, explain:"Arrangement fixé → présent continu pour le futur." }
+      ]}
+  ]},
+
+  { title:"Voix passive", icon:"🔄", lessons:[
+    { title:"La voix passive",
+      lesson:"<ul><li>Forme : <b>be + participe passé</b>. On l'emploie quand l'agent est inconnu, évident ou peu important.</li><li>Présent : is/are + pp · Passé : was/were + pp · Futur : will be + pp · Present perfect : has/have been + pp.</li></ul>",
+      example:{ sentence:"The new policy ____ by the board last week.", options:["approved","was approved","has approving","approves"], answer:1, explain:"Passé + agent par « by » → was + participe passé." },
+      exercises:[
+        { q:"All applications ____ carefully before a decision is made.", options:["review","reviews","are reviewed","reviewing"], answer:2, explain:"Présent passif : are + participe passé." },
+        { q:"The building ____ next year.", options:["will renovate","will be renovated","is renovating","renovated"], answer:1, explain:"Futur passif : will be + participe passé." },
+        { q:"The invoices have ____ sent to the client.", options:["been","be","being","to be"], answer:0, explain:"Present perfect passif : have been + participe passé." }
+      ]},
+    { title:"Passif avec modaux & report",
+      lesson:"<ul><li>Passif avec modal : <b>modal + be + participe passé</b>.</li><li>Report impersonnel : <em>It is said / believed / expected that…</em></li></ul>",
+      example:{ sentence:"The form must ____ in black ink.", options:["complete","be completed","completing","completed"], answer:1, explain:"must + be + participe passé." },
+      exercises:[
+        { q:"The results should ____ by Friday.", options:["announce","be announced","announcing","announced"], answer:1, explain:"should + be + participe passé." },
+        { q:"It is widely ____ that demand will increase.", options:["believe","believes","believed","believing"], answer:2, explain:"It is + participe passé + that → believed." }
+      ]}
+  ]},
+
+  { title:"Modaux", icon:"🗝️", lessons:[
+    { title:"Capacité & permission",
+      lesson:"<ul><li>Capacité : <b>can</b> (présent), <b>could</b> (passé/poli), <b>be able to</b> (toutes formes, futur : will be able to).</li><li>Permission : <b>can</b> (courant), <b>may</b> (plus formel).</li></ul>",
+      example:{ sentence:"After the training, employees ____ use the new software.", options:["can to","will be able to","could to","able to"], answer:1, explain:"Futur de la capacité → will be able to." },
+      exercises:[
+        { q:"____ I borrow your pen for a moment?", options:["May","Must","Should","Would"], answer:0, explain:"Demande de permission polie → May." },
+        { q:"She ____ speak three languages fluently.", options:["can","must","should","ought"], answer:0, explain:"Capacité → can." }
+      ]},
+    { title:"Obligation & déduction",
+      lesson:"<ul><li><b>must</b> = obligation forte / déduction logique. <b>have to</b> = obligation (souvent externe).</li><li><b>mustn't</b> = interdiction ; <b>don't have to</b> = pas nécessaire.</li><li>Déduction : <b>must</b> ↔ <b>can't</b>.</li></ul>",
+      example:{ sentence:"You ____ submit the form before the deadline; it's mandatory.", options:["can","must","might","could"], answer:1, explain:"« mandatory » = obligation forte → must." },
+      exercises:[
+        { q:"Employees ____ wear a uniform; casual clothes are fine.", options:["mustn't","don't have to","have to","must"], answer:1, explain:"Pas nécessaire → don't have to (≠ mustn't = interdit)." },
+        { q:"This ____ be the right address — the building doesn't exist.", options:["must","can't","should","has to"], answer:1, explain:"Impossibilité logique → can't." }
+      ]},
+    { title:"Conseil & possibilité",
+      lesson:"<ul><li>Conseil : <b>should</b> / <b>ought to</b>.</li><li>Possibilité : <b>may / might / could</b> (might et could = un peu moins sûr).</li></ul>",
+      example:{ sentence:"If you feel unwell, you ____ see a doctor.", options:["should","can","will","may"], answer:0, explain:"Conseil → should." },
+      exercises:[
+        { q:"It ____ rain later, so take an umbrella.", options:["should","might","must","ought"], answer:1, explain:"Possibilité → might." },
+        { q:"You ____ to arrive early for the interview.", options:["should","ought","must","can"], answer:1, explain:"Conseil avec « to » → ought to." }
+      ]},
+    { title:"Modaux du passé",
+      lesson:"<ul><li><b>should have + pp</b> = regret / reproche.</li><li><b>must have + pp</b> = déduction quasi certaine. <b>might / could have + pp</b> = possibilité. <b>can't have + pp</b> = impossibilité.</li></ul>",
+      example:{ sentence:"The client never received the email; you ____ sent it to the wrong address.", options:["must have","should have","can't have","would have"], answer:0, explain:"Conclusion logique sur le passé → must have + pp." },
+      exercises:[
+        { q:"I'm sorry — I ____ informed you earlier.", options:["must have","should have","can't have","might"], answer:1, explain:"Regret → should have + pp." },
+        { q:"He ____ have finished so fast; it's impossible.", options:["must","should","can't","would"], answer:2, explain:"Impossibilité passée → can't have." }
+      ]}
+  ]},
+
+  { title:"Infinitif & gérondif", icon:"🔗", lessons:[
+    { title:"Verbe + gérondif / verbe + infinitif",
+      lesson:"<ul><li><b>+ gérondif (-ing)</b> : enjoy, avoid, consider, finish, suggest, recommend, mind, keep.</li><li><b>+ infinitif (to)</b> : want, decide, plan, agree, hope, offer, manage, refuse.</li><li>Après une <b>préposition</b> → toujours le gérondif.</li></ul>",
+      example:{ sentence:"The manager suggested ____ the deadline.", options:["to extend","extending","extend","extended"], answer:1, explain:"« suggest » → gérondif." },
+      exercises:[
+        { q:"We decided ____ the project next month.", options:["starting","to start","start","started"], answer:1, explain:"« decide » → infinitif avec to." },
+        { q:"Please avoid ____ during the presentation.", options:["to talk","talk","talking","talked"], answer:2, explain:"« avoid » → gérondif." },
+        { q:"They are interested in ____ with our company.", options:["to work","work","working","worked"], answer:2, explain:"Après « in » → gérondif." }
+      ]},
+    { title:"Complément + infinitif, gérondif sujet & but",
+      lesson:"<ul><li><b>Verbe + complément + infinitif</b> : ask / tell / advise / allow someone <b>to</b> do.</li><li><b>Gérondif sujet</b> : <em>Reading reports is part of the job.</em></li><li><b>Infinitif de but</b> : to / in order to.</li></ul>",
+      example:{ sentence:"The manager asked the team ____ overtime.", options:["work","to work","working","worked"], answer:1, explain:"ask someone + to + infinitif." },
+      exercises:[
+        { q:"____ instructions carefully saves time.", options:["Read","To reading","Reading","Reads"], answer:2, explain:"Gérondif comme sujet → Reading." },
+        { q:"She left early ____ catch her train.", options:["for","to","for to","at"], answer:1, explain:"Infinitif de but → to." }
+      ]}
+  ]},
+
+  { title:"Noms", icon:"📦", lessons:[
+    { title:"Dénombrables, indénombrables & double usage",
+      lesson:"<ul><li><b>Indénombrables</b> (pas de pluriel, pas de « a ») : information, advice, equipment, furniture, luggage, news, money, work, research.</li><li>Sens variable : <em>a paper</em> (journal) / paper ; <em>an experience</em> / experience.</li></ul>",
+      example:{ sentence:"She gave me some useful ____.", options:["advices","advice","an advice","advise"], answer:1, explain:"« advice » est indénombrable." },
+      exercises:[
+        { q:"We ordered new office ____.", options:["furnitures","a furniture","furniture","furnitur"], answer:2, explain:"« furniture » est indénombrable." },
+        { q:"He has ten years of ____ in marketing.", options:["experiences","an experience","experience","experienced"], answer:2, explain:"« experience » = le vécu → indénombrable." }
+      ]},
+    { title:"Pluriels irréguliers, composés & possessifs",
+      lesson:"<ul><li>Pluriels irréguliers : child→children, person→people, foot→feet, analysis→analyses, criterion→criteria.</li><li>Noms composés : le 1<sup>er</sup> nom reste singulier (a five-year plan).</li><li>Possessif : <b>'s</b> / <b>s'</b>.</li></ul>",
+      example:{ sentence:"The ____ lounge is on the third floor.", options:["employees","employee's","employees'","employees's"], answer:2, explain:"Plusieurs employés → possessif pluriel : employees'." },
+      exercises:[
+        { q:"Three ____ attended the meeting.", options:["persons","people","peoples","person"], answer:1, explain:"Pluriel irrégulier de « person » → people." },
+        { q:"We need a ____ plan.", options:["five-years","five-year","five year's","fives-year"], answer:1, explain:"Nom composé : le nombre reste singulier." }
+      ]}
+  ]},
+
+  { title:"Articles", icon:"📰", lessons:[
+    { title:"Articles : a / an / the / zéro",
+      lesson:"<ul><li><b>a / an</b> : dénombrable singulier, 1<sup>re</sup> mention. « an » devant un <b>son</b> de voyelle (an hour, an MBA).</li><li><b>the</b> : élément précis, connu ou unique.</li><li><b>Zéro article</b> : pluriels et indénombrables au sens général.</li></ul>",
+      example:{ sentence:"We need to hire ____ experienced accountant.", options:["a","an","the","— (aucun)"], answer:1, explain:"« experienced » commence par un son de voyelle → an." },
+      exercises:[
+        { q:"____ information you sent was very helpful.", options:["A","An","The","— (aucun)"], answer:2, explain:"Information précise et identifiée → the." },
+        { q:"____ teamwork is essential in this company.", options:["A","An","The","— (aucun)"], answer:3, explain:"Indénombrable au sens général → pas d'article." }
+      ]},
+    { title:"Articles & noms géographiques",
+      lesson:"<ul><li><b>Sans article</b> : pays, villes, continents (France, Tokyo, Asia), lacs.</li><li><b>The</b> : pluriels (the Netherlands, the United States), océans/mers/fleuves, régions (the Middle East).</li></ul>",
+      example:{ sentence:"Our new branch is in ____ Netherlands.", options:["a","an","the","— (aucun)"], answer:2, explain:"Pays au pluriel → the." },
+      exercises:[
+        { q:"She flew to ____ Japan for the conference.", options:["the","a","an","— (aucun)"], answer:3, explain:"Nom de pays simple → pas d'article." },
+        { q:"The cruise sailed across ____ Atlantic.", options:["— (aucun)","the","a","an"], answer:1, explain:"Océans → the." }
+      ]}
+  ]},
+
+  { title:"Déterminants", icon:"🧱", lessons:[
+    { title:"some / any / no",
+      lesson:"<ul><li><b>some</b> : phrases affirmatives, offres/demandes polies.</li><li><b>any</b> : négations et questions.</li><li><b>no</b> = not any.</li></ul>",
+      example:{ sentence:"I'm sorry, there aren't ____ tickets left.", options:["some","any","no","none"], answer:1, explain:"Phrase négative → any." },
+      exercises:[
+        { q:"Would you like ____ help with that?", options:["any","some","no","none"], answer:1, explain:"Offre polie → some." },
+        { q:"There is ____ time to lose.", options:["any","some","no","not"], answer:2, explain:"Négation directe → no." }
+      ]},
+    { title:"every / each / either / neither",
+      lesson:"<ul><li><b>every / each</b> + nom singulier (+ verbe singulier).</li><li><b>either</b> = l'un ou l'autre (deux) ; <b>neither</b> = ni l'un ni l'autre (deux).</li></ul>",
+      example:{ sentence:"____ employee must wear a badge.", options:["Every","All","Both","Several"], answer:0, explain:"+ nom singulier → Every." },
+      exercises:[
+        { q:"You can park on ____ side of the street.", options:["neither","either","both","every"], answer:1, explain:"L'un ou l'autre → either." },
+        { q:"____ of the two proposals was approved.", options:["Either","Neither","Both","Every"], answer:1, explain:"Verbe singulier « was » + sens négatif → Neither." }
+      ]},
+    { title:"another / other / the other / others",
+      lesson:"<ul><li><b>another</b> + singulier (un autre).</li><li><b>other</b> + pluriel ; <b>the other</b> = l'autre (de deux).</li><li><b>others</b> = d'autres ; <b>the others</b> = les autres.</li></ul>",
+      example:{ sentence:"One option is to wait; ____ is to cancel.", options:["other","another","others","the other"], answer:3, explain:"Le second de deux → the other." },
+      exercises:[
+        { q:"We need ____ volunteer for the booth.", options:["other","another","others","the other"], answer:1, explain:"Un autre, singulier indéfini → another." },
+        { q:"Some staff work remotely; ____ come to the office.", options:["another","other","others","the other"], answer:2, explain:"Pronom pluriel → others." }
+      ]},
+    { title:"Quantifieurs : much/many, few/little, several, enough",
+      lesson:"<ul><li><b>many</b> + dénombrable pluriel ; <b>much</b> + indénombrable.</li><li><b>a few</b>/<b>few</b> + dénombrable ; <b>a little</b>/<b>little</b> + indénombrable.</li><li><b>several</b> = plusieurs ; <b>enough</b> = assez.</li></ul>",
+      example:{ sentence:"There isn't ____ time left before the deadline.", options:["many","much","few","a few"], answer:1, explain:"« time » indénombrable → much." },
+      exercises:[
+        { q:"We received ____ applications this year — over 500.", options:["much","little","many","a little"], answer:2, explain:"Dénombrable pluriel → many." },
+        { q:"She has ____ experience in finance, so we'll train her.", options:["a little","few","little","many"], answer:2, explain:"Indénombrable + sens négatif → little." }
+      ]}
+  ]},
+
+  { title:"Pronoms", icon:"🧍", lessons:[
+    { title:"Pronoms personnels & possessifs",
+      lesson:"<ul><li>Sujet (I, he, they) vs complément (me, him, them).</li><li>Adjectifs possessifs + nom (my, his, their).</li><li>Pronoms possessifs, seuls (mine, his, theirs).</li></ul>",
+      example:{ sentence:"The CEO thanked ____ for the hard work.", options:["we","us","our","ours"], answer:1, explain:"Après le verbe → pronom complément → us." },
+      exercises:[
+        { q:"This desk is ____, not yours.", options:["my","mine","me","I"], answer:1, explain:"Pronom possessif seul → mine." },
+        { q:"____ presentation impressed the board.", options:["Them","They","Their","Theirs"], answer:2, explain:"Avant le nom → adjectif possessif → Their." }
+      ]},
+    { title:"Pronoms réfléchis & démonstratifs",
+      lesson:"<ul><li>Réfléchis (myself, yourself, themselves) quand le sujet = le complément.</li><li>Démonstratifs : this/these (proche), that/those (loin).</li></ul>",
+      example:{ sentence:"The employees organized the event ____.", options:["theirself","themselves","themself","theirselves"], answer:1, explain:"Pluriel → themselves." },
+      exercises:[
+        { q:"He fixed the problem ____.", options:["himself","hisself","themselves","itself"], answer:0, explain:"Sujet masculin singulier → himself." },
+        { q:"____ figures are from last quarter.", options:["This","That","These","Those"], answer:2, explain:"Pluriel proche → These." }
+      ]},
+    { title:"Pronoms indéfinis",
+      lesson:"<ul><li><b>some-</b> : affirmatif. <b>any-</b> : négatif/questions.</li><li><b>every-</b> : tous, <b>verbe singulier</b>. <b>no one / nothing</b> : négation.</li></ul>",
+      example:{ sentence:"____ has finished the report yet.", options:["Someone","Anyone","No one","Everyone"], answer:2, explain:"Contexte négatif (« yet ») → No one." },
+      exercises:[
+        { q:"Is there ____ I can help?", options:["someone","anyone","no one","everyone"], answer:1, explain:"Question → anyone." },
+        { q:"____ in the team was satisfied with the result.", options:["Everyone","Anyone","Many","Few"], answer:0, explain:"Verbe singulier « was » → Everyone." }
+      ]}
+  ]},
+
+  { title:"Adjectifs", icon:"🎨", lessons:[
+    { title:"Place & ordre des adjectifs",
+      lesson:"<ul><li>L'adjectif se place <b>avant le nom</b> ou après be/seem/look.</li><li>Ordre : opinion → taille → âge → couleur → origine → matière + nom (a large wooden desk).</li></ul>",
+      example:{ sentence:"It was a ____ meeting.", options:["productively","productive","productivity","produce"], answer:1, explain:"Avant le nom → adjectif → productive." },
+      exercises:[
+        { q:"She bought a ____ desk.", options:["wooden large","large wooden","wood large","largely wooden"], answer:1, explain:"Ordre : taille puis matière → large wooden." },
+        { q:"The proposal seems ____.", options:["reasonably","reason","reasonable","reasoned"], answer:2, explain:"Après « seem » → adjectif → reasonable." }
+      ]},
+    { title:"Adjectifs en -ed / -ing",
+      lesson:"<ul><li><b>-ing</b> décrit ce qui provoque le sentiment (an interesting book).</li><li><b>-ed</b> décrit ce qu'on ressent (I'm interested).</li></ul>",
+      example:{ sentence:"The results were ____.", options:["disappointed","disappointing","disappoint","disappointment"], answer:1, explain:"Les résultats provoquent le sentiment → -ing." },
+      exercises:[
+        { q:"The audience was ____ by the speech.", options:["inspiring","inspire","inspired","inspiration"], answer:2, explain:"L'auditoire ressent → -ed → inspired." },
+        { q:"It was a ____ presentation.", options:["bored","boring","bore","boredom"], answer:1, explain:"La présentation provoque l'ennui → boring." }
+      ]},
+    { title:"Adjectifs composés",
+      lesson:"<ul><li>Deux mots reliés par un trait d'union avant le nom (a well-known brand, a five-star hotel).</li><li>Le nombre reste au singulier (a ten-minute break).</li></ul>",
+      example:{ sentence:"They offered me a ____ contract.", options:["two-years","two-year","two year","two years'"], answer:1, explain:"Adjectif composé → nombre au singulier → two-year." },
+      exercises:[
+        { q:"It's a ____ company.", options:["well-known","well-knowing","good-known","well-knows"], answer:0, explain:"Adjectif composé figé → well-known." },
+        { q:"She works ____.", options:["part-time","part-timely","parts-time","part-times"], answer:0, explain:"Forme figée → part-time." }
+      ]}
+  ]},
+
+  { title:"Adverbes", icon:"🏃", lessons:[
+    { title:"Types & place des adverbes",
+      lesson:"<ul><li>Manière (carefully), fréquence (often), temps, lieu, degré (very).</li><li>Fréquence : <b>avant</b> le verbe principal, <b>après</b> be.</li><li>Adverbe de phrase en tête : <em>Fortunately, …</em></li></ul>",
+      example:{ sentence:"He ____ checks his email in the morning.", options:["usual","usually","usualy","is usually"], answer:1, explain:"Adverbe de fréquence avant le verbe → usually." },
+      exercises:[
+        { q:"The team worked ____ to meet the deadline.", options:["efficient","efficiency","efficiently","efficientness"], answer:2, explain:"Modifie le verbe → adverbe → efficiently." },
+        { q:"____, the shipment arrived on time.", options:["Fortunate","Fortunately","Fortune","Fortuner"], answer:1, explain:"Adverbe de phrase en tête → Fortunately." }
+      ]}
+  ]},
+
+  { title:"Comparaison", icon:"⚖️", lessons:[
+    { title:"Comparatifs & superlatifs",
+      lesson:"<ul><li>Court (1 syllabe) : -er / the -est.</li><li>Long (3+ syllabes) : more / the most.</li><li>Irréguliers : good→better→best, bad→worse→worst.</li></ul>",
+      example:{ sentence:"This method is ____ than the old one.", options:["efficient","more efficient","most efficient","efficiently"], answer:1, explain:"Adjectif long → more efficient." },
+      exercises:[
+        { q:"It's the ____ option we have.", options:["good","better","best","well"], answer:2, explain:"Superlatif irrégulier → best." },
+        { q:"Sales are ____ this year than last year.", options:["high","higher","highest","highly"], answer:1, explain:"Comparatif court + than → higher." }
+      ]},
+    { title:"as…as, less…than, the more…the more",
+      lesson:"<ul><li><b>as + adjectif + as</b> = aussi…que. <b>not as…as</b> = moins…que.</li><li><b>less…than</b> = moins.</li><li><b>the more…, the more…</b> = plus…, plus…</li></ul>",
+      example:{ sentence:"This printer is not as fast ____ the previous model.", options:["than","as","that","so"], answer:1, explain:"Structure not as … as." },
+      exercises:[
+        { q:"The new plan is ____ expensive than the old one.", options:["less","least","fewer","lesser"], answer:0, explain:"less … than → less." },
+        { q:"The ____ you prepare, the more confident you feel.", options:["much","most","more","many"], answer:2, explain:"the more …, the more … → more." }
+      ]}
+  ]},
+
+  { title:"Prépositions", icon:"📍", lessons:[
+    { title:"Prépositions de temps",
+      lesson:"<ul><li><b>at</b> + heure · <b>on</b> + jour/date · <b>in</b> + mois/année/partie de journée.</li><li><b>by</b> = au plus tard · <b>until</b> = jusqu'à · <b>during</b> + nom · <b>for</b> + durée · <b>since</b> + point de départ.</li></ul>",
+      example:{ sentence:"The report is due ____ Friday at the latest.", options:["in","on","by","until"], answer:2, explain:"Échéance « au plus tard » → by." },
+      exercises:[
+        { q:"The conference will take place ____ March.", options:["at","on","in","by"], answer:2, explain:"Mois → in." },
+        { q:"Please remain seated ____ the announcement is finished.", options:["by","until","during","for"], answer:1, explain:"« jusqu'à ce que » → until." }
+      ]},
+    { title:"Prépositions de lieu",
+      lesson:"<ul><li><b>at</b> (point précis) · <b>in</b> (espace fermé) · <b>on</b> (surface).</li><li>above/over, below/under, between (deux), among (plusieurs), next to, near, opposite, behind, in front of.</li></ul>",
+      example:{ sentence:"The documents are ____ the top drawer.", options:["at","in","on","over"], answer:1, explain:"Espace fermé → in." },
+      exercises:[
+        { q:"The printer is ____ the two desks.", options:["among","between","in","on"], answer:1, explain:"Entre deux éléments → between." },
+        { q:"Her name is ____ the bottom of the list.", options:["in","on","at","under"], answer:2, explain:"Expression figée → at the bottom." }
+      ]},
+    { title:"Prépositions de mouvement",
+      lesson:"<ul><li><b>into</b> (entrer dans), <b>onto</b> (sur), <b>through</b> (à travers), <b>across</b> (de l'autre côté).</li><li><b>along</b>, <b>around</b>, <b>toward(s)</b>, <b>away from</b>.</li></ul>",
+      example:{ sentence:"He walked ____ the conference room.", options:["into","in","on","at"], answer:0, explain:"Mouvement vers l'intérieur → into." },
+      exercises:[
+        { q:"The delivery truck drove ____ the bridge.", options:["across","on","in","at"], answer:0, explain:"D'un côté à l'autre → across." },
+        { q:"Please move ____ the exit calmly.", options:["toward","into","onto","through"], answer:0, explain:"Direction → toward." }
+      ]},
+    { title:"Prépositions du monde professionnel",
+      lesson:"<p>À mémoriser comme des blocs :</p><ul><li>responsible <b>for</b>, interested <b>in</b>, involved <b>in</b>, apply <b>for</b>, participate <b>in</b></li><li>depend <b>on</b>, comply <b>with</b>, focus <b>on</b>, deal <b>with</b>, belong <b>to</b></li><li>benefit <b>from</b>, contribute <b>to</b>, invest <b>in</b>, succeed <b>in</b>, approve <b>of</b></li></ul>",
+      example:{ sentence:"All staff must comply ____ the new safety regulations.", options:["to","with","for","on"], answer:1, explain:"comply with." },
+      exercises:[
+        { q:"She is responsible ____ the marketing department.", options:["of","for","to","with"], answer:1, explain:"responsible for." },
+        { q:"The company plans to invest ____ renewable energy.", options:["on","to","in","for"], answer:2, explain:"invest in." }
+      ]}
+  ]},
+
+  { title:"Conjonctions & connecteurs", icon:"🪢", lessons:[
+    { title:"Coordination & subordination",
+      lesson:"<ul><li><b>Coordonnantes</b> (and, but, or, so, yet) relient deux éléments de même rang.</li><li><b>Subordonnantes</b> (because, since, as, although, while, whereas, unless, if, when) introduisent une proposition dépendante.</li></ul>",
+      example:{ sentence:"We can start now, ____ we can wait for the others.", options:["so","or","but","for"], answer:1, explain:"Deux possibilités → or." },
+      exercises:[
+        { q:"____ the budget is limited, we must prioritize.", options:["Despite","Since","Therefore","However"], answer:1, explain:"Cause → Since." },
+        { q:"I'll sign the contract ____ the terms are fair.", options:["unless","if","although","whereas"], answer:1, explain:"Condition → if." }
+      ]},
+    { title:"Le contraste",
+      lesson:"<ul><li><b>although / though / even though</b> + sujet + verbe.</li><li><b>despite / in spite of</b> + nom ou -ing.</li><li><b>however / nevertheless</b> = cependant ; <b>whereas / while</b> = tandis que.</li></ul>",
+      example:{ sentence:"____ the heavy rain, the event took place as planned.", options:["Although","Despite","However","Because"], answer:1, explain:"Suivi d'un nom → Despite." },
+      exercises:[
+        { q:"____ the team worked hard, the project was delayed.", options:["Despite","Although","In spite of","However"], answer:1, explain:"Suivi de sujet + verbe → Although." },
+        { q:"The product is expensive. ____, it sells very well.", options:["Although","Despite","However","Because"], answer:2, explain:"Relie deux phrases → However." }
+      ]},
+    { title:"La cause",
+      lesson:"<ul><li>Cause + <b>sujet + verbe</b> : <b>because, since, as</b>.</li><li>Cause + <b>nom</b> : <b>because of, due to, owing to, thanks to</b>.</li></ul>",
+      example:{ sentence:"The flight was canceled ____ the storm.", options:["because","because of","so","therefore"], answer:1, explain:"Suivi d'un nom → because of." },
+      exercises:[
+        { q:"Sales increased ____ we launched a new campaign.", options:["because of","due to","because","so"], answer:2, explain:"Suivi de sujet + verbe → because." },
+        { q:"The delay was ____ a technical problem.", options:["because","so","due to","therefore"], answer:2, explain:"Après « be » + nom → due to." }
+      ]},
+    { title:"Le résultat",
+      lesson:"<ul><li><b>so / therefore / consequently / thus / as a result</b> = donc.</li><li><b>so</b> + adjectif + <b>that</b> ; <b>such</b> + (a) + adjectif + nom + <b>that</b> = si…que.</li></ul>",
+      example:{ sentence:"The demand was ____ high that we increased production.", options:["such","so","very","too"], answer:1, explain:"so + adjectif + that." },
+      exercises:[
+        { q:"It was ____ a popular event that tickets sold out.", options:["so","such","very","too"], answer:1, explain:"such + a + nom + that." },
+        { q:"Costs rose sharply; ____, we revised the budget.", options:["although","therefore","because","despite"], answer:1, explain:"Conséquence formelle → therefore." }
+      ]}
+  ]},
+
+  { title:"Propositions relatives", icon:"🧩", lessons:[
+    { title:"Pronoms relatifs",
+      lesson:"<ul><li><b>who</b> = personnes · <b>whom</b> = personnes (complément) · <b>which</b> = choses · <b>that</b> = personnes ou choses (déterminative).</li><li><b>whose</b> = possession · <b>where</b> = lieu · <b>when</b> = moment.</li><li>Proposition entre virgules : pas de « that ».</li></ul>",
+      example:{ sentence:"The candidate ____ resume impressed us will be interviewed.", options:["who","which","whose","whom"], answer:2, explain:"« son CV » = possession → whose." },
+      exercises:[
+        { q:"This is the report ____ summarizes our results.", options:["who","which","whose","where"], answer:1, explain:"Antécédent = chose → which." },
+        { q:"Our new office, ____ is downtown, opens Monday.", options:["that","which","who","where"], answer:1, explain:"Proposition entre virgules → which (jamais « that »)." }
+      ]}
+  ]},
+
+  { title:"Conditionnels", icon:"🔀", lessons:[
+    { title:"Les quatre conditionnels",
+      lesson:"<ul><li><b>Type 0</b> : if + présent, présent.</li><li><b>Type 1</b> : if + présent, will + base.</li><li><b>Type 2</b> : if + prétérit, would + base.</li><li><b>Type 3</b> : if + past perfect, would have + pp.</li></ul>",
+      example:{ sentence:"If the shipment ____ on time, we will meet the deadline.", options:["arrives","will arrive","arrived","would arrive"], answer:0, explain:"Type 1 : après « if » → présent." },
+      exercises:[
+        { q:"If I ____ more time, I would help you.", options:["have","had","will have","would have"], answer:1, explain:"Type 2 : if + prétérit." },
+        { q:"If they had invested earlier, they ____ more profit.", options:["would make","will make","would have made","made"], answer:2, explain:"Type 3 : would have + pp." }
+      ]},
+    { title:"Conditionnels mixtes & unless",
+      lesson:"<ul><li><b>Mixte</b> : condition passée → conséquence présente.</li><li><b>unless</b> = if not (sauf si).</li></ul>",
+      example:{ sentence:"We'll lose the client ____ we respond quickly.", options:["if","unless","whether","despite"], answer:1, explain:"« sauf si » → unless." },
+      exercises:[
+        { q:"If she had taken the job, she ____ in London now.", options:["would live","would have lived","lives","lived"], answer:0, explain:"Mixte : passé → présent → would + base." },
+        { q:"____ you have a ticket, you can't enter.", options:["If","Unless","Whether","Although"], answer:1, explain:"= if you don't have → Unless." }
+      ]}
+  ]},
+
+  { title:"Discours rapporté", icon:"🗣️", lessons:[
+    { title:"Affirmations & concordance des temps",
+      lesson:"<ul><li>On recule les temps : présent→passé, will→would, can→could.</li><li>Marqueurs : today→that day, tomorrow→the next day, here→there.</li></ul>",
+      example:{ sentence:"She said she ____ finish the report by Friday.", options:["will","would","can","shall"], answer:1, explain:"will → would au discours rapporté." },
+      exercises:[
+        { q:"He told me he ____ tired.", options:["is","was","has been","will be"], answer:1, explain:"« I am tired » → he was tired." },
+        { q:"They said they ____ call us the next day.", options:["will","would","can","are"], answer:1, explain:"will → would." }
+      ]},
+    { title:"Questions & ordres rapportés",
+      lesson:"<ul><li>Question rapportée : <b>pas d'inversion</b> ; <b>if / whether</b> pour les questions fermées.</li><li>Ordres : tell / ask someone <b>to</b> + infinitif.</li></ul>",
+      example:{ sentence:"The manager asked me ____ I had finished.", options:["that","if","do","what"], answer:1, explain:"Question fermée rapportée → if / whether." },
+      exercises:[
+        { q:"She told him ____ the door.", options:["close","closing","to close","closes"], answer:2, explain:"tell someone to + infinitif." },
+        { q:"He asked where the meeting ____.", options:["was","was it","is it","does"], answer:0, explain:"Pas d'inversion → where the meeting was." }
+      ]}
+  ]},
+
+  { title:"Questions", icon:"❓", lessons:[
+    { title:"Yes/No, WH-, sujet vs objet",
+      lesson:"<ul><li>Yes/No : auxiliaire + sujet + verbe.</li><li>WH- : mot interrogatif + auxiliaire + sujet.</li><li>Question sur le <b>sujet</b> : pas d'auxiliaire (Who called?).</li></ul>",
+      example:{ sentence:"____ wrote this report?", options:["Who","Who did","Whom did","Did who"], answer:0, explain:"Question sur le sujet → pas d'auxiliaire → Who." },
+      exercises:[
+        { q:"Where ____ the conference take place?", options:["does","do","is","has"], answer:0, explain:"3<sup>e</sup> personne singulier → does." },
+        { q:"What time ____ the store open?", options:["do","does","is","has"], answer:1, explain:"« the store » → does." }
+      ]},
+    { title:"Questions indirectes & question tags",
+      lesson:"<ul><li>Question indirecte (polie) : ordre <b>affirmatif</b> après l'introduction.</li><li>Question tag : auxiliaire + pronom, <b>polarité inversée</b>.</li></ul>",
+      example:{ sentence:"Could you tell me where ____?", options:["is the elevator","the elevator is","does the elevator","the elevator does"], answer:1, explain:"Question indirecte → ordre affirmatif → the elevator is." },
+      exercises:[
+        { q:"You sent the invoice, ____?", options:["didn't you","did you","don't you","weren't you"], answer:0, explain:"Affirmatif au passé → tag négatif → didn't you." },
+        { q:"She isn't the new manager, ____?", options:["isn't she","is she","does she","was she"], answer:1, explain:"Négatif → tag affirmatif → is she." }
+      ]}
+  ]},
+
+  { title:"Structures causatives", icon:"🔧", lessons:[
+    { title:"have / get something done",
+      lesson:"<ul><li>Faire faire quelque chose : <b>have / get + complément + participe passé</b>.</li><li><em>We had the office painted. I need to get my laptop repaired.</em></li></ul>",
+      example:{ sentence:"We're going to ____ the report translated.", options:["have","make","do","let"], answer:0, explain:"Structure causative → have + complément + pp." },
+      exercises:[
+        { q:"She got her presentation ____ by a colleague.", options:["check","checking","checked","to check"], answer:2, explain:"get + complément + participe passé → checked." },
+        { q:"They had the system ____ last week.", options:["update","updated","updating","to update"], answer:1, explain:"have + complément + participe passé → updated." }
+      ]}
+  ]},
+
+  { title:"Le but", icon:"🎯", lessons:[
+    { title:"to / in order to / so as to / so that",
+      lesson:"<ul><li>But + infinitif : <b>to / in order to / so as to</b> + base verbale.</li><li><b>so that</b> + sujet + verbe (souvent can/could/would).</li></ul>",
+      example:{ sentence:"He stayed late ____ finish the project.", options:["for","to","so","for to"], answer:1, explain:"But avec infinitif → to." },
+      exercises:[
+        { q:"We sent reminders ____ that everyone would attend.", options:["so","for","to","in order"], answer:0, explain:"+ sujet + verbe → so that." },
+        { q:"She took notes ____ to remember the details.", options:["so as","for","so that","in order"], answer:0, explain:"so as to + infinitif." }
+      ]}
+  ]},
+
+  { title:"Accord & structure", icon:"✅", lessons:[
+    { title:"Accord sujet-verbe",
+      lesson:"<ul><li>Le verbe s'accorde avec le <b>vrai</b> sujet : <em>The list of suppliers is…</em></li><li><b>each / every / everyone</b> → singulier.</li><li>Avec <b>neither… nor</b>, accord avec l'élément <b>le plus proche</b>.</li></ul>",
+      example:{ sentence:"The list of approved suppliers ____ available online.", options:["are","is","were","have"], answer:1, explain:"Sujet = « the list » (singulier) → is." },
+      exercises:[
+        { q:"Each of the employees ____ a personal locker.", options:["have","are","has","were"], answer:2, explain:"« each » → singulier → has." },
+        { q:"The number of applications ____ increased.", options:["have","has","are","were"], answer:1, explain:"« the number » = singulier → has." }
+      ]},
+    { title:"Structures parallèles & corrélatives",
+      lesson:"<ul><li><b>Parallélisme</b> : même forme dans une énumération.</li><li>Corrélatives : both… and, either… or, neither… nor, not only… but also.</li></ul>",
+      example:{ sentence:"The job involves answering calls, scheduling meetings, and ____ reports.", options:["prepare","prepared","preparing","to prepare"], answer:2, explain:"Parallélisme en -ing → preparing." },
+      exercises:[
+        { q:"The new system is not only faster ____ also cheaper.", options:["and","but","or","than"], answer:1, explain:"not only … but also." },
+        { q:"You can pay ____ by card or in cash.", options:["neither","both","either","not only"], answer:2, explain:"either … or." }
+      ]}
+  ]},
+
+  { title:"Formes des mots", icon:"🏗️", lessons:[
+    { title:"Familles de mots (verbe/nom/adjectif/adverbe)",
+      lesson:"<ul><li>decide → decision → decisive → decisively.</li><li>Après article/adjectif → <b>nom</b> ; avant un nom → <b>adjectif</b> ; modifie un verbe → <b>adverbe</b>.</li><li>Suffixes — noms : -tion, -ment, -ance, -ity ; adjectifs : -al, -ive, -ous, -able ; adverbes : -ly.</li></ul>",
+      example:{ sentence:"The committee will make a final ____ tomorrow.", options:["decide","decision","decisive","decisively"], answer:1, explain:"Après l'adjectif « final » → nom → decision." },
+      exercises:[
+        { q:"We need to improve the ____ of our team.", options:["produce","productive","productivity","productively"], answer:2, explain:"Après « the » → nom → productivity." },
+        { q:"The manager gave a ____ presentation.", options:["success","succeed","successful","successfully"], answer:2, explain:"Avant le nom → adjectif → successful." }
+      ]},
+    { title:"Préfixes négatifs",
+      lesson:"<ul><li><b>un-</b> (unhappy), <b>in-</b> (incomplete), <b>im-</b> (devant m/p : impossible).</li><li><b>il-</b> (illegal), <b>ir-</b> (irregular), <b>dis-</b> (disagree), <b>non-</b> (non-refundable).</li></ul>",
+      example:{ sentence:"The instructions were ____, so we asked for help.", options:["unclear","inclear","disclear","nonclear"], answer:0, explain:"Préfixe négatif correct → unclear." },
+      exercises:[
+        { q:"It is ____ to park here.", options:["unpossible","impossible","inpossible","dispossible"], answer:1, explain:"Devant « p » → im- → impossible." },
+        { q:"He gave an ____ answer.", options:["uncorrect","discorrect","incorrect","noncorrect"], answer:2, explain:"Forme correcte → incorrect." }
+      ]},
+    { title:"Adjectif vs adverbe (le piège n°1)",
+      lesson:"<ul><li>L'<b>adjectif</b> décrit un nom (a careful driver). L'<b>adverbe</b> décrit un verbe/adjectif/adverbe (she drives carefully).</li><li>Après les verbes d'état (be, seem, become, look) → <b>adjectif</b>.</li></ul>",
+      example:{ sentence:"The team completed the project ____.", options:["quick","quickly","quicker","quickness"], answer:1, explain:"Décrit le verbe « completed » → adverbe → quickly." },
+      exercises:[
+        { q:"Our customers are ____ satisfied with the service.", options:["high","highly","height","higher"], answer:1, explain:"Modifie l'adjectif « satisfied » → adverbe → highly." },
+        { q:"The proposal looks ____.", options:["professionally","profession","professional","professionalize"], answer:2, explain:"Après « look » → adjectif → professional." }
+      ]}
+  ]},
+
+  { title:"Pièges TOEIC", icon:"⚠️", lessons:[
+    { title:"Redondance & doubles négations",
+      lesson:"<ul><li>Évite les répétitions : <em>return back → return ; repeat again → repeat ; new innovation → innovation.</em></li><li>Pas de double négation : <em>don't need any</em> (pas « don't need no »).</li><li><b>hardly / barely</b> sont déjà négatifs.</li></ul>",
+      example:{ sentence:"Please ____ the document to the sender.", options:["return back","return","back return","return again"], answer:1, explain:"« return back » est redondant → return." },
+      exercises:[
+        { q:"We ____ any problems with the new system.", options:["don't have no","haven't no","don't have any","have no any"], answer:2, explain:"Pas de double négation → don't have any." },
+        { q:"She could ____ hear the announcement.", options:["hardly","not hardly","hardly not","don't hardly"], answer:0, explain:"« hardly » est déjà négatif → hardly seul." }
+      ]}
+  ]}
+
+  ];
+
+  /* ---------- Helpers locaux (n'écrasent rien) ------------------------- */
+  var LETTERS = ["A","B","C","D"];
+  var DONE_KEY = "grammarDone";
+
+  function ce(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+  function escAttr(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function blankify(s){ // réutilise formatStem du site si présent, sinon repli
+    if (typeof formatStem === "function") return formatStem(s);
+    return escAttr(s).replace(/____/g,'<span class="blank">_____</span>');
+  }
+  function getDone(){ try{ return (typeof Store!=="undefined" && Store.get("grammarDone",[])) || []; }catch(e){ return []; } }
+  function setDone(arr){ try{ if(typeof Store!=="undefined") Store.set("grammarDone",arr); }catch(e){} }
+  function lessonId(ci,li){ return "g"+ci+"-"+li; }
+  function isDone(id){ return getDone().indexOf(id)!==-1; }
+  function markDone(id){ var a=getDone(); if(a.indexOf(id)===-1){ a.push(id); setDone(a); } updateProgress(); }
+  function totalLessons(){ return GRAMMAR.reduce(function(n,c){return n+c.lessons.length;},0); }
+
+  /* ---------- Mise en place (une fois le site prêt) -------------------- */
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded",fn); }
+  ready(setup);
+
+  function setup(){
+    if(document.getElementById("grammar")) return;     // déjà en place
+    injectStyle();
+    injectSection();
+    injectTab();
+    injectHomeCard();
+    selectCat(0);
+    updateProgress();
+  }
+
+  function injectStyle(){
+    var css = ""
+      + "#grammar .gr-cats{margin-bottom:6px}"
+      + "#grammar .gr-prog{font-size:.85rem;color:var(--ink-soft);margin:0 0 16px}"
+      + "#grammar .gr-prog b{font-family:var(--num)}"
+      + "#grammar .gr-acc{width:100%;text-align:left;background:none;border:0;font:inherit;cursor:pointer;display:flex;align-items:center;gap:10px;padding:0;color:var(--ink);font-family:var(--display);font-weight:600;font-size:1.06rem}"
+      + "#grammar .gr-chev{margin-left:auto;transition:transform .2s ease;color:var(--ink-soft);flex:none}"
+      + "#grammar .gr-acc[aria-expanded=\"true\"] .gr-chev{transform:rotate(180deg)}"
+      + "#grammar .gr-done-pill{flex:none;display:none}"
+      + "#grammar .gr-card.is-done .gr-done-pill{display:inline-flex}"
+      + "#grammar .gr-panel{margin-top:14px;display:none}"
+      + "#grammar .gr-panel.open{display:block}"
+      + "#grammar .gr-lab{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.74rem;color:var(--teal);margin:18px 0 8px}"
+      + "#grammar .gr-les{color:var(--ink)}"
+      + "#grammar .gr-les ul{margin:6px 0;padding-left:1.1em}"
+      + "#grammar .gr-les li{margin:5px 0}"
+      + "#grammar .gr-box{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px}"
+      + "#grammar .gr-opts{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:4px}"
+      + "#grammar .gr-ans{margin:0}"
+      + "#grammar .gr-ans b{color:var(--green)}"
+      + "#grammar .gr-card+.gr-card{margin-top:14px}";
+    var st = document.createElement("style"); st.id="grammar-style"; st.textContent=css;
+    document.head.appendChild(st);
+  }
+
+  function injectSection(){
+    var sec = ce("section","view"); sec.id="grammar"; sec.setAttribute("aria-labelledby","gr-h");
+    sec.innerHTML =
+      '<span class="eyebrow">Grammaire</span>'
+      + '<h1 id="gr-h">Mini-leçons de grammaire</h1>'
+      + '<p class="lead">La règle expliquée simplement, un exemple au format TOEIC, puis des exercices corrigés. Choisis un thème.</p>'
+      + '<p class="gr-prog"><b id="grDone">0</b> / <span id="grTotal">0</span> leçons travaillées</p>'
+      + '<div class="filters gr-cats" id="grCats" role="group" aria-label="Thèmes de grammaire"></div>'
+      + '<div id="grList"></div>';
+    var host = document.querySelector("#main .wrap") || document.querySelector("main") || document.body;
+    host.appendChild(sec);
+    document.getElementById("grTotal").textContent = totalLessons();
+  }
+
+  function injectTab(){
+    var bar = document.getElementById("tabBar");
+    if(!bar || bar.querySelector('[data-nav="grammar"]')) return;
+    var b = ce("button","tab"); b.setAttribute("data-nav","grammar"); b.setAttribute("aria-label","Grammaire");
+    b.innerHTML = '<span class="gly" aria-hidden="true">&#128221;</span>Grammaire';
+    var practice = bar.querySelector('[data-nav="practice"]');
+    if(practice && practice.nextSibling) bar.insertBefore(b, practice.nextSibling);
+    else bar.appendChild(b);
+  }
+
+  function injectHomeCard(){
+    var grid = document.querySelector("#home .grid");
+    if(!grid || grid.querySelector('[data-nav="grammar"]')) return;
+    var card = ce("button","card focus-hide");
+    card.setAttribute("data-nav","grammar");
+    card.setAttribute("style","text-align:left;cursor:pointer;border:1px solid var(--line)");
+    card.innerHTML = '<span class="pill blue">Grammaire</span>'
+      + '<h3 style="margin-top:12px">Mini-leçons ciblées</h3>'
+      + '<p style="margin:0">La règle, un exemple TOEIC et des exercices corrigés — point par point.</p>';
+    grid.insertBefore(card, grid.firstChild);
+  }
+
+  function updateProgress(){
+    var el = document.getElementById("grDone"); if(el) el.textContent = getDone().length;
+  }
+
+  /* ---------- Rendu ---------------------------------------------------- */
+  function selectCat(ci){
+    var cats = document.getElementById("grCats");
+    cats.innerHTML="";
+    GRAMMAR.forEach(function(cat,i){
+      var f = ce("button","filter"); f.setAttribute("aria-pressed", i===ci?"true":"false");
+      f.innerHTML = (cat.icon?cat.icon+" ":"")+escAttr(cat.title);
+      f.addEventListener("click",function(){ selectCat(i); });
+      cats.appendChild(f);
+    });
+    renderLessons(ci);
+  }
+
+  function renderLessons(ci){
+    var list = document.getElementById("grList"); list.innerHTML="";
+    GRAMMAR[ci].lessons.forEach(function(lesson,li){
+      list.appendChild(buildLessonCard(ci,li,lesson,GRAMMAR[ci].title));
+    });
+  }
+
+  function buildLessonCard(ci,li,lesson,catTitle){
+    var id = lessonId(ci,li);
+    var card = ce("div","card gr-card" + (isDone(id)?" is-done":""));
+    var panelId = "gr-panel-"+id;
+
+    var head = ce("button","gr-acc");
+    head.setAttribute("aria-expanded","false");
+    head.setAttribute("aria-controls",panelId);
+    head.innerHTML = '<span>'+escAttr(lesson.title)+'</span>'
+      + '<span class="pill green gr-done-pill">✓ travaillée</span>'
+      + '<span class="gr-chev" aria-hidden="true">▾</span>';
+
+    var panel = ce("div","gr-panel"); panel.id=panelId;
+
+    panel.appendChild(ce("p","gr-lab","📘 La leçon"));
+    panel.appendChild(ce("div","gr-les",lesson.lesson));
+
+    panel.appendChild(ce("p","gr-lab","🎯 Exemple TOEIC"));
+    panel.appendChild(buildExample(lesson.example));
+
+    panel.appendChild(ce("p","gr-lab","🏋️ Exercices"));
+    var answered = {};
+    lesson.exercises.forEach(function(ex,xi){
+      panel.appendChild(buildExercise(ex,xi,catTitle,function(){
+        answered[xi]=true;
+        if(Object.keys(answered).length===lesson.exercises.length){
+          card.classList.add("is-done"); markDone(id);
+        }
+      }));
+    });
+
+    head.addEventListener("click",function(){
+      var open = head.getAttribute("aria-expanded")==="true";
+      head.setAttribute("aria-expanded", open?"false":"true");
+      panel.classList.toggle("open", !open);
+    });
+
+    card.appendChild(head); card.appendChild(panel);
+    return card;
+  }
+
+  function buildExample(ex){
+    var box = ce("div","gr-box");
+    box.appendChild(ce("div","q-stem", blankify(ex.sentence)));
+    var ul = ce("ul","gr-opts");
+    ex.options.forEach(function(o,i){ ul.appendChild(ce("li",null,"<b>("+LETTERS[i]+")</b> "+escAttr(o))); });
+    box.appendChild(ul);
+    box.appendChild(ce("p","gr-ans","<b>Réponse : "+LETTERS[ex.answer]+".</b> "+ex.explain));
+    return box;
+  }
+
+  function buildExercise(ex,xi,catTitle,onAnswered){
+    var card = ce("div","card"); card.style.marginTop="12px";
+    card.appendChild(ce("div","q-stem", (xi+1)+". "+blankify(ex.q)));
+    var opts = ce("div","opts");
+    var btns=[]; var answered=false;
+    ex.options.forEach(function(o,i){
+      var b = ce("button","opt"); b.setAttribute("data-i",i);
+      b.innerHTML = '<span class="key">'+LETTERS[i]+'</span><span>'+escAttr(o)+'</span>';
+      b.addEventListener("click",function(){
+        if(answered) return; answered=true;
+        var ok = i===ex.answer;
+        btns.forEach(function(bb,j){
+          bb.disabled=true; bb.style.cursor="default";
+          if(j===ex.answer){ bb.classList.add("correct"); bb.insertAdjacentHTML("beforeend",'<span class="res" aria-hidden="true">&#10003;</span>'); }
+          if(j===i && !ok){ bb.classList.add("wrong"); bb.insertAdjacentHTML("beforeend",'<span class="res" aria-hidden="true">&#10007;</span>'); }
+        });
+        var fb = ce("div","feedback "+(ok?"ok":"no")); fb.setAttribute("role","status");
+        fb.innerHTML = '<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bien vu':'<span aria-hidden="true">&#10007;</span> Pas encore')+'</h4><p>'+ex.explain+'</p>';
+        card.appendChild(fb);
+        // ---- branchement à la progression existante du site ----
+        try{ if(typeof recordAnswer==="function") recordAnswer("Grammaire · "+catTitle, ok); }catch(e){}
+        try{ if(typeof touchStreak==="function") touchStreak(); }catch(e){}
+        onAnswered();
+      });
+      btns.push(b); opts.appendChild(b);
+    });
+    card.appendChild(opts);
+    return card;
+  }
+
+})();
 </script>
+
 </body>
 </html>
