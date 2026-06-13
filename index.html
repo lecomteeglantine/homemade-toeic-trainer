@@ -3253,6 +3253,22 @@ go("home");
   });
 })();
 </script>
+<style id="checklist-fix">
+  /* Avant : .checklist li{ display:flex } → chaque <strong> et chaque
+     morceau de texte devenait une colonne flex qui se rétrécissait.
+     Après : une puce en retrait (icône positionnée à gauche, texte fluide). */
+  ul.checklist li{
+    display:block;            /* fini le flex qui éclatait le texte */
+    position:relative;
+    padding:11px 0 11px 32px; /* 32px à gauche : la place réservée à l'icône */
+  }
+  ul.checklist li .gly{
+    position:absolute;        /* l'icône est calée à gauche, hors du flux */
+    left:0;
+    top:11px;                 /* alignée avec la première ligne de texte */
+    flex:none;
+  }
+</style>
 
 </body>
 </html>
