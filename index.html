@@ -3096,6 +3096,46 @@ go("home");
   setTimeout(render, 2600);
 })();
 </script>
+<script>
+(function () {
+  "use strict";
+
+  function ready(fn) {
+    if (document.readyState !== "loading") fn();
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
+
+  ready(function () {
+    if (document.getElementById("gr-cert-note")) return; // déjà inséré
+
+    // Retrouver l'encadré « À lire avant de commencer » via sa pastille.
+    var card = null;
+    var pills = document.querySelectorAll("#home .card .pill");
+    for (var i = 0; i < pills.length; i++) {
+      if (/à lire avant de commencer/i.test(pills[i].textContent || "")) {
+        card = pills[i].closest(".card");
+        break;
+      }
+    }
+    if (!card) return;
+
+    var list = card.querySelector("ul.checklist");
+    if (!list) return;
+
+    var li = document.createElement("li");
+    li.id = "gr-cert-note";
+    li.innerHTML =
+      '<span class="gly" aria-hidden="true">&#127891;</span> ' +
+      'Le TOEIC est une <strong>certification</strong> : on le <strong>prépare</strong> ' +
+      "pour valider un niveau à un instant T, mais réussir le test ne fait pas progresser " +
+      "en soi. Pour <strong>améliorer ton anglais et communiquer au quotidien</strong>, " +
+      "rien ne vaut de <strong>vrais cours d'anglais</strong> avec un·e enseignant·e.";
+
+    // On la place en tête de liste pour qu'elle soit la première lue.
+    list.insertBefore(li, list.firstChild);
+  });
+})();
+</script>
 
 </body>
 </html>
