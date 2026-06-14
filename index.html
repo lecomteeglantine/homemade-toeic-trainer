@@ -3386,6 +3386,457 @@ go("home");
   });
 })();
 </script>
+<script>
+(function () {
+  "use strict";
+
+  // Libellés + mots-clés (synonymes FR/EN) pour chaque page du site.
+  var META = {
+    home:      { label:"Accueil",         kw:"accueil demarrage commencer start home" },
+    whatis:    { label:"Le TOEIC",        kw:"toeic format test sections listening reading parties epreuve presentation comprendre" },
+    diagnostic:{ label:"Diagnostic",      kw:"diagnostic niveau placement evaluation depart se situer test de niveau" },
+    practice:  { label:"Exercices",       kw:"exercices entrainement questions training pratique s'entrainer reviser" },
+    chrono:    { label:"Examen blanc",    kw:"examen blanc test blanc mock chronometre minute chrono timer simulation conditions reelles" },
+    grammar:   { label:"Grammaire",       kw:"grammaire regles temps verbes conjugaison prepositions articles pronoms gerondif accords" },
+    vocab:     { label:"Vocabulaire",     kw:"vocabulaire mots audio prononciation traduction lexique words exemples collocations" },
+    pron:      { label:"Prononciation",   kw:"prononciation accent phonetique ipa liaisons formes reduites nombres sons ecouter" },
+    listening: { label:"Ecoute",          kw:"ecoute comprehension orale listening partie 2 audio entendre question reponse" },
+    traps:     { label:"Faux amis",       kw:"faux amis false friends pieges confusions erreurs typiques franco-anglais francais" },
+    mywords:   { label:"My Words",        kw:"my words mes mots revision memorisation favoris enregistres repetition espacee" },
+    dashboard: { label:"Tableau de bord", kw:"tableau de bord progres progression score statistiques objectif serie bilan suivi resultats" },
+    examday:   { label:"Le jour J",       kw:"jour j jour du test conseils examen le jour de l'examen materiel checklist stress" },
+    resources: { label:"Ressources",      kw:"ressources liens livres plateformes bibliotheque universitaire bu pour aller plus loin" },
+    about:     { label:"A propos",        kw:"a propos credits informations rgpd donnees accessibilite mentions auteur eglantine" }
+  };
+
+  var index = [];
+
+  function fold(s){ return (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+  function esc(s){ return (s||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
+  function ce(tag,cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+
+  /* ---- Index : titre + intro + mots-clés + texte de chaque page ---- */
+  function buildIndex(){
+    index = [];
+    var secs = document.querySelectorAll("#main .view");
+    Array.prototype.forEach.call(secs, function(sec){
+      var id = sec.id; if(!id || id==="search") return;
+      var meta = META[id] || {};
+      var titleEl = sec.querySelector("h1,h2,h3");
+      var title = titleEl ? titleEl.textContent.replace(/\s+/g," ").trim() : (meta.label||id);
+      var label = meta.label || title;
+      var pEl = sec.querySelector("p");
+      var desc = pEl ? pEl.textContent.replace(/\s+/g," ").trim() : "";
+      if(desc.length>160) desc = desc.slice(0,157).trim()+"\u2026";
+      var text = sec.textContent.replace(/\s+/g," ").trim();
+      index.push({
+        id:id, label:label, desc:desc,
+        hayLabel: fold(label),
+        hayTitle: fold(title),
+        hayKw: fold(meta.kw||""),
+        hayText: fold(text)
+      });
+    });
+  }
+
+  /* ---- Surlignage simple des termes trouvés ---- */
+  function hi(text, terms){
+    var out = esc(text);
+    terms.forEach(function(t){
+      try{
+        var re = new RegExp("("+t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");
+        out = out.replace(re,"<mark>$1</mark>");
+      }catch(e){}
+    });
+    return out;
+  }
+
+  /* ---- Une ligne de résultat (renvoie vers la page) ---- */
+  function resultRow(e, terms){
+    var b = ce("button","search-result"); b.type="button"; b.setAttribute("role","listitem");
+    var main = ce("span","sr-main");
+    var t = ce("span","sr-title"); t.innerHTML = hi(e.label, terms);
+    main.appendChild(t);
+    if(e.desc){ var d = ce("span","sr-desc"); d.innerHTML = hi(e.desc, terms); main.appendChild(d); }
+    var go = ce("span","sr-go"); go.setAttribute("aria-hidden","true"); go.innerHTML = "&#8250;";
+    b.appendChild(main); b.appendChild(go);
+    b.addEventListener("click", function(){ if(typeof window.go==="function") window.go(e.id); });
+    return b;
+  }
+
+  /* ---- Recherche ---- */
+  function runSearch(q){
+    var res = document.getElementById("siteSearchResults");
+    if(!res) return;
+    res.innerHTML = "";
+    var terms = fold(q).split(/\s+/).filter(function(t){ return t.length>=2; });
+
+    if(!terms.length){ // requête vide : annuaire de toutes les pages
+      index.forEach(function(e){ res.appendChild(resultRow(e, [])); });
+      return;
+    }
+
+    var scored = [];
+    index.forEach(function(e){
+      var s=0, all=true;
+      terms.forEach(function(t){
+        var inLabel = e.hayLabel.indexOf(t)>=0;
+        var inTitle = e.hayTitle.indexOf(t)>=0;
+        var inKw    = e.hayKw.indexOf(t)>=0;
+        var inText  = e.hayText.indexOf(t)>=0;
+        if(inLabel) s+=6; else if(inTitle) s+=5; else if(inKw) s+=2; else if(inText) s+=1;
+        if(!(inLabel||inTitle||inKw||inText)) all=false;
+      });
+      if(s>0) scored.push({e:e, s:s, all:all});
+    });
+    var strict = scored.filter(function(x){ return x.all; });
+    var list = (strict.length ? strict : scored).sort(function(a,b){ return b.s-a.s; });
+
+    if(!list.length){
+      var p = ce("p","search-empty");
+      p.innerHTML = "Aucun r\u00e9sultat pour \u00ab\u00a0" + esc(q) + "\u00a0\u00bb. Essaie un autre mot-cl\u00e9 (grammaire, faux amis, prononciation\u2026).";
+      res.appendChild(p);
+      return;
+    }
+    list.forEach(function(x){ res.appendChild(resultRow(x.e, terms)); });
+  }
+
+  /* ---- Styles ---- */
+  function injectStyle(){
+    if(document.getElementById("site-search-style")) return;
+    var css = ""
+      + "#search .search-sub{color:var(--ink-soft,#5A6B82);margin:.2rem 0 1rem}"
+      + "#search .search-box{position:relative;max-width:560px;margin:0 0 1.1rem}"
+      + "#search .search-box .gly{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-soft,#5A6B82);font-size:1.1rem;pointer-events:none}"
+      + "#search #siteSearchInput{width:100%;box-sizing:border-box;padding:13px 16px 13px 42px;border:1px solid var(--line,#ECE6DA);border-radius:12px;background:var(--bg,#fff);color:var(--ink,#22324B);font:inherit;font-size:1rem}"
+      + "#search #siteSearchInput:focus{outline:none;border-color:var(--blue,#4F7CFF);box-shadow:0 0 0 3px var(--blue-soft,#EAF0FF)}"
+      + "#search #siteSearchResults{display:flex;flex-direction:column;gap:10px;max-width:720px}"
+      + "#search .search-result{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;padding:14px 16px;border:1px solid var(--line,#ECE6DA);border-radius:12px;background:var(--bg2,#F8F4EC);font:inherit;transition:border-color .15s ease,transform .05s ease}"
+      + "#search .search-result:hover{border-color:var(--blue,#4F7CFF)}"
+      + "#search .search-result:focus-visible{outline:3px solid var(--blue,#4F7CFF);outline-offset:2px}"
+      + "#search .search-result:active{transform:scale(.997)}"
+      + "#search .sr-main{flex:1 1 auto;display:flex;flex-direction:column;min-width:0}"
+      + "#search .sr-title{font-weight:700;color:var(--ink,#22324B)}"
+      + "#search .sr-desc{color:var(--ink-soft,#5A6B82);font-size:.92rem;margin-top:3px}"
+      + "#search .sr-go{flex:none;font-size:1.5rem;line-height:1;color:var(--ink-soft,#5A6B82)}"
+      + "#search .search-result mark{background:var(--teal-soft,#E2F7F4);color:inherit;padding:0 2px;border-radius:3px}"
+      + "#search .search-empty{color:var(--ink-soft,#5A6B82)}";
+    var st = ce("style"); st.id="site-search-style"; st.textContent=css; document.head.appendChild(st);
+  }
+
+  /* ---- Page de recherche ---- */
+  function injectSection(){
+    var host = document.querySelector("#main .wrap");
+    if(!host || document.getElementById("search")) return;
+    var sec = ce("section","view"); sec.id="search"; sec.setAttribute("aria-labelledby","search-h");
+    sec.innerHTML =
+      '<span class="eyebrow">Recherche</span>'
+      + '<h2 id="search-h">Rechercher dans le site</h2>'
+      + '<p class="search-sub">Tape un mot-cl\u00e9 (grammaire, faux amis, prononciation, examen blanc\u2026) pour aller directement \u00e0 la bonne page.</p>'
+      + '<div class="search-box"><span class="gly" aria-hidden="true">&#128269;</span>'
+      + '<input id="siteSearchInput" type="search" autocomplete="off" placeholder="Rechercher\u2026" aria-label="Rechercher dans le site" aria-controls="siteSearchResults"></div>'
+      + '<div id="siteSearchResults" role="list" aria-live="polite"></div>';
+    host.appendChild(sec);
+
+    var input = sec.querySelector("#siteSearchInput");
+    input.addEventListener("input", function(){ runSearch(this.value); });
+    input.addEventListener("keydown", function(e){
+      if(e.key==="Enter"){
+        var first = document.querySelector("#siteSearchResults .search-result");
+        if(first) first.click();
+      }
+    });
+  }
+
+  /* ---- Bouton « Rechercher » dans l'en-tête ---- */
+  function injectHeaderBtn(){
+    var bar = document.querySelector("header.top .top-in");
+    if(!bar || bar.querySelector('[data-nav="search"]')) return;
+    var b = ce("button","icon-btn"); b.type="button";
+    b.setAttribute("data-nav","search");
+    b.setAttribute("aria-label","Rechercher dans le site");
+    b.innerHTML = '<span class="gly" aria-hidden="true">&#128269;</span><span class="hide-sm">Rechercher</span>';
+    var settings = document.getElementById("openSettings");
+    if(settings) bar.insertBefore(b, settings); else bar.appendChild(b);
+  }
+
+  /* ---- À l'ouverture de la page recherche : ré-indexer + focus ---- */
+  function hookGo(){
+    if(typeof window.go!=="function" || window.go.__searchHook) return;
+    var orig = window.go;
+    window.go = function(id){
+      var r = orig.apply(this, arguments);
+      if(id==="search"){
+        try{
+          buildIndex();
+          setTimeout(function(){
+            var i=document.getElementById("siteSearchInput");
+            if(i){ i.focus(); runSearch(i.value); }
+          }, 30);
+        }catch(e){}
+      }
+      return r;
+    };
+    window.go.__searchHook = true;
+  }
+
+  /* ---- Raccourci clavier « / » ---- */
+  function hookShortcut(){
+    document.addEventListener("keydown", function(e){
+      if(e.key==="/" ){
+        var tag = (e.target && e.target.tagName || "").toLowerCase();
+        if(tag==="input"||tag==="textarea"||tag==="select"||(e.target&&e.target.isContentEditable)) return;
+        e.preventDefault();
+        if(typeof window.go==="function") window.go("search");
+      }
+    });
+  }
+
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded",fn); }
+  ready(function(){
+    injectStyle();
+    injectSection();
+    injectHeaderBtn();
+    hookGo();
+    hookShortcut();
+    buildIndex();
+  });
+})();
+  <script>
+(function () {
+  "use strict";
+
+  /* ---- La liste (à enrichir librement). Triée à l'affichage. ---- */
+  var DICO = [
+    {w:"accommodation",ipa:"/əˌkɒməˈdeɪʃən/",en:"a place to live or stay, especially temporarily",fr:"hébergement, logement"},
+    {w:"acquisition",ipa:"/ˌækwɪˈzɪʃən/",en:"the act of buying or gaining something, especially a company",fr:"acquisition, rachat"},
+    {w:"agenda",ipa:"/əˈdʒendə/",en:"a list of items to be discussed at a meeting",fr:"ordre du jour"},
+    {w:"agreement",ipa:"/əˈɡriːmənt/",en:"an arrangement accepted by all the people involved",fr:"accord, contrat"},
+    {w:"allowance",ipa:"/əˈlaʊəns/",en:"an amount of money given regularly for a specific purpose",fr:"indemnité, allocation"},
+    {w:"announcement",ipa:"/əˈnaʊnsmənt/",en:"an official public statement giving information",fr:"annonce"},
+    {w:"applicant",ipa:"/ˈæplɪkənt/",en:"a person who formally asks for a job or position",fr:"candidat(e), postulant(e)"},
+    {w:"apply",ipa:"/əˈplaɪ/",en:"to make a formal request, especially for a job",fr:"postuler, faire une demande"},
+    {w:"appointment",ipa:"/əˈpɔɪntmənt/",en:"an arrangement to meet someone at a set time",fr:"rendez-vous"},
+    {w:"approve",ipa:"/əˈpruːv/",en:"to officially accept or agree to something",fr:"approuver, valider"},
+    {w:"assemble",ipa:"/əˈsembəl/",en:"to put parts together to make something",fr:"assembler, monter"},
+    {w:"asset",ipa:"/ˈæset/",en:"something valuable owned by a person or company",fr:"actif, atout"},
+    {w:"attachment",ipa:"/əˈtætʃmənt/",en:"a file sent together with an email",fr:"pièce jointe"},
+    {w:"attend",ipa:"/əˈtend/",en:"to be present at an event or meeting",fr:"assister à"},
+    {w:"audit",ipa:"/ˈɔːdɪt/",en:"an official examination of financial records",fr:"audit, vérification"},
+    {w:"benefits",ipa:"/ˈbenɪfɪts/",en:"extra advantages given to employees besides salary",fr:"avantages (sociaux)"},
+    {w:"bill",ipa:"/bɪl/",en:"a document showing how much money you must pay",fr:"facture, note"},
+    {w:"board",ipa:"/bɔːd/",en:"the group of people who manage a company",fr:"conseil (d'administration)"},
+    {w:"branch",ipa:"/brɑːntʃ/",en:"a local office of a larger organization",fr:"agence, succursale"},
+    {w:"brand",ipa:"/brænd/",en:"a product name and identity created by a company",fr:"marque"},
+    {w:"budget",ipa:"/ˈbʌdʒɪt/",en:"a plan of how money will be spent",fr:"budget"},
+    {w:"campaign",ipa:"/kæmˈpeɪn/",en:"an organized set of actions to reach a goal",fr:"campagne"},
+    {w:"cancel",ipa:"/ˈkænsəl/",en:"to decide that something planned will not happen",fr:"annuler"},
+    {w:"candidate",ipa:"/ˈkændɪdət/",en:"a person being considered for a job",fr:"candidat(e)"},
+    {w:"client",ipa:"/ˈklaɪənt/",en:"a person or company that uses a professional service",fr:"client(e)"},
+    {w:"colleague",ipa:"/ˈkɒliːɡ/",en:"a person you work with",fr:"collègue"},
+    {w:"commission",ipa:"/kəˈmɪʃən/",en:"money paid to someone based on the sales they make",fr:"commission"},
+    {w:"commute",ipa:"/kəˈmjuːt/",en:"to travel regularly between home and work",fr:"faire le trajet domicile-travail"},
+    {w:"competitor",ipa:"/kəmˈpetɪtər/",en:"a company or person competing against another",fr:"concurrent(e)"},
+    {w:"complaint",ipa:"/kəmˈpleɪnt/",en:"a statement that something is wrong or unsatisfactory",fr:"réclamation, plainte"},
+    {w:"compliance",ipa:"/kəmˈplaɪəns/",en:"the act of following rules, laws or standards",fr:"conformité"},
+    {w:"confirmation",ipa:"/ˌkɒnfəˈmeɪʃən/",en:"a statement that something is certain or has been done",fr:"confirmation"},
+    {w:"contract",ipa:"/ˈkɒntrækt/",en:"a legal written agreement between parties",fr:"contrat"},
+    {w:"customer",ipa:"/ˈkʌstəmər/",en:"a person who buys goods or services",fr:"client(e)"},
+    {w:"deadline",ipa:"/ˈdedlaɪn/",en:"the latest time by which something must be finished",fr:"date limite, échéance"},
+    {w:"delivery",ipa:"/dɪˈlɪvəri/",en:"the act of bringing goods to a place",fr:"livraison"},
+    {w:"department",ipa:"/dɪˈpɑːtmənt/",en:"a separate section of an organization",fr:"service, département"},
+    {w:"deposit",ipa:"/dɪˈpɒzɪt/",en:"a sum paid in advance or put into an account",fr:"acompte, dépôt"},
+    {w:"discount",ipa:"/ˈdɪskaʊnt/",en:"a reduction in the usual price",fr:"remise, réduction"},
+    {w:"dismiss",ipa:"/dɪsˈmɪs/",en:"to remove someone from their job",fr:"licencier, renvoyer"},
+    {w:"earnings",ipa:"/ˈɜːnɪŋz/",en:"money earned, especially a company's profits",fr:"gains, bénéfices"},
+    {w:"employee",ipa:"/ɪmˈplɔɪiː/",en:"a person who works for an organization",fr:"salarié(e), employé(e)"},
+    {w:"employer",ipa:"/ɪmˈplɔɪər/",en:"a person or company that employs people",fr:"employeur"},
+    {w:"equipment",ipa:"/ɪˈkwɪpmənt/",en:"the tools and machines needed for an activity",fr:"équipement, matériel"},
+    {w:"estimate",ipa:"/ˈestɪmət/",en:"an approximate calculation of cost or value",fr:"devis, estimation"},
+    {w:"expenditure",ipa:"/ɪkˈspendɪtʃər/",en:"the total amount of money that is spent",fr:"dépenses"},
+    {w:"expense",ipa:"/ɪkˈspens/",en:"money spent for a particular purpose",fr:"dépense, frais"},
+    {w:"facility",ipa:"/fəˈsɪləti/",en:"a building or place provided for a purpose",fr:"installation, site"},
+    {w:"fee",ipa:"/fiː/",en:"money paid for a professional service",fr:"honoraires, frais"},
+    {w:"feedback",ipa:"/ˈfiːdbæk/",en:"comments about how well something is done",fr:"retour, commentaires"},
+    {w:"forecast",ipa:"/ˈfɔːkɑːst/",en:"a prediction of future events or figures",fr:"prévision"},
+    {w:"freight",ipa:"/freɪt/",en:"goods transported in large quantities",fr:"fret, marchandises"},
+    {w:"headquarters",ipa:"/ˈhedˌkwɔːtəz/",en:"the main office of an organization",fr:"siège (social)"},
+    {w:"hire",ipa:"/ˈhaɪər/",en:"to give someone a job",fr:"embaucher, recruter"},
+    {w:"inquiry",ipa:"/ɪnˈkwaɪəri/",en:"a request for information",fr:"demande de renseignements"},
+    {w:"inventory",ipa:"/ˈɪnvəntri/",en:"the goods a business currently has in stock",fr:"inventaire, stock"},
+    {w:"invoice",ipa:"/ˈɪnvɔɪs/",en:"a document requesting payment for goods or services",fr:"facture"},
+    {w:"issue",ipa:"/ˈɪʃuː/",en:"a problem or topic; also, to officially give out",fr:"problème ; émettre, délivrer"},
+    {w:"itinerary",ipa:"/aɪˈtɪnərəri/",en:"a planned route or schedule for a trip",fr:"itinéraire, programme de voyage"},
+    {w:"launch",ipa:"/lɔːntʃ/",en:"to introduce a new product onto the market",fr:"lancer ; lancement"},
+    {w:"layoff",ipa:"/ˈleɪɒf/",en:"the ending of a job, usually for economic reasons",fr:"licenciement (économique)"},
+    {w:"liability",ipa:"/ˌlaɪəˈbɪləti/",en:"a debt or a legal responsibility",fr:"passif ; responsabilité"},
+    {w:"maintenance",ipa:"/ˈmeɪntənəns/",en:"the work of keeping equipment in good condition",fr:"entretien, maintenance"},
+    {w:"manager",ipa:"/ˈmænɪdʒər/",en:"a person who runs a team or part of a business",fr:"responsable, directeur(trice)"},
+    {w:"manufacture",ipa:"/ˌmænjʊˈfæktʃər/",en:"to make goods, especially in a factory",fr:"fabriquer"},
+    {w:"memo",ipa:"/ˈmeməʊ/",en:"a short written note used within an organization",fr:"note de service"},
+    {w:"merchandise",ipa:"/ˈmɜːtʃəndaɪs/",en:"goods that are for sale",fr:"marchandises"},
+    {w:"merger",ipa:"/ˈmɜːdʒər/",en:"the joining of two companies into one",fr:"fusion"},
+    {w:"minutes",ipa:"/ˈmɪnɪts/",en:"the written record of what was said at a meeting",fr:"compte rendu, procès-verbal"},
+    {w:"negotiate",ipa:"/nɪˈɡəʊʃieɪt/",en:"to discuss something in order to reach an agreement",fr:"négocier"},
+    {w:"outstanding",ipa:"/aʊtˈstændɪŋ/",en:"not yet paid or dealt with",fr:"impayé, en suspens"},
+    {w:"overtime",ipa:"/ˈəʊvətaɪm/",en:"extra hours worked beyond normal working hours",fr:"heures supplémentaires"},
+    {w:"payroll",ipa:"/ˈpeɪrəʊl/",en:"the list of employees and the money paid to them",fr:"paie, masse salariale"},
+    {w:"postpone",ipa:"/pəʊstˈpəʊn/",en:"to move an event to a later time",fr:"reporter, ajourner"},
+    {w:"premises",ipa:"/ˈpremɪsɪz/",en:"the building and land that a business occupies",fr:"locaux"},
+    {w:"procedure",ipa:"/prəˈsiːdʒər/",en:"an official or established way of doing something",fr:"procédure"},
+    {w:"profit",ipa:"/ˈprɒfɪt/",en:"money gained after costs have been subtracted",fr:"bénéfice, profit"},
+    {w:"promotion",ipa:"/prəˈməʊʃən/",en:"a move to a higher job; also, the marketing of a product",fr:"promotion"},
+    {w:"purchase",ipa:"/ˈpɜːtʃəs/",en:"to buy something; also, a thing bought",fr:"acheter ; achat"},
+    {w:"quote",ipa:"/kwəʊt/",en:"a stated price for doing a job",fr:"devis"},
+    {w:"receipt",ipa:"/rɪˈsiːt/",en:"a document proving that payment was made",fr:"reçu, ticket"},
+    {w:"recipient",ipa:"/rɪˈsɪpiənt/",en:"a person who receives something",fr:"destinataire"},
+    {w:"recruit",ipa:"/rɪˈkruːt/",en:"to find and employ new staff",fr:"recruter"},
+    {w:"refund",ipa:"/ˈriːfʌnd/",en:"money returned to a customer",fr:"remboursement"},
+    {w:"reimburse",ipa:"/ˌriːɪmˈbɜːs/",en:"to pay back money that someone has spent",fr:"rembourser"},
+    {w:"reminder",ipa:"/rɪˈmaɪndər/",en:"a message that helps you remember something",fr:"rappel"},
+    {w:"reservation",ipa:"/ˌrezəˈveɪʃən/",en:"an arrangement to keep a place, seat or room",fr:"réservation"},
+    {w:"resign",ipa:"/rɪˈzaɪn/",en:"to officially leave a job",fr:"démissionner"},
+    {w:"retail",ipa:"/ˈriːteɪl/",en:"the sale of goods directly to the public",fr:"vente au détail"},
+    {w:"revenue",ipa:"/ˈrevənjuː/",en:"the total income of a business",fr:"chiffre d'affaires, recettes"},
+    {w:"schedule",ipa:"/ˈskedʒuːl/",en:"a plan of when things will happen",fr:"emploi du temps, planning"},
+    {w:"shareholder",ipa:"/ˈʃeəhəʊldər/",en:"a person who owns shares in a company",fr:"actionnaire"},
+    {w:"shift",ipa:"/ʃɪft/",en:"a set period of work during the day or night",fr:"poste, équipe (de travail)"},
+    {w:"shipment",ipa:"/ˈʃɪpmənt/",en:"a quantity of goods sent together",fr:"expédition, envoi"},
+    {w:"shortage",ipa:"/ˈʃɔːtɪdʒ/",en:"a situation in which there is not enough of something",fr:"pénurie"},
+    {w:"staff",ipa:"/stɑːf/",en:"all the people who work for an organization",fr:"personnel, effectif"},
+    {w:"stakeholder",ipa:"/ˈsteɪkhəʊldər/",en:"a person or group with an interest in a business",fr:"partie prenante"},
+    {w:"submit",ipa:"/səbˈmɪt/",en:"to send something for consideration or approval",fr:"soumettre, remettre"},
+    {w:"supervisor",ipa:"/ˈsuːpəvaɪzər/",en:"a person who oversees workers or a task",fr:"superviseur, chef d'équipe"},
+    {w:"supplier",ipa:"/səˈplaɪər/",en:"a company that provides goods or services",fr:"fournisseur"},
+    {w:"surplus",ipa:"/ˈsɜːpləs/",en:"an amount that is more than what is needed",fr:"excédent, surplus"},
+    {w:"survey",ipa:"/ˈsɜːveɪ/",en:"a set of questions used to gather opinions",fr:"enquête, sondage"},
+    {w:"tax",ipa:"/tæks/",en:"money paid to the government",fr:"impôt, taxe"},
+    {w:"turnover",ipa:"/ˈtɜːnəʊvər/",en:"total sales in a period; also, the rate staff leave",fr:"chiffre d'affaires ; rotation du personnel"},
+    {w:"vacancy",ipa:"/ˈveɪkənsi/",en:"a job or room that is available",fr:"poste vacant, chambre libre"},
+    {w:"vendor",ipa:"/ˈvendər/",en:"a person or company that sells something",fr:"vendeur, fournisseur"},
+    {w:"venue",ipa:"/ˈvenjuː/",en:"the place where an event happens",fr:"lieu (d'un événement)"},
+    {w:"wage",ipa:"/weɪdʒ/",en:"money paid for work, usually by the hour or week",fr:"salaire (horaire)"},
+    {w:"warehouse",ipa:"/ˈweəhaʊs/",en:"a large building used for storing goods",fr:"entrepôt"},
+    {w:"warranty",ipa:"/ˈwɒrənti/",en:"a written guarantee for a product",fr:"garantie"},
+    {w:"wholesale",ipa:"/ˈhəʊlseɪl/",en:"the selling of goods in large quantities to retailers",fr:"vente en gros"},
+    {w:"workload",ipa:"/ˈwɜːkləʊd/",en:"the amount of work to be done",fr:"charge de travail"}
+  ];
+
+  function fold(s){ return (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+  function esc(s){ return (s||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
+  function ce(tag,cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+
+  // Audio : on réutilise l'objet Speech du site (respecte l'accent choisi).
+  function speak(word, btn){
+    try{
+      if(typeof Speech!=="undefined" && Speech && typeof Speech.say==="function"){ Speech.say(word, btn); return; }
+      if("speechSynthesis" in window){
+        window.speechSynthesis.cancel();
+        var u=new SpeechSynthesisUtterance(word);
+        u.lang = (localStorage.getItem("ht_accent")||"en-US"); u.rate=.92;
+        window.speechSynthesis.speak(u);
+      }
+    }catch(e){}
+  }
+
+  function entryNode(d){
+    var card = ce("div","dico-entry");
+    var head = ce("div","dico-head");
+    var w = ce("span","dico-word"); w.textContent = d.w;
+    var audio = ce("button","dico-audio"); audio.type="button";
+    audio.setAttribute("aria-label","Écouter « "+d.w+" »"); audio.innerHTML="&#128266;";
+    audio.addEventListener("click", function(){ speak(d.w, audio); });
+    var ipa = ce("span","dico-ipa"); ipa.textContent = d.ipa||"";
+    head.appendChild(w); head.appendChild(audio); if(d.ipa) head.appendChild(ipa);
+    var en = ce("div","dico-en"); en.textContent = d.en||"";
+    var fr = ce("div","dico-fr"); fr.textContent = d.fr||"";
+    card.appendChild(head); card.appendChild(en); card.appendChild(fr);
+    card.setAttribute("data-hay", fold(d.w+" "+d.en+" "+d.fr));
+    return card;
+  }
+
+  function render(filter){
+    var list = document.getElementById("dicoList");
+    var count = document.getElementById("dicoCount");
+    if(!list) return;
+    var q = fold(filter||"");
+    list.innerHTML="";
+    var shown=0;
+    DICO.slice().sort(function(a,b){ return a.w.localeCompare(b.w); }).forEach(function(d){
+      var hay = fold(d.w+" "+d.en+" "+d.fr);
+      if(q && hay.indexOf(q)<0) return;
+      list.appendChild(entryNode(d)); shown++;
+    });
+    if(!shown){
+      var p=ce("p","dico-empty"); p.textContent = "Aucun mot trouvé pour « "+filter+" ».";
+      list.appendChild(p);
+    }
+    if(count) count.textContent = shown + " mot" + (shown>1?"s":"");
+  }
+
+  function injectStyle(){
+    if(document.getElementById("dico-style")) return;
+    var css = ""
+      + "#dico .dico-sub{color:var(--ink-soft,#5A6B82);margin:.2rem 0 1rem}"
+      + "#dico .dico-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}"
+      + "#dico #dicoSearch{flex:1;min-width:200px;min-height:48px;box-sizing:border-box;padding:0 16px;border:1.5px solid var(--line,#ECE6DA);border-radius:14px;background:var(--card,var(--bg,#fff));color:var(--ink,#22324B);font:inherit;font-size:1rem}"
+      + "#dico #dicoSearch:focus{outline:none;border-color:var(--blue,#4F7CFF);box-shadow:0 0 0 3px var(--blue-soft,#EAF0FF)}"
+      + "#dico #dicoCount{font-size:.82rem;color:var(--ink-soft,#5A6B82);white-space:nowrap}"
+      + "#dico #dicoList{display:flex;flex-direction:column;gap:10px}"
+      + "#dico .dico-entry{border:1px solid var(--line,#ECE6DA);border-radius:14px;background:var(--bg2,#F8F4EC);padding:13px 16px}"
+      + "#dico .dico-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}"
+      + "#dico .dico-word{font-weight:800;font-size:1.08rem;color:var(--ink,#22324B)}"
+      + "#dico .dico-ipa{color:var(--ink-soft,#5A6B82);font-size:.95rem}"
+      + "#dico .dico-audio{flex:none;cursor:pointer;border:0;background:var(--blue-soft,#EAF0FF);color:var(--blue,#4F7CFF);width:34px;height:34px;border-radius:50%;font-size:1rem;line-height:1;display:inline-flex;align-items:center;justify-content:center}"
+      + "#dico .dico-audio:hover{filter:brightness(.97)}"
+      + "#dico .dico-audio.speaking{animation:dicoPulse .7s ease infinite}"
+      + "@keyframes dicoPulse{50%{transform:scale(1.12)}}"
+      + "#dico .dico-en{margin-top:6px;color:var(--ink,#22324B)}"
+      + "#dico .dico-fr{margin-top:2px;color:var(--ink-soft,#5A6B82);font-style:italic}"
+      + "#dico .dico-empty{color:var(--ink-soft,#5A6B82)}";
+    var st=ce("style"); st.id="dico-style"; st.textContent=css; document.head.appendChild(st);
+  }
+
+  function injectSection(){
+    var host = document.querySelector("#main .wrap");
+    if(!host || document.getElementById("dico")) return;
+    var sec = ce("section","view"); sec.id="dico"; sec.setAttribute("aria-labelledby","dico-h");
+    sec.innerHTML =
+      '<span class="eyebrow">Dictionnaire</span>'
+      + '<h1 id="dico-h">Dictionnaire TOEIC</h1>'
+      + '<p class="dico-sub">Le vocabulaire-clé du TOEIC : mot anglais, prononciation, définition en anglais et traduction. Touche &#128266; pour entendre le mot (accent choisi en haut de page).</p>'
+      + '<div class="dico-bar"><input id="dicoSearch" type="search" autocomplete="off" placeholder="Filtrer un mot, un sens…" aria-label="Filtrer le dictionnaire"><span id="dicoCount" class="chip"></span></div>'
+      + '<div id="dicoList"></div>';
+    host.appendChild(sec);
+    var input = sec.querySelector("#dicoSearch");
+    input.addEventListener("input", function(){ render(this.value); });
+    render("");
+  }
+
+  // Bouton d'accès depuis la page Vocabulaire.
+  function injectEntryPoint(){
+    var vocab = document.getElementById("vocab");
+    if(!vocab || vocab.querySelector('[data-nav="dico"]')) return;
+    var row = ce("div","linkrow"); row.style.margin = "2px 0 14px";
+    var b = ce("button","btn ghost"); b.type="button";
+    b.setAttribute("data-nav","dico");
+    b.innerHTML = '<span class="gly" aria-hidden="true">&#128214;</span> Ouvrir le dictionnaire TOEIC';
+    row.appendChild(b);
+    var lead = vocab.querySelector("p.lead");
+    if(lead && lead.nextSibling) vocab.insertBefore(row, lead.nextSibling);
+    else vocab.insertBefore(row, vocab.firstChild);
+  }
+
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded",fn); }
+  ready(function(){
+    injectStyle();
+    injectSection();
+    injectEntryPoint();
+  });
+})();
+</script>
+
+</script>
 
 </body>
 </html>
