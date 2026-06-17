@@ -1,0 +1,65 @@
+/* ht-kit.css — Kit TOEIC (vitesse d'ecoute, transcription, strategies, gamification)
+   A charger dans le <head>. Ajoute la classe "ht-kit" sur <body>. */
+
+:root{
+  --ht-blue:#4F7CFF; --ht-blue-d:#3A63DB; --ht-ink:#1f2a44; --ht-soft:#eef2ff;
+  --ht-line:#d7defb; --ht-ok:#1E7A46; --ht-gold:#9C6B12; --ht-bg:#ffffff; --ht-muted:#5b6478;
+}
+.ht-kit, .ht-kit *{ box-sizing:border-box; }
+.ht-kit{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ht-ink); line-height:1.5; }
+.ht-sr{ position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0; }
+.ht-kit :focus-visible{ outline:3px solid var(--ht-blue); outline-offset:2px; border-radius:8px; }
+
+/* --- Module A : vitesse --- */
+.ht-speedbar{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; padding:.5rem .7rem; background:var(--ht-soft); border:1px solid var(--ht-line); border-radius:14px; }
+.ht-seg-label{ font-weight:700; font-size:.95rem; }
+.ht-seg{ display:inline-flex; background:#fff; border:1px solid var(--ht-line); border-radius:999px; padding:3px; gap:3px; }
+.ht-seg-btn{ border:0; background:transparent; padding:.35rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; color:var(--ht-muted); font-size:.95rem; }
+.ht-seg-btn.is-on{ background:var(--ht-blue); color:#fff; }
+.ht-seg-btn:hover{ background:#e7ecff; color:var(--ht-ink); }
+.ht-seg-btn.is-on:hover{ background:var(--ht-blue-d); color:#fff; }
+
+/* --- audio item + transcription pliable --- */
+.ht-audio{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin:.4rem 0; }
+.ht-play,.ht-replay{ border:1px solid var(--ht-blue); background:var(--ht-blue); color:#fff; border-radius:12px; padding:.45rem .8rem; font-weight:700; cursor:pointer; font-size:.95rem; }
+.ht-replay{ background:#fff; color:var(--ht-blue); }
+.ht-play:hover{ background:var(--ht-blue-d); }
+.ht-replay:hover{ background:var(--ht-soft); }
+details.ht-tr{ border:1px dashed var(--ht-line); border-radius:12px; padding:0 .8rem; background:#fbfcff; width:100%; }
+details.ht-tr>summary{ cursor:pointer; font-weight:700; color:var(--ht-blue-d); padding:.55rem 0; list-style:none; }
+details.ht-tr>summary::-webkit-details-marker{ display:none; }
+details.ht-tr>summary::before{ content:"▸ "; }
+details.ht-tr[open]>summary::before{ content:"▾ "; }
+details.ht-tr>div,details.ht-tr>p{ padding-bottom:.7rem; margin:.2rem 0; }
+
+/* --- Module B : cartes stratégie --- */
+.ht-strat-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:1rem; }
+.ht-card{ border:1px solid var(--ht-line); border-radius:16px; padding:1rem; background:var(--ht-bg); box-shadow:0 1px 3px rgba(31,42,68,.06); }
+.ht-card-tag{ display:inline-block; background:var(--ht-soft); color:var(--ht-blue-d); font-weight:800; font-size:.78rem; padding:.18rem .55rem; border-radius:999px; letter-spacing:.02em; }
+.ht-card-title{ margin:.5rem 0 .6rem; font-size:1.08rem; }
+.ht-line{ margin:.35rem 0; font-size:.93rem; }
+.ht-line.ht-tip{ color:var(--ht-gold); }
+
+/* --- Module C : gamification --- */
+.ht-gam{ border:1px solid var(--ht-line); border-radius:18px; padding:1.1rem 1.2rem; background:linear-gradient(180deg,#fff, #fafbff); display:grid; gap:1.1rem; }
+.ht-rank{ display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+.ht-rank-name{ font-size:1.25rem; font-weight:800; color:var(--ht-blue-d); }
+.ht-xp-total{ font-weight:800; }
+.ht-bar{ height:14px; background:var(--ht-soft); border-radius:999px; overflow:hidden; margin:.5rem 0 .35rem; }
+.ht-bar-fill{ display:block; height:100%; background:linear-gradient(90deg,var(--ht-blue),#7aa0ff); border-radius:999px; transition:width .5s ease; }
+.ht-rank-next{ font-size:.85rem; color:var(--ht-muted); }
+.ht-week-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.4rem; }
+.ht-week-total{ font-weight:800; color:var(--ht-blue-d); }
+.ht-week-bars{ display:flex; gap:.5rem; align-items:flex-end; }
+.ht-wb{ flex:1; text-align:center; }
+.ht-wb-track{ height:70px; background:#f1f4ff; border-radius:8px; display:flex; align-items:flex-end; overflow:hidden; }
+.ht-wb-fill{ width:100%; background:linear-gradient(180deg,#7aa0ff,var(--ht-blue)); transition:height .5s ease; }
+.ht-wb-label{ font-size:.72rem; color:var(--ht-muted); margin-top:.25rem; }
+.ht-badge-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:.6rem; margin-top:.4rem; }
+.ht-badge{ border:1px solid var(--ht-line); border-radius:14px; padding:.6rem; text-align:center; background:#fff; opacity:.55; }
+.ht-badge.is-on{ opacity:1; border-color:var(--ht-blue); background:var(--ht-soft); }
+.ht-badge-emo{ display:block; font-size:1.5rem; }
+.ht-badge-lab{ display:block; font-size:.74rem; color:var(--ht-muted); margin-top:.2rem; }
+.ht-toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:var(--ht-ink); color:#fff; padding:.7rem 1.1rem; border-radius:12px; font-weight:700; opacity:0; transition:opacity .3s, transform .3s; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+.ht-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+@media (prefers-reduced-motion:reduce){ .ht-bar-fill,.ht-wb-fill,.ht-toast{ transition:none; } }

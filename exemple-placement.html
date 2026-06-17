@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exemple de placement — Kit TOEIC</title>
+
+  <!-- ▼▼▼ 1) DANS LE <head> : charge la feuille de styles du kit ▼▼▼ -->
+  <link rel="stylesheet" href="ht-kit.css">
+  <!-- ▲▲▲ (mets ht-kit.css dans le MÊME dossier que cette page, ou ajuste le chemin) ▲▲▲ -->
+</head>
+
+<!-- ▼ 2) Ajoute la classe "ht-kit" sur ton <body> (ou sur un grand conteneur) ▼ -->
+<body class="ht-kit">
+
+  <!-- =================================================================
+       A) VITESSE D'ÉCOUTE — pose ce conteneur où tu veux le sélecteur
+          (par ex. en haut de tes sections d'écoute, ou dans ton panneau Accessibilité)
+       ================================================================= -->
+  <div class="ht-speedbar" data-ht-speed></div>
+
+  <!-- Modèle d'item audio à réutiliser PARTOUT (bouton + transcription pliable) -->
+  <div class="ht-audio">
+    <button class="ht-play"   data-ht-text="Where is the meeting room?" data-ht-lang="en-US">🔊 Écouter</button>
+    <button class="ht-replay" data-ht-text="Where is the meeting room?" data-ht-lang="en-US" aria-label="Réécouter">↻ Réécouter</button>
+  </div>
+  <details class="ht-tr">
+    <summary>Afficher la transcription</summary>
+    <div><strong>Question :</strong> Where is the meeting room?<br>(A) On the second floor. (B) At three o'clock. (C) Yes, I do.</div>
+  </details>
+
+
+  <!-- =================================================================
+       B) MINI-FICHES STRATÉGIE — pose ce seul conteneur, le contenu se génère.
+          (Pour modifier les textes : édite le tableau HT.STRATEGIES dans ht-kit.js)
+       ================================================================= -->
+  <div data-ht-strategy></div>
+
+
+  <!-- =================================================================
+       C) GAMIFICATION — pose ce conteneur dans ton tableau de bord
+       ================================================================= -->
+  <div data-ht-gamify></div>
+
+
+  <!-- ▼▼▼ 3) JUSTE AVANT </body> : charge le moteur du kit ▼▼▼ -->
+  <script src="ht-kit.js"></script>
+  <!-- ▲▲▲ (mets ht-kit.js dans le MÊME dossier, ou ajuste le chemin) ▲▲▲ -->
+
+  <!-- 4) RELIE TES ACTIONS EXISTANTES À L'XP (exemples — à appeler depuis TON code) :
+       Quand une question est validée :   HT.xp.add(5,'question'); HT.xp.inc('questions');
+       Quand un mot est ajouté :          HT.xp.inc('words');
+       Quand un examen blanc se termine :  HT.xp.add(50,'examen blanc'); HT.xp.inc('mocks');
+       À la fin du diagnostic :           HT.xp.unlock('first_diag');
+       Leçon sans faute :                 HT.xp.unlock('perfect');
+       Pour synchroniser ta série :       HT.xp.set('streak', taSerie);
+  -->
+</body>
+</html>
