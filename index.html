@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" data-theme="warm">
 <head>
-  <link rel="stylesheet" href="ht-kit.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Homemade TOEIC Trainer — entraînement TOEIC Listening & Reading : diagnostic, vocabulaire avec audio, leçons courtes, score estimé. Créé par Eglantine Lecomte. Non affilié à ETS Global.">
@@ -275,7 +274,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 }
 .scene-img{background:var(--bg2,#f4f6fb);border:1px solid var(--line,#e6e9f2);border-radius:16px;padding:8px;margin-bottom:12px}.scene-img img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px}
 </style>
-  le <link rel="stylesheet" href="ht-kit.css">
+<link rel="stylesheet" href="ht-kit.css">
 </head>
 <body class="ht-kit">
 <a class="skip" href="#main">Aller au contenu</a>
@@ -365,6 +364,8 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 <section class="view" id="whatis" aria-labelledby="wi-h">
   <span class="eyebrow">Comprendre le test</span>
   <h1 id="wi-h">Le TOEIC Listening &amp; Reading, c'est quoi&nbsp;?</h1>
+  <h2 style="margin-top:18px">Stratégies par partie</h2>
+  <div data-ht-strategy></div>
   <p class="lead">Un test à choix multiples qui mesure ta compréhension de l'anglais de la vie courante et professionnelle. Voici comment il fonctionne, partie par partie, avec des exemples.</p>
 
   <div class="card">
@@ -508,6 +509,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 <section class="view" id="dashboard" aria-labelledby="dash-h">
   <div class="section-head">
     <div><span class="eyebrow">Mon tableau de bord</span><h1 id="dash-h" style="margin:0">Ta progression</h1></div>
+    <div data-ht-gamify style="margin-top:14px"></div>
   </div>
   <div id="dashEmpty" class="card" hidden>
     <h3>Commence par le diagnostic</h3>
@@ -618,6 +620,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 <section class="view" id="listening" aria-labelledby="li-h">
   <span class="eyebrow">Écoute · Part 2</span>
   <h1 id="li-h">Entraînement à l'écoute</h1>
+  <div class="ht-speedbar" data-ht-speed></div>
   <p class="lead">Comme dans la Partie 2 du TOEIC : écoute la question, puis choisis la meilleure réponse. Tu peux réécouter autant que tu veux.</p>
   <div id="voiceWarn2" class="note" hidden style="margin-bottom:10px"></div>
   <div id="listenBody"></div>
@@ -3846,6 +3849,7 @@ go("home");
   });
 })();
 </script>
- <script src="ht-kit.js"></script>
+
+<script src="ht-kit.js"></script>
 </body>
 </html>
