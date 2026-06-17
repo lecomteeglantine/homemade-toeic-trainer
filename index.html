@@ -1697,6 +1697,7 @@ function touchStreak(){
   const yest = new Date(Date.now()-86400000).toISOString().slice(0,10);
   s.count = (s.last===yest) ? s.count+1 : 1;
   s.last = t; Store.set("streak",s);
+  if(window.HT&&HT.xp){ HT.xp.set("streak", s.count); }
 }
 function recordAnswer(skill, ok){
   const st = Store.get("skills",{});
@@ -1705,6 +1706,7 @@ function recordAnswer(skill, ok){
   Store.set("skills",st);
   const g = Store.get("global",{ok:0,n:0}); g.n++; if(ok) g.ok++; Store.set("global",g);
   const t=todayStr(); const d=Store.get("daily",{date:t,count:0}); if(d.date!==t){ d.date=t; d.count=0; } d.count++; Store.set("daily",d);
+  if(window.HT&&HT.xp){ HT.xp.add(ok?5:2,"question"); HT.xp.inc("questions"); }
 }
 function levelOf(pct){
   if(pct<50) return {k:"red",label:"À travailler"};
@@ -1769,6 +1771,7 @@ function renderDiagQ(){
 function formatStem(s){ return esc(s).replace(/____/g,'<span class="blank">_____</span>'); }
 function showDiagResult(){
   $("#diagRun").hidden=true;
+  if(window.HT&&HT.xp){ HT.xp.unlock("first_diag"); }
   // per-domain
   const byDom={};
   diagState.answers.forEach(a=>{ const d=a.q.dom; (byDom[d]=byDom[d]||{ok:0,n:0}); byDom[d].n++; if(a.ok) byDom[d].ok++; });
@@ -1927,6 +1930,7 @@ function answerPrac(idx,opts,card,q){
 }
 function pracDone(){
   const c=$("#pracRun"); const pct=Math.round(pracState.ok/pracState.pool.length*100); const lv=levelOf(pct);
+  if(window.HT&&HT.xp&&pracState.ok===pracState.pool.length&&pracState.pool.length>0){ HT.xp.unlock("perfect"); }
   c.innerHTML='<div class="card" style="text-align:center"><span class="pill '+(pct>=70?'green':'coral')+'">Bilan</span>'
    +'<div class="num" style="font-size:3rem;margin:10px 0">'+pracState.ok+' / '+pracState.pool.length+'</div>'
    +'<p style="font-weight:600;color:var(--ink)">'+(pct>=85?"Cette compétence est sous contrôle.":pct>=70?"Tu progresses bien, continue.":"Encore un peu de travail — c'est en forgeant qu'on progresse.")+'</p>'
@@ -1982,6 +1986,7 @@ function toggleWord(v,card){
   if(mw.some(x=>x.w===v.w)){ mw=mw.filter(x=>x.w!==v.w); toast("Retiré de My Words"); }
   else { mw.push({w:v.w,ipa:v.ipa,fr:v.fr,ex:v.ex,col:v.col,t:v.t,box:1,added:todayStr()}); toast("Ajouté à My Words"); }
   Store.set("mywords",mw);
+  if(window.HT&&HT.xp){ HT.xp.set("words", mw.length); }
   if(card){ const btn=$(".save-w",card); btn.innerHTML=isSaved(v.w)?"&#11088; Enregistré":"+ My Words"; }
 }
 function renderMyWords(){
@@ -2124,6 +2129,7 @@ function finishExam(timedOut){
     if(!good) review.push({q,sel:sel[idx]});
   });
   const total=pool.length; const pct=Math.round(ok/total*100);
+  if(window.HT&&HT.xp){ HT.xp.add(50,"examen blanc"); HT.xp.inc("mocks"); }
   exam=null;
   $("#chronoRun").hidden=true; const r=$("#chronoResult"); r.hidden=false; r.innerHTML="";
   const est=estimateScore();
