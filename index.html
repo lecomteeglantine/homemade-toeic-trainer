@@ -598,6 +598,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
   <p class="lead">Les mots que tu enregistres reviennent ici pour une révision espacée toute simple.</p>
   <div id="mwEmpty" class="card"><h3>Aucun mot pour l'instant</h3><p>Ajoute des mots depuis le vocabulaire avec le bouton <strong>+ My Words</strong>.</p><button class="btn ghost" data-nav="vocab">Aller au vocabulaire</button></div>
   <div id="mwList" class="grid g2"></div>
+  <div data-ht-errors style="margin-top:22px"></div>
 </section>
 
 <!-- PRONUNCIATION -->
@@ -1776,6 +1777,7 @@ function showDiagResult(){
   const byDom={};
   diagState.answers.forEach(a=>{ const d=a.q.dom; (byDom[d]=byDom[d]||{ok:0,n:0}); byDom[d].n++; if(a.ok) byDom[d].ok++; });
   Store.set("lastDiag",{when:todayStr(), byDom});
+  if(window.HTErr){ diagState.answers.forEach(function(a){ HTErr.onAnswer(a.q, a.ok, "Diagnostic"); }); }
   const est=estimateScore();
   const c=$("#diagResult"); c.hidden=false; c.innerHTML="";
   const head=el("div",{class:"card",style:"text-align:center"});
@@ -1920,6 +1922,7 @@ function answerPrac(idx,opts,card,q){
     if(i===idx && !ok){ b.classList.add("wrong"); b.insertAdjacentHTML("beforeend",'<span class="res" aria-hidden="true">&#10007;</span>'); }
   });
   recordAnswer(q.skill+" ("+q.dom+")", ok); if(ok) pracState.ok++;
+  if(window.HTErr) HTErr.onAnswer(q, ok, "Entraînement");
   const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
   fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bien vu':'<span aria-hidden="true">&#10007;</span> Pas encore')+' — '+esc(q.skill)+'</h4><p>'+esc(q.why)+'</p>';
   card.appendChild(fb);
@@ -2125,6 +2128,7 @@ function finishExam(timedOut){
   pool.forEach((q,idx)=>{
     const good=sel[idx]===q.a; if(good) ok++;
     recordAnswer(q.skill+" ("+q.dom+")", good);
+    if(window.HTErr) HTErr.onAnswer(q, good, "Examen");
     (byDom[q.dom]=byDom[q.dom]||{ok:0,n:0}); byDom[q.dom].n++; if(good) byDom[q.dom].ok++;
     if(!good) review.push({q,sel:sel[idx]});
   });
@@ -2194,6 +2198,7 @@ function answerListen(idx,opts,card,q){
     if(i===idx && !ok) b.classList.add("wrong");
   });
   recordAnswer("Écoute (Part 2)", ok); if(ok) listenState.ok++;
+  if(window.HTErr) HTErr.onAnswer(q, ok, "Écoute");
   const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
   fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bonne réponse':'<span aria-hidden="true">&#10007;</span> Pas tout à fait')+'</h4><p><strong>Question :</strong> '+esc(q.prompt)+'<br><strong>Bonne réponse :</strong> '+esc(q.opts[q.a])+'<br>'+esc(q.why)+'</p>';
   card.appendChild(fb);
@@ -3857,5 +3862,6 @@ go("home");
 </script>
 
 <script src="ht-kit.js"></script>
+<script src="ht-errors.js"></script>
 </body>
 </html>
