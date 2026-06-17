@@ -146,11 +146,17 @@
     { id:"words50",    emoji:"📚", label:"50 mots appris",     counter:"words",     threshold:50 },
     { id:"q100",       emoji:"🎯", label:"100 questions",      counter:"questions", threshold:100 },
     { id:"mock1",      emoji:"⏱️", label:"Premier examen blanc", counter:"mocks",   threshold:1 },
-    { id:"perfect",    emoji:"⭐", label:"Leçon sans-faute" }
+    { id:"perfect",    emoji:"⭐", label:"Leçon sans-faute" },
+    { id:"early",      emoji:"🌅", label:"Lève-tôt" },
+    { id:"q500",       emoji:"🏆", label:"500 questions",      counter:"questions", threshold:500 }
   ];
-  var DEFAULT = { v:1, xp:0, daily:{}, badges:{}, counters:{ questions:0, words:0, mocks:0, streak:0 } };
+  var DEFAULT = { v:2, xp:0, daily:{}, dailyQ:{}, badges:{}, counters:{ questions:0, words:0, mocks:0, streak:0 } };
   var g = load(LS.gamify, null);
-  if(!g || g.v!==1){ g = JSON.parse(JSON.stringify(DEFAULT)); save(LS.gamify, g); } // migration simple par version
+  if(!g){ g = JSON.parse(JSON.stringify(DEFAULT)); }
+  g.daily = g.daily || {}; g.dailyQ = g.dailyQ || {}; g.badges = g.badges || {};
+  g.counters = g.counters || { questions:0, words:0, mocks:0, streak:0 };
+  if(g.v!==2){ g.v = 2; }
+  save(LS.gamify, g); // migration : conserve les donnees existantes, ajoute dailyQ
 
   function gsave(){ save(LS.gamify, g); }
   function rankOf(xp){
@@ -188,7 +194,15 @@
       gsave(); checkBadges(); refresh();
       announce("+"+points+" XP" + (reason?(" ("+reason+")"):"") + ". Total : "+g.xp+" XP.");
     },
-    inc: function(counter, by){ g.counters[counter] = (g.counters[counter]||0) + (by==null?1:by); gsave(); checkBadges(); refresh(); },
+    inc: function(counter, by){
+      by = (by==null?1:by);
+      g.counters[counter] = (g.counters[counter]||0) + by;
+      if(counter==="questions"){
+        var tq=todayKey(); g.dailyQ[tq]=(g.dailyQ[tq]||0)+by;
+        var hr=new Date().getHours(); if(hr>=4 && hr<8) unlock("early");
+      }
+      gsave(); checkBadges(); refresh();
+    },
     set: function(counter, val){ g.counters[counter] = parseInt(val,10)||0; gsave(); checkBadges(); refresh(); },
     unlock: unlock,
     rank: function(){ return rankOf(g.xp); },
@@ -197,7 +211,7 @@
       for(var i=6;i>=0;i--){
         var d=new Date(); d.setDate(d.getDate()-i);
         var key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-        out.push({ key:key, label:names[d.getDay()], xp:(g.daily[key]||0) });
+        out.push({ key:key, label:names[d.getDay()], xp:(g.daily[key]||0), qn:(g.dailyQ[key]||0) });
       }
       return out;
     },
@@ -226,6 +240,7 @@
     var wk = HT.xp.weekly();
     var maxXp = Math.max(1, Math.max.apply(null, wk.map(function(d){return d.xp;})));
     var weekTotal = wk.reduce(function(a,d){return a+d.xp;},0);
+    var weekQ = wk.reduce(function(a,d){return a+(d.qn||0);},0);
     var recap = el("section",{class:"ht-week"},[
       el("div",{class:"ht-week-head"},[ el("strong",{text:"Cette semaine"}), el("span",{class:"ht-week-total",text:weekTotal+" XP"}) ])
     ]);
@@ -240,6 +255,7 @@
       bars.appendChild(col);
     });
     recap.appendChild(bars);
+    recap.appendChild(el("div",{class:"ht-week-q",text:"🎯 "+weekQ+" question"+(weekQ>1?"s":"")+" cette semaine"}));
     wrap.appendChild(recap);
 
     // Badges
