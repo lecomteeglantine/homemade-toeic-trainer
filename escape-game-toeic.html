@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Game TOEIC: Get the Job!</title>
+<!--
+  ESCAPE GAME TOEIC — GET THE JOB!
+  ------------------------------------------------------------------
+  Fichier autonome (HTML + CSS + JS), sans dépendance externe.
+  Compatible GitHub Pages. Sauvegarde dans localStorage.
+
+  POUR AJOUTER UNE MISSION : ajoute simplement un objet dans le tableau
+  MISSIONS (plus bas, section DATA). Toute la logique (score, rangs, XP,
+  progression) s'adapte automatiquement à la taille du tableau.
+
+  CHEMINS DES MÉDIAS (modifiables en une ligne dans la section CONFIG) :
+    - Images des missions : images/escape-game/missionN-...png
+    - Image de victoire   : images/escape-game/victory-you-got-the-job.png
+    - Musique             : audio/escape-game-theme.mp3
+  NB : chemins RELATIFS (sans « / » au début) pour fonctionner sur
+  GitHub Pages projet (username.github.io/depot/).
+-->
+<style>
+/* =================================================================
+   1. TOKENS DE DESIGN
+   ================================================================= */
+:root{
+  /* Palette professionnelle */
+  --navy:#1B3A6B;          /* bleu foncé pro */
+  --navy-deep:#142A4E;
+  --parchment:#F1EAD9;     /* fond chaud */
+  --parchment-2:#E8DFC9;
+  --card:#FFFFFF;
+  --ink:#26303F;
+  --ink-soft:#5C6675;
+  --line:#E3D9C3;
+  --gold:#E0A92E;          /* badges / XP */
+  --gold-soft:#FBEFD0;
+  --green:#3F9D5C;         /* réussites */
+  --green-soft:#E4F3E7;
+  --red:#C85a4d;           /* erreurs (rouge doux) */
+  --red-soft:#FBE7E2;
+  /* Accents par mission (repris de la maquette) */
+  --m1:#1B3A6B;  --m2:#1E6E68;  --m3:#4A3B7A;  --m4:#2B5BA8;  --m5:#8E2F35;
+
+  --radius:18px;
+  --radius-sm:12px;
+  --shadow:0 14px 34px rgba(20,42,78,.12), 0 3px 10px rgba(20,42,78,.07);
+  --shadow-lift:0 22px 50px rgba(20,42,78,.20);
+  --display:"Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --tap:48px;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; font-family:var(--body); color:var(--ink); line-height:1.55;
+  background:
+    radial-gradient(60vw 40vw at 110% -10%, rgba(224,169,46,.18), transparent 60%),
+    radial-gradient(50vw 40vw at -10% 0%, rgba(27,58,107,.12), transparent 55%),
+    var(--parchment);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+.wrap{ max-width:1080px; margin:0 auto; padding:18px 18px 80px; }
+h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; }
+.eyebrow{ font-family:var(--display); text-transform:uppercase; letter-spacing:.16em; font-size:.72rem; font-weight:700; color:var(--gold); }
+a{ color:var(--navy); }
+.hide{ display:none !important; }
+.visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* =================================================================
+   2. CONTRÔLE MUSIQUE (fixé en haut à droite)
+   ================================================================= */
+.music-dock{
+  position:fixed; top:14px; right:14px; z-index:60;
+  display:flex; align-items:center; gap:10px;
+  background:rgba(20,42,78,.92); color:#fff;
+  border-radius:999px; padding:7px 8px 7px 14px;
+  box-shadow:var(--shadow); backdrop-filter:blur(6px);
+}
+.music-btn{
+  border:0; cursor:pointer; font:inherit; font-weight:700; font-size:.85rem;
+  color:#fff; background:transparent; display:flex; align-items:center; gap:7px;
+  min-height:34px;
+}
+.vol{ display:flex; align-items:center; gap:6px; }
+.vol input[type=range]{ width:90px; accent-color:var(--gold); cursor:pointer; }
+@media (max-width:560px){ .vol input[type=range]{ width:60px; } .music-dock{ padding:6px 8px; } }
+
+/* =================================================================
+   3. HÉRO / ÉCRAN DE DÉMARRAGE
+   ================================================================= */
+.hero{
+  background:linear-gradient(150deg,var(--navy) 0%, var(--navy-deep) 100%);
+  color:#fff; border-radius:var(--radius); padding:38px 30px;
+  box-shadow:var(--shadow); position:relative; overflow:hidden; margin-top:46px;
+}
+.hero::after{
+  content:""; position:absolute; right:-60px; top:-60px; width:240px; height:240px;
+  background:radial-gradient(circle, rgba(224,169,46,.35), transparent 70%);
+}
+.hero .eyebrow{ color:var(--gold); }
+.hero h1{ font-size:clamp(1.8rem,5vw,3rem); margin:8px 0 6px; letter-spacing:.01em; }
+.hero p.sub{ font-size:clamp(1rem,2.4vw,1.2rem); color:#D7E0F0; margin:0 0 18px; max-width:46ch; }
+.hero .narr{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:var(--radius-sm); padding:14px 16px; color:#EAF0FB; font-size:.98rem; max-width:60ch; }
+
+/* Boutons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  min-height:var(--tap); padding:0 22px; border-radius:999px; border:0; cursor:pointer;
+  font-family:var(--display); font-weight:700; font-size:1rem; text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease, background .2s;
+}
+.btn:active{ transform:translateY(1px); }
+.btn.primary{ background:var(--gold); color:#3a2a05; box-shadow:0 8px 20px rgba(224,169,46,.4); }
+.btn.primary:hover{ box-shadow:0 12px 26px rgba(224,169,46,.5); transform:translateY(-1px); }
+.btn.dark{ background:#fff; color:var(--navy); }
+.btn.ghost{ background:transparent; border:1.5px solid var(--line); color:var(--ink); }
+.btn.ghost:hover{ border-color:var(--navy); }
+.btn.block{ width:100%; }
+.btn.small{ min-height:40px; font-size:.9rem; padding:0 16px; }
+.btn-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+
+/* =================================================================
+   4. HUD (rang, XP, score, progression, badges)
+   ================================================================= */
+.hud{ display:grid; gap:14px; margin:0 0 18px; }
+.rank-banner{
+  background:linear-gradient(120deg,var(--navy),var(--navy-deep));
+  color:#fff; border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow);
+  display:grid; grid-template-columns:1fr auto; gap:8px 16px; align-items:center;
+  position:relative; overflow:hidden;
+}
+.rank-banner .rk-label{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:#9DB4DA; }
+.rank-banner .rk-name{ font-family:var(--display); font-weight:800; font-size:clamp(1.3rem,3.4vw,1.9rem); }
+.rank-banner .rk-name .promote{ display:inline-block; }
+.rk-right{ text-align:right; }
+.rk-right .score-big{ font-family:var(--display); font-weight:800; font-size:1.5rem; color:var(--gold); }
+.rk-right .score-lbl{ font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:#9DB4DA; }
+.xp-wrap{ grid-column:1 / -1; }
+.xp-meta{ display:flex; justify-content:space-between; font-size:.74rem; color:#C9D6EC; margin:8px 0 5px; }
+.xp-bar{ height:12px; background:rgba(255,255,255,.16); border-radius:999px; overflow:hidden; }
+.xp-fill{ height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--gold),#FFD56A); transition:width .9s cubic-bezier(.2,.8,.2,1); box-shadow:0 0 14px rgba(255,213,106,.7) inset; }
+
+/* Progression des missions (pastilles d'étapes) */
+.steps{ display:flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:10px 14px; box-shadow:var(--shadow); overflow-x:auto; }
+.steps .step{ display:flex; align-items:center; gap:6px; flex:none; }
+.dot{ width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:.82rem; font-family:var(--display); background:var(--parchment-2); color:var(--ink-soft); border:2px solid transparent; transition:.3s; }
+.dot.done{ background:var(--green); color:#fff; }
+.dot.current{ background:var(--navy); color:#fff; border-color:var(--gold); }
+.connector{ width:26px; height:3px; border-radius:2px; background:var(--line); flex:none; }
+.connector.done{ background:var(--green); }
+.steps .lbl{ font-size:.7rem; color:var(--ink-soft); white-space:nowrap; }
+
+/* Badges */
+.badges{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); }
+.badges h3{ margin:0 0 10px; font-size:.95rem; display:flex; align-items:center; gap:8px; }
+.badge-list{ display:flex; flex-wrap:wrap; gap:8px; }
+.pill{ display:inline-flex; align-items:center; gap:6px; background:var(--gold-soft); color:#7a5a08; border:1px solid #EAD79A; border-radius:999px; padding:6px 12px; font-weight:700; font-size:.82rem; }
+.pill.bonus{ background:#EDE7FB; border-color:#D6C9F2; color:#4A3B7A; }
+.pill.empty{ background:transparent; border:1px dashed var(--line); color:var(--ink-soft); font-weight:500; }
+@keyframes pop{ 0%{ transform:scale(.4); opacity:0; } 60%{ transform:scale(1.12); } 100%{ transform:scale(1); opacity:1; } }
+.pill.new{ animation:pop .5s ease both; }
+
+/* =================================================================
+   5. CARTE DE MISSION
+   ================================================================= */
+.mission{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.mission-top{ color:#fff; padding:16px 20px; display:flex; align-items:center; gap:12px; }
+.mission-top .num{ width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.22); display:grid; place-items:center; font-family:var(--display); font-weight:800; flex:none; }
+.mission-top h2{ margin:0; font-size:clamp(1.15rem,3vw,1.5rem); }
+.mission-top .mt-eyebrow{ font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; }
+
+/* Illustration de mission (image fournie, affichée en grand) */
+.mission-illu{ background:var(--parchment-2); }
+.mission-illu img{
+  display:block; width:100%; height:auto; object-fit:cover;
+  border-bottom:1px solid var(--line);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.mission-illu{ overflow:hidden; }
+.mission-illu img:hover{ transform:scale(1.035); }
+.mission-illu img.img-missing{ /* filet de sécurité si le fichier manque : panneau neutre */
+  min-height:160px; background:var(--parchment-2);
+}
+@media (max-width:640px){
+  .mission-illu img{ max-height:210px; }
+}
+
+.mission-body{ padding:20px; }
+.context{ font-style:italic; color:var(--ink-soft); margin:0 0 16px; }
+
+/* Document à lire */
+.doc{ background:var(--parchment); border:1px solid var(--line); border-left:5px solid var(--navy); border-radius:var(--radius-sm); padding:16px 18px; margin:0 0 22px; }
+.doc.m1{ border-left-color:var(--m1); } .doc.m2{ border-left-color:var(--m2); }
+.doc.m3{ border-left-color:var(--m3); } .doc.m4{ border-left-color:var(--m4); }
+.doc.m5{ border-left-color:var(--m5); }
+.doc .doc-kind{ font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin-bottom:6px; }
+.doc .doc-title{ font-family:var(--display); font-weight:800; margin:0 0 8px; }
+.doc pre{ font-family:var(--body); white-space:pre-wrap; margin:0; font-size:.96rem; }
+
+/* Questions */
+.q{ border-top:1px solid var(--line); padding:16px 0; }
+.q:first-of-type{ border-top:0; padding-top:0; }
+.q .q-text{ font-weight:700; margin:0 0 10px; }
+.q .q-text .qn{ color:var(--navy); }
+.opts{ display:grid; gap:8px; }
+.opt{
+  display:flex; align-items:center; gap:11px; text-align:left; width:100%;
+  background:var(--card); border:1.5px solid var(--line); border-radius:var(--radius-sm);
+  padding:11px 13px; min-height:var(--tap); cursor:pointer; font:inherit; color:var(--ink);
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.opt:hover:not(:disabled){ border-color:var(--navy); transform:translateY(-1px); }
+.opt:disabled{ cursor:default; }
+.opt .key{ width:26px; height:26px; border-radius:7px; background:var(--parchment-2); color:var(--ink-soft); font-weight:800; font-family:var(--display); display:grid; place-items:center; flex:none; font-size:.85rem; }
+.opt.correct{ background:var(--green-soft); border-color:var(--green); }
+.opt.correct .key{ background:var(--green); color:#fff; }
+.opt.wrong{ background:var(--red-soft); border-color:var(--red); }
+.opt.wrong .key{ background:var(--red); color:#fff; }
+.fb{ margin-top:9px; font-weight:700; font-size:.92rem; display:none; }
+.fb.show{ display:block; }
+.fb.ok{ color:var(--green); }
+.fb.no{ color:var(--red); }
+
+/* Résultat de mission */
+.result{ margin-top:6px; border-top:1px solid var(--line); padding-top:18px; }
+.result.passed .r-head{ color:var(--green); }
+.result.failed .r-head{ color:var(--red); }
+.result .r-head{ font-family:var(--display); font-weight:800; font-size:1.2rem; margin:0 0 4px; display:flex; align-items:center; gap:9px; }
+.result .r-score{ color:var(--ink-soft); margin:0 0 14px; }
+
+/* =================================================================
+   6. COFFRE
+   ================================================================= */
+.chest-zone{ text-align:center; background:var(--parchment); border:1px dashed var(--gold); border-radius:var(--radius); padding:22px; margin-top:16px; }
+.chest{ font-size:4.2rem; line-height:1; cursor:pointer; display:inline-block; filter:drop-shadow(0 8px 14px rgba(0,0,0,.18)); transition:transform .2s; }
+.chest:hover{ transform:scale(1.06); }
+@keyframes chestShake{ 0%,100%{ transform:rotate(0); } 20%{ transform:rotate(-8deg) scale(1.05);} 40%{ transform:rotate(8deg) scale(1.08);} 60%{ transform:rotate(-6deg) scale(1.1);} 80%{ transform:rotate(5deg) scale(1.06);} }
+.chest.opening{ animation:chestShake .7s ease; }
+.chest-hint{ color:var(--ink-soft); font-size:.9rem; margin-top:8px; }
+.reward{ display:none; }
+.reward.show{ display:block; animation:pop .5s ease both; }
+.reward .r-kind{ display:inline-block; background:var(--gold); color:#3a2a05; font-weight:800; font-family:var(--display); border-radius:999px; padding:5px 14px; font-size:.85rem; }
+.reward .r-body{ margin:10px auto 0; max-width:48ch; color:var(--ink); }
+
+/* =================================================================
+   7. ÉCRAN DE VICTOIRE
+   ================================================================= */
+.victory{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.victory img{ display:block; width:100%; height:auto; object-fit:cover; transition:transform .6s; }
+.victory img:hover{ transform:scale(1.02); }
+@media (max-width:640px){ .victory img{ max-height:240px; } }
+.victory .v-body{ padding:24px 22px; text-align:center; }
+.victory h2{ margin:0 0 6px; font-size:clamp(1.5rem,4vw,2.2rem); color:var(--navy); }
+.motivation{ display:inline-block; background:var(--gold-soft); border:1px solid #EAD79A; color:#7a5a08; font-weight:800; font-family:var(--display); border-radius:999px; padding:8px 18px; margin:10px 0; }
+
+/* Panneaux secondaires (review, teacher, skills) */
+.panel{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; margin-top:16px; }
+.panel h3{ margin:0 0 12px; font-size:1.05rem; display:flex; align-items:center; gap:9px; }
+.mistake{ border-left:4px solid var(--red); background:var(--red-soft); border-radius:8px; padding:11px 13px; margin:0 0 10px; }
+.mistake .mq{ font-weight:700; }
+.mistake .ma{ font-size:.9rem; margin-top:3px; }
+.mistake .ma .x{ color:var(--red); font-weight:700; } .mistake .ma .v{ color:var(--green); font-weight:700; }
+details.teacher{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-top:16px; overflow:hidden; }
+details.teacher>summary{ cursor:pointer; list-style:none; padding:16px 20px; font-family:var(--display); font-weight:800; color:var(--navy); display:flex; align-items:center; gap:10px; }
+details.teacher>summary::-webkit-details-marker{ display:none; }
+details.teacher[open]>summary{ border-bottom:1px solid var(--line); }
+.teacher-inner{ padding:8px 20px 20px; }
+.tq{ padding:10px 0; border-top:1px dashed var(--line); }
+.tq:first-child{ border-top:0; }
+.tq .ans{ color:var(--green); font-weight:700; }
+.skills-list{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.skills-list li{ display:flex; align-items:center; gap:10px; }
+.skills-list .ck{ color:var(--green); font-weight:800; }
+
+/* Toast promotion */
+.toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--navy); color:#fff; padding:14px 22px; border-radius:999px; box-shadow:var(--shadow-lift); font-family:var(--display); font-weight:800; z-index:80; opacity:0; pointer-events:none; transition:opacity .4s, transform .4s; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.toast .g{ color:var(--gold); }
+
+/* Confettis (CSS pur) */
+#confetti{ position:fixed; inset:0; pointer-events:none; z-index:70; overflow:hidden; }
+.confetti-piece{ position:absolute; top:-12px; width:10px; height:14px; opacity:.95; will-change:transform; animation:fall linear forwards; }
+@keyframes fall{ to{ transform:translateY(110vh) rotate(720deg); } }
+
+@media (prefers-reduced-motion:reduce){
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Contrôle musique : toujours visible en haut à droite -->
+<div class="music-dock" role="group" aria-label="Music controls">
+  <button id="musicBtn" class="music-btn" aria-pressed="false">🔇 Music OFF</button>
+  <span class="vol">
+    <input id="vol" type="range" min="0" max="100" value="50" aria-label="Volume">
+  </span>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== ÉCRAN DE DÉMARRAGE ===================== -->
+  <section id="startScreen" class="hero">
+    <div class="eyebrow">Career mission · TOEIC training</div>
+    <h1>Escape Game TOEIC: Get the Job!</h1>
+    <p class="sub">Complete five professional missions and unlock your dream job.</p>
+    <div class="narr">
+      You walk into <strong>BrightWay Solutions</strong> with one goal: land the job.
+      Five real-world challenges stand between you and the contract — a job ad, an email,
+      a flight, a meeting room, and an unhappy customer. Read carefully, answer well, and
+      climb the career ladder from <em>Intern</em> to <em>Director</em>… and finally, <em>Hired</em>.
+    </div>
+    <div class="btn-row">
+      <button id="startBtn" class="btn primary">▶ Start Game</button>
+      <button class="btn dark resetBtn">↺ Reset Progress</button>
+    </div>
+  </section>
+
+  <!-- ===================== JEU ===================== -->
+  <main id="game" class="hide">
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="rank-banner">
+        <div>
+          <div class="rk-label">Your current rank</div>
+          <div class="rk-name"><span id="rankName" class="promote">Intern</span></div>
+        </div>
+        <div class="rk-right">
+          <div id="scoreBig" class="score-big">0 / 15</div>
+          <div class="score-lbl">Total score</div>
+        </div>
+        <div class="xp-wrap">
+          <div class="xp-meta"><span>Experience</span><span id="xpText">0 XP</span></div>
+          <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+        </div>
+      </div>
+
+      <div id="steps" class="steps" aria-label="Mission progress"></div>
+
+      <div class="badges">
+        <h3>⭐ Badges</h3>
+        <div id="badgeList" class="badge-list"></div>
+      </div>
+    </div>
+
+    <!-- Zone de mission (rendue dynamiquement) -->
+    <div id="missionZone"></div>
+
+    <!-- Écran de victoire (rendu dynamiquement) -->
+    <div id="victoryZone"></div>
+
+    <div class="btn-row">
+      <button class="btn ghost small resetBtn">↺ Reset Progress</button>
+    </div>
+  </main>
+
+</div>
+
+<div id="confetti" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* =================================================================
+   CONFIG — chemins des médias (modifiables ici en une ligne)
+   ================================================================= */
+var IMG_DIR   = "images/escape-game/";
+var MUSIC_SRC = "audio/escape-game-theme.mp3";
+
+/* =================================================================
+   DATA — Missions, rangs, récompenses de coffre, compétences
+   Ajoute une mission = ajoute un objet dans MISSIONS. C'est tout.
+   ================================================================= */
+var MISSIONS = [
+  {
+    id:1, accent:"m1", emoji:"💼",
+    title:"The Job Offer", eyebrow:"Mission 1 · Reading a job ad",
+    image:IMG_DIR+"mission1-job-offer.png",
+    context:"You have found a job offer for a Junior Marketing Assistant position. Read the advertisement carefully.",
+    badge:"Job Hunter",
+    doc:{
+      kind:"Job advertisement",
+      title:"Junior Marketing Assistant – BrightWay Solutions",
+      body:"BrightWay Solutions is looking for a Junior Marketing Assistant to join its Lyon office. The successful candidate will help prepare presentations, update customer databases, organise meetings, and assist the sales team during trade fairs.\n\nApplicants must have good communication skills, basic knowledge of Excel, and the ability to work in a team. Previous experience is not required, but an internship in marketing or sales would be a plus.\n\nThe position starts on September 2nd. Applications must be sent before July 15th."
+    },
+    questions:[
+      { text:"What is one responsibility of the Junior Marketing Assistant?",
+        options:["Repairing office equipment","Preparing presentations","Managing company finances","Training new employees"], answer:1 },
+      { text:"What is NOT required for the position?",
+        options:["Good communication skills","Basic knowledge of Excel","Previous experience","Teamwork skills"], answer:2 },
+      { text:"When does the position start?",
+        options:["July 15th","August 1st","September 2nd","October 15th"], answer:2 }
+    ]
+  },
+  {
+    id:2, accent:"m2", emoji:"📧",
+    title:"The Email", eyebrow:"Mission 2 · Understanding an email",
+    image:IMG_DIR+"mission2-email.png",
+    context:"You have been invited to an interview. Read the email and answer the questions.",
+    badge:"Inbox Survivor",
+    doc:{
+      kind:"Professional email",
+      title:"Subject: Interview Invitation",
+      body:"Dear Candidate,\n\nThank you for applying for the Junior Marketing Assistant position. We would like to invite you to an interview on Tuesday, July 23rd, at 10:30 a.m.\n\nThe interview will take place at our Lyon office, on the 4th floor. Please bring a copy of your CV and arrive ten minutes early. If you need to reschedule, contact Ms Parker before Friday.\n\nBest regards,\nHuman Resources Department"
+    },
+    questions:[
+      { text:"What is the purpose of the email?",
+        options:["To reject an application","To invite the candidate to an interview","To offer the candidate a job","To request a report"], answer:1 },
+      { text:"What should the candidate bring?",
+        options:["A passport","A copy of the CV","A laptop","A contract"], answer:1 },
+      { text:"Who should the candidate contact to reschedule?",
+        options:["The sales manager","The receptionist","Ms Parker","The director"], answer:2 }
+    ]
+  },
+  {
+    id:3, accent:"m3", emoji:"✈️",
+    title:"The Flight Reservation", eyebrow:"Mission 3 · Finding key information",
+    image:IMG_DIR+"mission3-flight.png",
+    context:"The company asks you to attend a short training session in London. Choose the correct travel information.",
+    badge:"Airport Ninja",
+    doc:{
+      kind:"Travel confirmation",
+      title:"Travel Confirmation",
+      body:"Passenger: Alex Martin\nFlight: AF1680\nDeparture: Lyon Saint-Exupéry – 08:45\nArrival: London Heathrow – 09:30 local time\nDate: Monday, September 9th\nBaggage: One cabin bag included\nTraining location: Westbridge Training Centre\nTaxi from airport: Booked by the company"
+    },
+    questions:[
+      { text:"Where is the passenger travelling to?",
+        options:["Paris","Lyon","London","Brussels"], answer:2 },
+      { text:"What is included in the reservation?",
+        options:["Two checked bags","One cabin bag","Hotel breakfast","Train tickets"], answer:1 },
+      { text:"Who booked the taxi?",
+        options:["The passenger","The airline","The hotel","The company"], answer:3 }
+    ]
+  },
+  {
+    id:4, accent:"m4", emoji:"🏢",
+    title:"The Meeting Room", eyebrow:"Mission 4 · Reading a schedule",
+    image:IMG_DIR+"mission4-meeting-room.png",
+    context:"You are now inside the company. You must find the correct meeting room for your final interview.",
+    badge:"Meeting Master",
+    doc:{
+      kind:"Meeting schedule",
+      title:"Meeting Schedule – Tuesday",
+      body:"09:00 – Sales Team Briefing – Room A\n10:30 – Junior Marketing Assistant Interview – Room C\n11:00 – Budget Review – Room B\n13:00 – Client Presentation – Conference Hall\n15:30 – Staff Training – Room A"
+    },
+    questions:[
+      { text:"Where is the Junior Marketing Assistant interview?",
+        options:["Room A","Room B","Room C","Conference Hall"], answer:2 },
+      { text:"What happens at 11:00?",
+        options:["Sales Team Briefing","Budget Review","Staff Training","Client Presentation"], answer:1 },
+      { text:"Which event takes place in the Conference Hall?",
+        options:["Client Presentation","Staff Training","Budget Review","Interview"], answer:0 }
+    ]
+  },
+  {
+    id:5, accent:"m5", emoji:"🛠️",
+    title:"The Customer Problem", eyebrow:"Mission 5 · Solving a complaint",
+    image:IMG_DIR+"mission5-customer-problem.png",
+    context:"You are given a final task during the interview. A customer has sent a complaint. Read the message and choose the best responses.",
+    badge:"Customer Hero",
+    doc:{
+      kind:"Customer email",
+      title:"Subject: Problem with Order #4821",
+      body:"Dear Customer Service Team,\n\nI received my order this morning, but two items are missing from the package. I ordered six office chairs, but only four were delivered. The delivery note says that all six chairs were included.\n\nCould you please check this issue and send the missing items as soon as possible? We need them before Thursday for a staff meeting.\n\nRegards,\nDaniel Cooper"
+    },
+    questions:[
+      { text:"What is the problem?",
+        options:["The order arrived late","Two chairs are missing","The chairs are broken","The customer ordered the wrong product"], answer:1 },
+      { text:"How many chairs did the customer receive?",
+        options:["Two","Four","Six","Eight"], answer:1 },
+      { text:"Why does the customer need the chairs before Thursday?",
+        options:["For a trade fair","For a staff meeting","For an interview","For a training session"], answer:1 }
+    ]
+  }
+];
+
+/* Échelle de carrière. Le dernier rang ("Hired") est réservé à la victoire. */
+var RANKS = ["Intern","Assistant","Employee","Senior Employee","Manager","Director","Hired"];
+
+/* Image finale de victoire */
+var VICTORY_IMG = IMG_DIR+"victory-you-got-the-job.png";
+
+/* Récompenses de coffre : pools réutilisables et faciles à enrichir */
+var REWARD_POOLS = {
+  badge: ["Speed Reader","Grammar Guardian","Vocabulary Voyager","Time Keeper","Detail Detective"],
+  tip: [
+    "Read the questions BEFORE the text. You'll know exactly what to look for.",
+    "In Part 7, the answers usually follow the order of the document. Move top to bottom.",
+    "Underline names, dates and numbers — TOEIC loves to test them.",
+    "Don't read every word. Scan for the keyword from the question, then read around it.",
+    "Wrong options often repeat a word from the text. A familiar word is not always the answer."
+  ],
+  trick: [
+    "Running out of time? Never leave a blank — there is no penalty for wrong answers on the TOEIC.",
+    "Two answers look identical except one word? That one word is the key. Compare them carefully.",
+    "If two options mean the same thing, neither can be correct — eliminate both.",
+    "Manage your clock: about 75 minutes for 100 reading questions ≈ 45 seconds each.",
+    "For 'NOT'/'EXCEPT' questions, find the three TRUE statements first, then the odd one out."
+  ],
+  fact: [
+    "'CC' in emails means 'carbon copy' — from the old days of carbon paper used to copy letters.",
+    "'RSVP' comes from French: 'Répondez s'il vous plaît' (please reply).",
+    "'EOD' = End Of Day, 'EOW' = End Of Week, 'ASAP' = As Soon As Possible.",
+    "A 'cover letter' isn't a cover — it's the letter that introduces your CV.",
+    "'Touch base' is business slang for 'let's talk briefly', borrowed from baseball."
+  ]
+};
+
+var SKILLS_PRACTISED = [
+  "Scanning a text for specific information",
+  "Reading professional emails",
+  "Finding dates and times",
+  "Understanding workplace vocabulary",
+  "Identifying key information"
+];
+
+/* =================================================================
+   ÉTAT + localStorage
+   ================================================================= */
+var STORAGE_KEY = "toeicEscapeGame_v1";
+var MAX_SCORE = MISSIONS.length * 3;          // dénominateur du score total
+var XP_PER_MISSION = 100;
+var XP_TARGET = MISSIONS.length * XP_PER_MISSION; // 100% de la jauge
+
+function defaultState(){
+  return {
+    started:false,
+    current:0,                  // index de la mission affichée
+    completed:[],               // ids de missions réussies
+    missionScore:{},            // id -> bonnes réponses (0..3)
+    totalScore:0,
+    xp:0,
+    rankIndex:0,
+    badges:[],                  // badges de mission
+    bonusBadges:[],             // badges bonus (coffre)
+    mistakes:[],                // {missionTitle, question, your, correct}
+    chests:{},                  // id -> récompense tirée (mémorisée)
+    rewardsLog:[],              // textes des tips/tricks/facts débloqués
+    finished:false,
+    music:{ on:false, volume:0.5 }
+  };
+}
+function loadState(){
+  try{ var s=JSON.parse(localStorage.getItem(STORAGE_KEY)); return s||null; }
+  catch(e){ return null; }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+var state = loadState() || defaultState();
+
+/* Helpers DOM */
+function $(s, r){ return (r||document).querySelector(s); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+var LETTERS = ["A","B","C","D","E"];
+
+/* Rang correspondant à n missions réussies (Hired réservé à la fin) */
+function rankForCompleted(n){ return Math.min(n, RANKS.length-2); }
+
+/* =================================================================
+   RENDU DU HUD
+   ================================================================= */
+function renderHUD(){
+  // Rang
+  $("#rankName").textContent = RANKS[state.rankIndex];
+  // Score
+  $("#scoreBig").textContent = state.totalScore + " / " + MAX_SCORE;
+  // XP
+  $("#xpText").textContent = state.xp + " XP";
+  var pct = Math.min(100, Math.round(state.xp / XP_TARGET * 100));
+  $("#xpFill").style.width = pct + "%";
+
+  // Étapes / progression
+  var steps = $("#steps"); steps.innerHTML = "";
+  MISSIONS.forEach(function(m, i){
+    if(i>0){
+      var c = document.createElement("div");
+      c.className = "connector" + (state.completed.indexOf(MISSIONS[i-1].id)>=0 ? " done":"");
+      steps.appendChild(c);
+    }
+    var wrap = document.createElement("div"); wrap.className="step";
+    var d = document.createElement("div");
+    var done = state.completed.indexOf(m.id)>=0;
+    var cur = (i===state.current && !state.finished && !done);
+    d.className = "dot" + (done?" done":"") + (cur?" current":"");
+    d.textContent = done ? "✓" : (i+1);
+    wrap.appendChild(d);
+    if(i===state.current && !state.finished){
+      var lbl=document.createElement("span"); lbl.className="lbl";
+      lbl.textContent = "Mission " + (i+1) + "/" + MISSIONS.length;
+      wrap.appendChild(lbl);
+    }
+    steps.appendChild(wrap);
+  });
+
+  // Badges
+  var list = $("#badgeList"); list.innerHTML="";
+  if(state.badges.length===0 && state.bonusBadges.length===0){
+    var e=document.createElement("span"); e.className="pill empty";
+    e.textContent="No badges yet — complete a mission to earn one.";
+    list.appendChild(e);
+  }
+  state.badges.forEach(function(b){
+    var p=document.createElement("span"); p.className="pill"; p.textContent="🏅 "+b; list.appendChild(p);
+  });
+  state.bonusBadges.forEach(function(b){
+    var p=document.createElement("span"); p.className="pill bonus"; p.textContent="✨ "+b; list.appendChild(p);
+  });
+}
+
+/* =================================================================
+   RENDU D'UNE MISSION
+   ================================================================= */
+var attempt = null; // suivi de la tentative en cours
+
+function renderMission(){
+  var zone = $("#missionZone");
+  var vzone = $("#victoryZone");
+  vzone.innerHTML = "";
+
+  if(state.finished){ zone.innerHTML=""; renderVictory(); renderHUD(); return; }
+
+  var m = MISSIONS[state.current];
+  attempt = { answers:new Array(m.questions.length).fill(null), answered:0, correct:0, wrong:[] };
+
+  var html = ""
+    + '<div class="mission">'
+    +   '<div class="mission-top" style="background:var(--'+m.accent+')">'
+    +     '<span class="num">'+(state.current+1)+'</span>'
+    +     '<div><div class="mt-eyebrow">'+esc(m.eyebrow)+'</div><h2>'+m.emoji+' '+esc(m.title)+'</h2></div>'
+    +   '</div>'
+    +   '<div class="mission-illu">'
+    +     '<img src="'+m.image+'" alt="Illustration: '+esc(m.title)+'" '
+    +          'onerror="this.classList.add(\'img-missing\');this.alt=\'(image: '+esc(m.image)+')\'">'
+    +   '</div>'
+    +   '<div class="mission-body">'
+    +     '<p class="context">'+esc(m.context)+'</p>'
+    +     '<div class="doc '+m.accent+'">'
+    +       '<div class="doc-kind">'+esc(m.doc.kind)+'</div>'
+    +       '<div class="doc-title">'+esc(m.doc.title)+'</div>'
+    +       '<pre>'+esc(m.doc.body)+'</pre>'
+    +     '</div>'
+    +     '<div id="questions"></div>'
+    +     '<div id="missionResult"></div>'
+    +   '</div>'
+    + '</div>';
+  zone.innerHTML = html;
+
+  // Questions
+  var qWrap = $("#questions");
+  m.questions.forEach(function(q, qi){
+    var qEl = document.createElement("div"); qEl.className="q";
+    var opts = '<div class="opts">';
+    q.options.forEach(function(o, oi){
+      opts += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'
+            +   '<span class="key">'+LETTERS[oi]+'</span><span>'+esc(o)+'</span>'
+            + '</button>';
+    });
+    opts += '</div>';
+    qEl.innerHTML = '<p class="q-text"><span class="qn">Q'+(qi+1)+'.</span> '+esc(q.text)+'</p>'
+                  + opts + '<div class="fb" id="fb-'+qi+'"></div>';
+    qWrap.appendChild(qEl);
+  });
+
+  // Écouteurs sur les options
+  Array.prototype.forEach.call(qWrap.querySelectorAll(".opt"), function(btn){
+    btn.addEventListener("click", function(){ onAnswer(m, btn); });
+  });
+
+  renderHUD();
+}
+
+/* Réponse à une question */
+function onAnswer(m, btn){
+  var qi = parseInt(btn.getAttribute("data-q"),10);
+  var oi = parseInt(btn.getAttribute("data-o"),10);
+  if(attempt.answers[qi]!==null) return;      // déjà répondu
+
+  var q = m.questions[qi];
+  var ok = (oi===q.answer);
+  attempt.answers[qi] = oi;
+  attempt.answered++;
+  if(ok) attempt.correct++;
+  else attempt.wrong.push({
+    missionTitle:m.title, question:q.text,
+    your:q.options[oi], correct:q.options[q.answer]
+  });
+
+  // Verrouille toutes les options de CETTE question + marque correct/wrong
+  var group = btn.parentNode.querySelectorAll(".opt");
+  Array.prototype.forEach.call(group, function(b){
+    b.disabled = true;
+    var bo = parseInt(b.getAttribute("data-o"),10);
+    if(bo===q.answer) b.classList.add("correct");
+    else if(bo===oi) b.classList.add("wrong");
+  });
+
+  // Feedback immédiat
+  var fb = $("#fb-"+qi);
+  fb.className = "fb show " + (ok?"ok":"no");
+  fb.textContent = ok ? "Correct! Well done." : "Not quite. Look carefully at the document.";
+
+  if(attempt.answered===m.questions.length) showMissionResult(m);
+}
+
+/* Résultat de mission (après les 3 questions) */
+function showMissionResult(m){
+  var passed = attempt.correct >= 2;
+  var box = $("#missionResult");
+  var firstTime = (state.completed.indexOf(m.id) < 0);
+
+  var html = '<div class="result '+(passed?"passed":"failed")+'">'
+    + '<p class="r-head">'+(passed?"✓ Mission complete!":"✗ Mission failed")+'</p>'
+    + '<p class="r-score">You scored <strong>'+attempt.correct+' / '+m.questions.length+'</strong>. '
+    +   (passed ? "You need 2/3 to pass — well played!" : "You need at least 2/3 to unlock the next mission.")+'</p>';
+
+  if(passed){
+    if(firstTime) awardMission(m);   // récompense une seule fois
+    html += '<div id="chestZone"></div>';
+    html += '<div class="btn-row"><button class="btn primary" id="continueBtn">'
+         +  (state.current >= MISSIONS.length-1 ? "Finish & get the job 🎉" : "Continue to next mission →")
+         +  '</button></div>';
+  } else {
+    html += '<div class="btn-row"><button class="btn primary" id="tryAgainBtn">↻ Try again</button></div>';
+  }
+  html += '</div>';
+  box.innerHTML = html;
+  box.scrollIntoView({ behavior:"smooth", block:"nearest" });
+
+  if(passed){
+    renderChest(m);
+    $("#continueBtn").addEventListener("click", function(){
+      state.current++;
+      if(state.current >= MISSIONS.length){
+        state.finished = true;
+        state.rankIndex = RANKS.length-1;   // → Hired
+        saveState();
+        renderMission();   // affichera la victoire
+        launchConfetti();
+        showToast("🎉 You got the job!");
+      } else {
+        saveState();
+        renderMission();
+        window.scrollTo({ top:0, behavior:"smooth" });
+      }
+    });
+  } else {
+    $("#tryAgainBtn").addEventListener("click", function(){ renderMission(); });
+  }
+
+  renderHUD();
+}
+
+/* Applique les gains d'une mission réussie (une seule fois) */
+function awardMission(m){
+  state.completed.push(m.id);
+  state.missionScore[m.id] = attempt.correct;
+  state.totalScore = MISSIONS.reduce(function(sum, mm){
+    return sum + (state.missionScore[mm.id] || 0);
+  }, 0);
+
+  // Badge de mission
+  if(state.badges.indexOf(m.badge)<0) state.badges.push(m.badge);
+
+  // Erreurs (de la tentative réussie) pour "Review mistakes"
+  attempt.wrong.forEach(function(w){ state.mistakes.push(w); });
+
+  // XP + montée de rang
+  state.xp += XP_PER_MISSION;
+  var oldRank = state.rankIndex;
+  state.rankIndex = rankForCompleted(state.completed.length);
+  saveState();
+
+  if(state.rankIndex > oldRank){
+    animateXP();
+    showToast('🎉 Promotion unlocked! You are now <span class="g">'+RANKS[state.rankIndex]+'</span>');
+  }
+}
+
+/* =================================================================
+   COFFRE
+   ================================================================= */
+function rollChest(){
+  var kinds = ["xp","badge","tip","trick","fact"];
+  var kind = pick(kinds);
+  if(kind==="xp") return { kind:"xp", title:"+50 XP Bonus", body:"Lucky find! Bonus experience added to your career." };
+  if(kind==="badge"){ var b=pick(REWARD_POOLS.badge); return { kind:"badge", title:"Bonus badge: "+b, body:"A shiny extra badge joins your collection.", badge:b }; }
+  var label = kind==="tip" ? "💡 TOEIC Tip" : kind==="trick" ? "🎯 Exam Trick" : "📌 Business English Fun Fact";
+  return { kind:kind, title:label, body:pick(REWARD_POOLS[kind]) };
+}
+
+function renderChest(m){
+  var zone = $("#chestZone");
+  if(!zone) return;
+  var already = state.chests[m.id];
+
+  zone.className = "chest-zone";
+  zone.innerHTML = '<div class="chest" id="chestIcon" role="button" tabindex="0" aria-label="Open the reward chest">🧰</div>'
+    + '<div class="chest-hint" id="chestHint">'+(already?"Reward already claimed:":"You earned a reward chest — tap to open it!")+'</div>'
+    + '<div class="reward" id="reward"><span class="r-kind"></span><p class="r-body"></p></div>';
+
+  var icon = $("#chestIcon");
+  if(already){ revealReward(already, true); return; }
+
+  function open(){
+    if(state.chests[m.id]) return;
+    var reward = rollChest();
+    state.chests[m.id] = reward;
+    // applique la récompense
+    if(reward.kind==="xp"){ state.xp += 50; }
+    else if(reward.kind==="badge"){ if(state.bonusBadges.indexOf(reward.badge)<0) state.bonusBadges.push(reward.badge); }
+    else { state.rewardsLog.push(reward.body); }
+    saveState();
+
+    icon.classList.add("opening");
+    setTimeout(function(){
+      icon.textContent = "🎉";
+      revealReward(reward, false);
+      animateXP();
+      renderHUD();
+    }, 600);
+  }
+  icon.addEventListener("click", open);
+  icon.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); open(); } });
+}
+
+function revealReward(reward, claimed){
+  var r = $("#reward");
+  if(!r) return;
+  if(claimed){ $("#chestIcon").textContent="🎉"; }
+  $(".r-kind", r).textContent = reward.title;
+  $(".r-body", r).textContent = reward.body;
+  r.classList.add("show");
+  $("#chestHint").textContent = claimed ? "Reward already claimed:" : "Reward unlocked!";
+}
+
+/* =================================================================
+   ÉCRAN DE VICTOIRE
+   ================================================================= */
+function motivationFor(score){
+  if(score>=15) return "TOEIC legend.";
+  if(score>=12) return "Excellent job.";
+  if(score>=8)  return "Good progress.";
+  return "Keep training — you are improving.";
+}
+
+function renderVictory(){
+  var z = $("#victoryZone");
+  var html = ""
+    + '<div class="victory">'
+    +   '<img src="'+VICTORY_IMG+'" alt="Congratulations, you got the job!" '
+    +        'onerror="this.classList.add(\'img-missing\')">'
+    +   '<div class="v-body">'
+    +     '<div class="eyebrow" style="color:var(--gold)">Final rank · Hired</div>'
+    +     '<h2>Congratulations! You got the job!</h2>'
+    +     '<p>Your TOEIC survival skills helped you complete all five missions.</p>'
+    +     '<div class="motivation">'+state.totalScore+' / '+MAX_SCORE+' — '+motivationFor(state.totalScore)+'</div>'
+    +   '</div>'
+    + '</div>';
+
+  // Panneau "Review mistakes"
+  html += '<div class="panel">'
+    +  '<h3>🔍 Review mistakes</h3>'
+    +  '<p id="mistakeIntro" style="margin:0 0 12px;color:var(--ink-soft)"></p>'
+    +  '<button class="btn ghost small" id="reviewBtn">Review my mistakes</button>'
+    +  '<div id="mistakeList" style="margin-top:14px"></div>'
+    + '</div>';
+
+  // Compétences pratiquées
+  html += '<div class="panel"><h3>🎯 What TOEIC skills did you practise?</h3><ul class="skills-list">';
+  SKILLS_PRACTISED.forEach(function(s){ html += '<li><span class="ck">✓</span>'+esc(s)+'</li>'; });
+  html += '</ul></div>';
+
+  // Récompenses débloquées dans les coffres
+  if(state.rewardsLog.length){
+    html += '<div class="panel"><h3>🧰 Tips & facts you unlocked</h3><ul class="skills-list">';
+    state.rewardsLog.forEach(function(t){ html += '<li><span class="ck">★</span>'+esc(t)+'</li>'; });
+    html += '</ul></div>';
+  }
+
+  // Teacher zone (repliable)
+  html += renderTeacherZone();
+
+  // Rejouer
+  html += '<div class="btn-row"><button class="btn primary" id="playAgainBtn">▶ Play again</button></div>';
+
+  z.innerHTML = html;
+
+  // Intro review
+  var n = state.mistakes.length;
+  $("#mistakeIntro").textContent = n===0
+    ? "Perfect run — you didn't miss a single question. Impressive!"
+    : "You answered " + n + " question(s) incorrectly. Go back and train to become even stronger!";
+
+  $("#reviewBtn").addEventListener("click", function(){
+    var ml = $("#mistakeList");
+    if(ml.innerHTML){ ml.innerHTML=""; return; }   // toggle
+    if(state.mistakes.length===0){ ml.innerHTML='<p style="color:var(--green);font-weight:700">No mistakes to review 🎉</p>'; return; }
+    var out="";
+    state.mistakes.forEach(function(w){
+      out += '<div class="mistake"><div class="mq">'+esc(w.missionTitle)+' — '+esc(w.question)+'</div>'
+          +  '<div class="ma"><span class="x">Your answer:</span> '+esc(w.your)
+          +  ' &nbsp;·&nbsp; <span class="v">Correct:</span> '+esc(w.correct)+'</div></div>';
+    });
+    ml.innerHTML = out;
+  });
+
+  $("#playAgainBtn").addEventListener("click", resetProgress);
+  bindTeacherToggle();
+}
+
+/* Teacher zone : toutes les réponses (repliable) */
+function renderTeacherZone(){
+  var inner = "";
+  MISSIONS.forEach(function(m, i){
+    inner += '<div style="margin-bottom:10px"><strong>'+(i+1)+'. '+m.emoji+' '+esc(m.title)+'</strong></div>';
+    m.questions.forEach(function(q, qi){
+      inner += '<div class="tq"><div>Q'+(qi+1)+'. '+esc(q.text)+'</div>'
+            +  '<div class="ans">✓ '+LETTERS[q.answer]+'. '+esc(q.options[q.answer])+'</div></div>';
+    });
+  });
+  return '<details class="teacher"><summary>🔒 Teacher zone — show all answers</summary>'
+       + '<div class="teacher-inner">'+inner+'</div></details>';
+}
+function bindTeacherToggle(){ /* <details> gère l'ouverture nativement */ }
+
+/* =================================================================
+   ANIMATIONS — XP, toast, confettis
+   ================================================================= */
+function animateXP(){
+  // simple "flash" + remise à jour de la largeur (transition CSS)
+  var fill = $("#xpFill");
+  if(!fill) return;
+  fill.style.filter = "brightness(1.4)";
+  setTimeout(function(){ fill.style.filter=""; }, 600);
+}
+
+var toastTimer=null;
+function showToast(htmlMsg){
+  var t = $("#toast");
+  t.innerHTML = htmlMsg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 3200);
+}
+
+function launchConfetti(){
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var box = $("#confetti");
+  var colors = ["#E0A92E","#3F9D5C","#2B5BA8","#8E2F35","#4A3B7A","#FFD56A"];
+  for(var i=0;i<120;i++){
+    var p = document.createElement("div");
+    p.className = "confetti-piece";
+    p.style.left = Math.random()*100 + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = (2.6 + Math.random()*2.4) + "s";
+    p.style.animationDelay = (Math.random()*0.6) + "s";
+    p.style.transform = "rotate("+(Math.random()*360)+"deg)";
+    if(Math.random()>0.5) p.style.borderRadius = "50%";
+    box.appendChild(p);
+  }
+  setTimeout(function(){ box.innerHTML=""; }, 5600);
+}
+
+/* =================================================================
+   MUSIQUE — toggle, fondu, volume, mémorisation
+   ================================================================= */
+var audio = new Audio(MUSIC_SRC);
+audio.loop = true;
+audio.preload = "none";
+audio.volume = 0;
+var fadeTimer = null;
+
+function fadeTo(target, ms, done){
+  clearInterval(fadeTimer);
+  var start = audio.volume;
+  var steps = Math.max(1, Math.round(ms/40));
+  var i = 0;
+  fadeTimer = setInterval(function(){
+    i++;
+    audio.volume = Math.min(1, Math.max(0, start + (target-start)*(i/steps)));
+    if(i>=steps){ clearInterval(fadeTimer); audio.volume = Math.min(1,Math.max(0,target)); if(done) done(); }
+  }, 40);
+}
+function startMusic(){
+  var p = audio.play();
+  if(p && p.catch){ p.then(function(){ fadeTo(state.music.volume, 2000); }).catch(function(){ /* bloqué par le navigateur */ }); }
+  else { fadeTo(state.music.volume, 2000); }
+}
+function stopMusic(){ fadeTo(0, 2000, function(){ audio.pause(); }); }
+
+function updateMusicBtn(){
+  var btn = $("#musicBtn");
+  btn.textContent = state.music.on ? "🔊 Music ON" : "🔇 Music OFF";
+  btn.setAttribute("aria-pressed", state.music.on ? "true":"false");
+}
+function setMusic(on){
+  state.music.on = on;
+  saveState();
+  updateMusicBtn();
+  if(on) startMusic(); else stopMusic();
+}
+
+$("#musicBtn").addEventListener("click", function(){ setMusic(!state.music.on); });
+$("#vol").addEventListener("input", function(e){
+  state.music.volume = (parseInt(e.target.value,10)||0)/100;
+  saveState();
+  if(state.music.on && !audio.paused) audio.volume = state.music.volume; // ajustement direct
+});
+
+/* =================================================================
+   NAVIGATION / RESET / INIT
+   ================================================================= */
+function showGame(){
+  $("#startScreen").classList.add("hide");
+  $("#game").classList.remove("hide");
+  renderMission();   // gère aussi l'écran de victoire si finished
+}
+function showStart(){
+  $("#startScreen").classList.remove("hide");
+  $("#game").classList.add("hide");
+}
+function resetProgress(){
+  var music = state.music;          // on garde la préférence musique
+  state = defaultState();
+  state.music = music;
+  saveState();
+  $("#confetti").innerHTML = "";
+  showStart();
+  renderHUD();
+}
+
+$("#startBtn").addEventListener("click", function(){
+  state.started = true; saveState(); showGame();
+});
+Array.prototype.forEach.call(document.querySelectorAll(".resetBtn"), function(b){
+  b.addEventListener("click", function(){
+    if(confirm("Reset all progress? Your rank, XP and badges will be erased.")) resetProgress();
+  });
+});
+
+/* --- Restauration de l'état au chargement --- */
+(function init(){
+  // Volume + bouton musique
+  $("#vol").value = Math.round((state.music.volume||0.5)*100);
+  updateMusicBtn();
+
+  // Si l'utilisateur avait laissé la musique ON, on tente de relancer
+  // (le navigateur peut bloquer l'autoplay → on attend la 1ʳᵉ interaction)
+  if(state.music.on){
+    startMusic();
+    var resume = function(){ if(state.music.on && audio.paused) startMusic(); window.removeEventListener("pointerdown", resume); };
+    window.addEventListener("pointerdown", resume, { once:true });
+  }
+
+  renderHUD();
+  if(state.started) showGame(); else showStart();
+})();
+
+/* Échappement HTML pour insérer du contenu texte en toute sécurité */
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+</script>
+</body>
+</html>
