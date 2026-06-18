@@ -326,6 +326,46 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 .sh-goal span{ color:var(--ink-soft); font-size:.9rem; }
 @media (max-width:680px){ .sh-paths{ grid-template-columns:1fr; } .sh-goals{ grid-template-columns:1fr; } }
 
+
+/* ===== Défi du jour + série (ajouté) ===== */
+.daily{ margin-top:18px; border-radius:var(--r); border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--coral-soft),var(--card) 70%); padding:20px 22px; }
+.dj-top{ display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
+.daily h2{ margin:8px 0 4px; font-size:clamp(1.25rem,3.4vw,1.7rem); }
+.dj-sub{ margin:0; color:var(--ink-soft); }
+.dj-streak{ text-align:center; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px 18px; min-width:124px; }
+.dj-streak .flame{ font-size:1.7rem; line-height:1; filter:grayscale(1) opacity(.45); transition:filter .3s, transform .3s; }
+.dj-streak.on .flame{ filter:none; transform:scale(1.08); }
+.dj-streak .num{ font-family:var(--display); font-weight:800; font-size:2rem; line-height:1; color:var(--coral); }
+.dj-streak .lbl{ font-size:.72rem; letter-spacing:.04em; color:var(--ink-soft); }
+.dj-streak .best{ margin-top:6px; font-size:.72rem; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:6px; }
+.dj-week{ display:flex; gap:8px; margin:16px 0 6px; flex-wrap:wrap; }
+.dj-day{ flex:1 1 0; min-width:42px; text-align:center; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px 4px; }
+.dj-day .d{ font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); }
+.dj-day .mk{ font-size:1.1rem; line-height:1.4; }
+.dj-day.done{ border-color:var(--green); background:var(--green-soft); }
+.dj-day.today{ border-color:var(--coral); box-shadow:0 0 0 2px var(--coral-soft); }
+.dj-badges{ display:flex; gap:8px; flex-wrap:wrap; margin:4px 0; }
+.dj-badges:empty{ display:none; }
+.dj-body{ margin-top:14px; }
+.dj-start{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px; }
+.dj-q{ background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin-bottom:12px; }
+.dj-q .qt{ font-weight:700; margin:0 0 10px; }
+.dj-q .qt .n{ color:var(--coral); font-family:var(--display); }
+.dj-opts{ display:grid; gap:8px; }
+.dj-opt{ text-align:left; width:100%; font:inherit; color:var(--ink); cursor:pointer; background:var(--card);
+  border:1px solid var(--line); border-radius:10px; padding:10px 12px; min-height:44px; display:flex; align-items:center; gap:10px; transition:border-color .15s, background .15s; }
+.dj-opt:hover:not(:disabled){ border-color:var(--coral); }
+.dj-opt:disabled{ cursor:default; }
+.dj-opt .k{ width:24px; height:24px; border-radius:6px; background:var(--bg2,#eef); color:var(--ink-soft); font-weight:700; display:grid; place-items:center; font-size:.8rem; flex:none; }
+.dj-opt.ok{ background:var(--green-soft); border-color:var(--green); } .dj-opt.ok .k{ background:var(--green); color:#fff; }
+.dj-opt.no{ background:var(--coral-soft); border-color:var(--coral); } .dj-opt.no .k{ background:var(--coral); color:#fff; }
+.dj-why{ margin-top:8px; font-size:.9rem; color:var(--ink-soft); display:none; }
+.dj-why.show{ display:block; }
+.dj-result{ background:var(--card); border:1px solid var(--green); border-radius:var(--r); padding:16px 18px; text-align:center; }
+.dj-result h3{ margin:0 0 6px; color:var(--green); }
+@media (max-width:620px){ .dj-streak{ min-width:110px; } }
+
 </style>
 <link rel="stylesheet" href="ht-kit.css">
 </head>
@@ -445,6 +485,26 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- =================== DÉFI DU JOUR + SÉRIE (ajouté) =================== -->
+  <section class="daily" id="defi-jour" aria-labelledby="dj-h">
+    <div class="dj-top">
+      <div>
+        <span class="pill teal">Reviens chaque jour</span>
+        <h2 id="dj-h">🔥 Défi du jour</h2>
+        <p class="dj-sub" id="djSub">3 questions, environ 2 minutes. Garde ta série vivante&nbsp;!</p>
+      </div>
+      <div class="dj-streak" id="djStreak">
+        <div class="flame" id="djFlame">🔥</div>
+        <div class="num" id="djNum">0</div>
+        <div class="lbl">jours d'affilée</div>
+        <div class="best" id="djBest">Record&nbsp;: 0</div>
+      </div>
+    </div>
+    <div class="dj-week" id="djWeek" aria-label="7 derniers jours"></div>
+    <div class="dj-badges" id="djBadges"></div>
+    <div class="dj-body" id="djBody"></div>
   </section>
 
   <div class="card" style="margin-top:22px;border-left:5px solid var(--coral)">
@@ -4160,5 +4220,150 @@ go("home");
 
 <script src="ht-kit.js"></script>
 <script src="ht-errors.js"></script>
+<script>
+/* ===================== DÉFI DU JOUR + SÉRIE (ajouté) =====================
+   Autonome, sans dépendance. Sauvegarde dans localStorage.
+   - 3 questions/jour, identiques pour tous le même jour (tirage déterministe).
+   - Série (streak) : +1 si tu as joué hier, sinon repart à 1.
+   - Calendrier 7 jours + badges paliers (3/7/14/30 jours).
+======================================================================== */
+(function(){
+  "use strict";
+  var KEY="toeicDaily_v1";
+  // Banque de questions courtes (facile à enrichir : ajoute des objets ici)
+  var POOL=[
+    {q:"The new report ____ ready for the meeting.",o:["are","is","were","be"],a:1,w:"Sujet singulier « report » → verbe singulier : is."},
+    {q:"Our team is interested ____ the new project.",o:["on","in","at","for"],a:1,w:"« interested in » : la préposition est in."},
+    {q:"____ the heavy rain, the conference continued.",o:["Although","Despite","Because","During"],a:1,w:"« Despite » + nom (la pluie). « Although » demanderait une proposition."},
+    {q:"Please ____ a decision before Friday.",o:["do","make","take","get"],a:1,w:"Collocation : on dit « make a decision »."},
+    {q:"I look forward to ____ from you.",o:["hear","hearing","heard","hears"],a:1,w:"« look forward to » + verbe en -ing."},
+    {q:"By next year, she ____ here for a decade.",o:["works","worked","will have worked","is working"],a:2,w:"Futur antérieur : will have + participe passé."},
+    {q:"You ____ submit the form by 5 p.m. — it's mandatory.",o:["can","might","must","could"],a:2,w:"Obligation forte → must."},
+    {q:"The package ____ yesterday afternoon.",o:["delivers","was delivered","is delivering","deliver"],a:1,w:"Passif au passé : was + participe passé."},
+    {q:"Could you ____ out this application form?",o:["fill","take","make","do"],a:0,w:"Phrasal verb : « fill out a form »."},
+    {q:"I've worked at this company ____ 2019.",o:["for","since","during","by"],a:1,w:"« since » + date précise ; « for » + durée."},
+    {q:"Prices ____ sharply last month.",o:["raised","rose","risen","raise"],a:1,w:"« rise » (monter) est intransitif → prétérit « rose »."},
+    {q:"We need ____ information before deciding.",o:["many","much","few","a number of"],a:1,w:"« information » est indénombrable → much."},
+    {q:"The manager ____ office is on the 4th floor is away.",o:["who","which","whose","whom"],a:2,w:"Possession → relatif « whose »."},
+    {q:"\u00ab Eventually \u00bb means:",o:["actuellement","\u00e9ventuellement","finalement","rarement"],a:2,w:"Faux ami : eventually = finalement (≠ éventuellement)."},
+    {q:"The meeting is scheduled ____ Monday morning.",o:["in","at","on","by"],a:2,w:"« on » + jour de la semaine."},
+    {q:"This is the ____ option for our budget.",o:["affordable","more affordable","most affordable","affordably"],a:2,w:"Superlatif : the most affordable."},
+    {q:"He decided ____ the offer.",o:["accept","to accept","accepting","accepted"],a:1,w:"« decide » + to + base verbale."},
+    {q:"Where is the supply room? —",o:["At 3 p.m.","Down the hall.","Yes, it is.","Because it's late."],a:1,w:"« Where » attend un lieu : « Down the hall »."},
+    {q:"Sales depend ____ the season.",o:["of","on","to","with"],a:1,w:"« depend on »."},
+    {q:"We submitted the ____ before the deadline.",o:["apply","applicant","application","applied"],a:2,w:"Le nom de l'objet soumis : « application »."},
+    {q:"The candidate has strong ____ skills.",o:["communicate","communication","communicative","communicated"],a:1,w:"Devant « skills », nom : communication skills."},
+    {q:"When does the store open? —",o:["On Main Street.","At 9 a.m.","With a coupon.","Yes, daily."],a:1,w:"« When » attend un moment : « At 9 a.m. »."},
+    {q:"If demand increases, production ____.",o:["increased","would increase","will increase","increasing"],a:2,w:"1er conditionnel : if + présent, … will + base verbale."},
+    {q:"She is responsible ____ the marketing team.",o:["of","for","to","with"],a:1,w:"« responsible for »."}
+  ];
+
+  var BADGES=[{n:3,t:"3 jours 🔥"},{n:7,t:"1 semaine 🏅"},{n:14,t:"2 semaines 💪"},{n:30,t:"30 jours 👑"}];
+  var DAYNAMES=["dim","lun","mar","mer","jeu","ven","sam"];
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+  var st = load() || { lastDate:null, streak:0, best:0, history:[], badges:[] };
+
+  function ds(d){ d=d||new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+  function addDays(base,n){ var x=new Date(base); x.setDate(x.getDate()+n); return x; }
+  function hash(s){ var h=2166136261>>>0; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+  function rng(seed){ return function(){ seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function todaysQuestions(){ var r=rng(hash(ds())); var idx=POOL.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=idx[i]; idx[i]=idx[j]; idx[j]=t; }
+    return idx.slice(0,3).map(function(i){ return POOL[i]; }); }
+  function doneToday(){ return st.lastDate===ds(); }
+  function $(id){ return document.getElementById(id); }
+  function esc(x){ return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+
+  function renderHeader(){
+    var sEl=$("djStreak"); if(!sEl) return;
+    $("djNum").textContent = st.streak;
+    $("djBest").innerHTML = "Record&nbsp;: " + st.best;
+    sEl.classList.toggle("on", doneToday() && st.streak>0);
+  }
+  function renderWeek(){
+    var host=$("djWeek"); if(!host) return; host.innerHTML="";
+    for(var k=6;k>=0;k--){
+      var d=addDays(new Date(),-k); var key=ds(d);
+      var done = st.history.indexOf(key)>=0;
+      var today = (k===0);
+      var el=document.createElement("div"); el.className="dj-day"+(done?" done":"")+(today?" today":"");
+      el.innerHTML='<div class="d">'+DAYNAMES[d.getDay()]+'</div><div class="mk">'+(done?"✅":(today?"⭐":"·"))+'</div>';
+      host.appendChild(el);
+    }
+  }
+  function renderBadges(){
+    var host=$("djBadges"); if(!host) return; host.innerHTML="";
+    st.badges.slice().sort(function(a,b){return a-b;}).forEach(function(n){
+      var b=BADGES.filter(function(x){return x.n===n;})[0]; if(!b) return;
+      var p=document.createElement("span"); p.className="pill teal"; p.textContent=b.t; host.appendChild(p);
+    });
+  }
+  function renderBody(){
+    var body=$("djBody"); if(!body) return;
+    if(doneToday()){
+      body.innerHTML='<div class="dj-result"><h3>✅ Défi du jour terminé&nbsp;!</h3>'
+        +'<p style="margin:0;color:var(--ink-soft)">Série en cours&nbsp;: <strong>'+st.streak+' jour'+(st.streak>1?'s':'')+'</strong>. Reviens demain pour ne pas la perdre&nbsp;!</p></div>';
+    } else {
+      var msg = st.streak>0 ? ("Ta série est de <strong>"+st.streak+" jour"+(st.streak>1?"s":"")+"</strong> — ne la casse pas&nbsp;!") : "Commence ta série aujourd'hui&nbsp;!";
+      body.innerHTML='<div class="dj-start"><div style="flex:1;min-width:200px"><strong>Prêt·e&nbsp;?</strong> '+msg+'</div>'
+        +'<button class="btn coral" id="djStart"><span aria-hidden="true">▶</span> Commencer le défi</button></div>';
+      var b=$("djStart"); if(b) b.addEventListener("click", startChallenge);
+    }
+  }
+  function renderAll(){ renderHeader(); renderWeek(); renderBadges(); renderBody(); }
+
+  var quiz=null;
+  function startChallenge(){
+    quiz={ qs:todaysQuestions(), answered:0, correct:0 };
+    var body=$("djBody"); body.innerHTML="";
+    quiz.qs.forEach(function(q,qi){
+      var d=document.createElement("div"); d.className="dj-q";
+      var opts='<div class="dj-opts">';
+      q.o.forEach(function(o,oi){ opts+='<button class="dj-opt" data-q="'+qi+'" data-o="'+oi+'"><span class="k">'+"ABCD"[oi]+'</span><span>'+esc(o)+'</span></button>'; });
+      opts+='</div>';
+      d.innerHTML='<p class="qt"><span class="n">Q'+(qi+1)+'.</span> '+esc(q.q)+'</p>'+opts+'<div class="dj-why" id="djw-'+qi+'"></div>';
+      body.appendChild(d);
+    });
+    Array.prototype.forEach.call(body.querySelectorAll(".dj-opt"), function(btn){
+      btn.addEventListener("click", function(){ answer(btn); });
+    });
+  }
+  function answer(btn){
+    var qi=+btn.getAttribute("data-q"), oi=+btn.getAttribute("data-o");
+    var q=quiz.qs[qi];
+    var group=btn.parentNode.querySelectorAll(".dj-opt");
+    if(group[0].disabled) return;
+    var ok=(oi===q.a); if(ok) quiz.correct++; quiz.answered++;
+    Array.prototype.forEach.call(group,function(b){ b.disabled=true; var bo=+b.getAttribute("data-o");
+      if(bo===q.a) b.classList.add("ok"); else if(bo===oi) b.classList.add("no"); });
+    var w=$("djw-"+qi); w.className="dj-why show"; w.innerHTML="<strong>"+(ok?"Bravo !":"À retenir :")+"</strong> "+esc(q.w);
+    if(quiz.answered===quiz.qs.length) finish();
+  }
+  function finish(){
+    var today=ds(), newBadge=null;
+    if(st.lastDate!==today){
+      var yest=ds(addDays(new Date(),-1));
+      st.streak = (st.lastDate===yest) ? st.streak+1 : 1;
+      st.lastDate=today;
+      if(st.history.indexOf(today)<0) st.history.push(today);
+      if(st.history.length>120) st.history=st.history.slice(-120);
+      if(st.streak>st.best) st.best=st.streak;
+      BADGES.forEach(function(b){ if(st.streak>=b.n && st.badges.indexOf(b.n)<0){ st.badges.push(b.n); newBadge=b; } });
+      save();
+    }
+    var body=$("djBody");
+    var extra = newBadge ? '<p style="margin:8px 0 0"><span class="pill teal">Nouveau badge : '+newBadge.t+'</span></p>' : '';
+    body.innerHTML='<div class="dj-result"><h3>🎉 '+quiz.correct+' / '+quiz.qs.length+' — défi terminé&nbsp;!</h3>'
+      +'<p style="margin:0;color:var(--ink-soft)">Série&nbsp;: <strong>🔥 '+st.streak+' jour'+(st.streak>1?'s':'')+'</strong> (record&nbsp;: '+st.best+'). Reviens demain pour la prolonger&nbsp;!</p>'+extra+'</div>';
+    renderHeader(); renderWeek(); renderBadges();
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", renderAll);
+  else renderAll();
+})();
+</script>
+
 </body>
 </html>
