@@ -250,7 +250,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="home" class="screen active" aria-labelledby="home-h">
     <div class="hero">
       <div class="hero-img-wrap framed" style="border:0">
-        <img class="banner-img" src="images/detective/01_home_screen.png" alt="Detective Academy — bureau d'enquête" onerror="this.classList.add('img-missing')">
+        <img class="banner-img" src="images/detective/01_home_screen.png.png" alt="Detective Academy — bureau d'enquête" onerror="this.classList.add('img-missing')">
         <div class="overlay">
           <span class="case-stamp">Confidential · Case #24-17-B</span>
           <h1>Detective Academy<br>Escape Game</h1>
@@ -268,7 +268,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="briefing" class="screen" aria-labelledby="brief-h">
     <div class="panel">
       <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img" src="images/detective/02_briefing_screen.png" alt="Briefing de l'enquête" onerror="this.classList.add('img-missing')">
+        <img class="banner-img" src="images/detective/02_briefing_screen.png.png" alt="Briefing de l'enquête" onerror="this.classList.add('img-missing')">
       </div>
       <div class="story">
         <span class="eyebrow">Case briefing</span>
@@ -319,7 +319,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="final" class="screen" aria-labelledby="final-h">
     <div class="panel">
       <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img square" src="images/detective/06_final_suspect.png" alt="Identifier le suspect" onerror="this.classList.add('img-missing')">
+        <img class="banner-img square" src="images/detective/06_final_suspect.png.png" alt="Identifier le suspect" onerror="this.classList.add('img-missing')">
       </div>
       <div class="story">
         <span class="eyebrow">Final deduction</span>
@@ -341,7 +341,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
     <div class="panel">
       <div class="reward-stage" style="padding-top:18px">
         <div class="framed" id="chestFrame">
-          <img id="chestImg" src="images/detective/03_chest_closed.png" alt="Reward chest" onerror="this.classList.add('img-missing')">
+          <img id="chestImg" src="images/detective/03_chest_closed.png.png" alt="Reward chest" onerror="this.classList.add('img-missing')">
         </div>
         <p class="muted" id="chestHint" style="margin:10px 0 0">Tap the chest to claim your reward.</p>
       </div>
@@ -350,7 +350,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
         <h2 id="promo-h" style="color:var(--gold-2);margin:6px 0 4px">Congratulations, Detective!</h2>
         <p>You solved the case and earned your promotion.</p>
         <div class="framed" style="max-width:520px;margin:8px auto;border:0">
-          <img src="images/detective/05_promotion_screen.png" alt="Promotion unlocked" style="width:100%;display:block;border-radius:var(--r)" onerror="this.classList.add('img-missing')">
+          <img src="images/detective/05_promotion_screen.png.png" alt="Promotion unlocked" style="width:100%;display:block;border-radius:var(--r)" onerror="this.classList.add('img-missing')">
         </div>
         <div class="medal" id="promoMedal">New rank</div>
         <p class="muted" id="promoScore"></p>
@@ -374,6 +374,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
    CONFIG — chemins des médias (relatifs pour GitHub Pages)
    ================================================================= */
 var IMG = "images/detective/";
+var IMG_EXT = ".png";   // tes fichiers se terminent par .png.png -> on ajoute un .png
 var MUSIC_SRC = "audio/theme_detective_jazz_vintage_poirot_style.mp3?v=2";
 
 /* =================================================================
@@ -383,7 +384,7 @@ var MUSIC_SRC = "audio/theme_detective_jazz_vintage_poirot_style.mp3?v=2";
 var MISSIONS = [
   {
     id:1, theme:"Suspicious Email", eyebrow:"Mission 1 · Reading emails",
-    image:IMG+"mission_01_email.png",
+    image:IMG+"mission_01_email.png"+IMG_EXT,
     context:"Two employees describe the same afternoon very differently. Read both emails and spot the contradiction.",
     doc:{ kind:"Email thread", title:"Subject: Client Meeting Documents",
       body:"From: Laura Jenkins  ·  To: Project Team\n\"I printed the signed contract yesterday afternoon and left it in Meeting Room B at 4:00 p.m. I also sent a digital copy to Mark, just in case.\"\n\n— — —\n\nFrom: Mark Evans  ·  To: Laura Jenkins\n\"Thanks, but I never received the digital copy — I checked my inbox this morning. I also went to Meeting Room B at 4:00 p.m. and there was no contract on the table.\"" },
@@ -399,7 +400,7 @@ var MISSIONS = [
   },
   {
     id:2, theme:"Meeting Room Mystery", eyebrow:"Mission 2 · Reading a schedule",
-    image:IMG+"mission_02_meeting.png",
+    image:IMG+"mission_02_meeting.png"+IMG_EXT,
     context:"Mark says Meeting Room B was empty at 4:00 p.m. The booking log tells another story.",
     doc:{ kind:"Room booking log — Tuesday", title:"Meeting Room B",
       body:"14:00 – 15:00   Finance review        — S. Lee\n15:30 – 16:30   Private meeting       — M. Evans\n16:30 – 17:00   Cleaning\n\nNote: badge access is required to enter Room B after 15:00." },
@@ -415,7 +416,7 @@ var MISSIONS = [
   },
   {
     id:3, theme:"Cancelled Flight", eyebrow:"Mission 3 · Reading travel info",
-    image:IMG+"mission_03_flight.png",
+    image:IMG+"mission_03_flight.png"+IMG_EXT,
     context:"Mark told colleagues he was flying out that afternoon and would be unreachable. Check the departures board.",
     doc:{ kind:"Travel record + departures board", title:"Flight NB220 — Lyon → London",
       body:"Passenger: M. Evans\nScheduled departure: Tuesday, 15:50\n\nDEPARTURES BOARD (Tuesday):\nNB218  Amsterdam   15:20   ON TIME\nNB220  London      15:50   CANCELLED\nNB224  Geneva      16:10   ON TIME\n\nMark had told the team: \"I'll be flying to London this afternoon — unreachable.\"" },
@@ -431,7 +432,7 @@ var MISSIONS = [
   },
   {
     id:4, theme:"Product Investigation", eyebrow:"Mission 4 · Reading an access log",
-    image:IMG+"mission_04_inventory.png",
+    image:IMG+"mission_04_inventory.png"+IMG_EXT,
     context:"The document vault keeps an electronic access log. Find out who opened the safe in Room B.",
     doc:{ kind:"Document vault — access log", title:"Room B — Tuesday afternoon",
       body:"16:00   Room B entered          — badge: M. EVANS\n16:05   Document safe OPENED     — badge: M. EVANS\n16:18   File 'Client contract' marked REMOVED\n16:22   Room B exited            — badge: M. EVANS" },
@@ -447,7 +448,7 @@ var MISSIONS = [
   },
   {
     id:5, theme:"Final Witness Statements", eyebrow:"Mission 5 · Comparing statements",
-    image:IMG+"mission_05_final_interview.png",
+    image:IMG+"mission_05_final_interview.png"+IMG_EXT,
     context:"Four short statements. Three are backed by records; one contradicts the evidence at every point.",
     doc:{ kind:"Witness statements", title:"Interview summaries",
       body:"Laura Jenkins: \"I left the contract in Room B at 4:00 and emailed Mark a copy.\"  (matches the email log)\n\nSarah Lee: \"My finance review ended at 3:00; I left the building at 3:15.\"  (confirmed by exit log)\n\nDaniel Cooper: \"I was off-site with the client all afternoon — see the visitor log.\"  (confirmed by visitor log)\n\nMark Evans: \"I was away on a flight, and Room B was empty.\"  (booking, flight and access logs all disagree)" },
@@ -537,7 +538,7 @@ function renderClueGrid(host){
   MISSIONS.forEach(function(m){
     var open = state.clues.indexOf(m.id)>=0;
     var el=document.createElement("div"); el.className="clue"+(open?" open":"");
-    var img = open ? IMG+"clue_unlocked.png" : IMG+"clue_locked.png";
+    var img = open ? IMG+"clue_unlocked.png"+IMG_EXT : IMG+"clue_locked.png"+IMG_EXT;
     el.innerHTML = '<img class="thumb" src="'+img+'" alt="'+(open?"Clue unlocked":"Clue locked")+'" onerror="this.style.display=\'none\'">'
       + '<div class="cap">' + (open
           ? '<b>'+esc(m.clue.title)+'</b>'+esc(m.clue.text)
@@ -607,7 +608,7 @@ function showMissionResult(m){
   if(passed){
     if(first) awardMission(m);
     html += '<div class="clue-reveal"><div class="ci">'
-      + '<img src="'+IMG+'clue_unlocked.png" alt="Clue unlocked" onerror="this.style.display=\'none\'">'
+      + '<img src="'+IMG+'clue_unlocked.png.png" alt="Clue unlocked" onerror="this.style.display=\'none\'">'
       + '<div class="ct"><span class="tag">🔓 '+esc(m.clue.title)+'</span><p style="margin:10px 0 0">'+esc(m.clue.text)+'</p></div>'
       + '</div></div>';
     var last = (state.current >= MISSIONS.length-1);
@@ -687,10 +688,10 @@ function goPromotion(){
   // reset visuel du coffre selon l'état
   var img=$("#chestImg"), hint=$("#chestHint"), body=$("#promoBody"), frame=$("#chestFrame");
   if(state.chestOpened){
-    img.src = IMG+"04_chest_open.png"; hint.style.display="none"; body.style.display="block";
+    img.src = IMG+"04_chest_open.png"+IMG_EXT; hint.style.display="none"; body.style.display="block";
     fillPromo();
   } else {
-    img.src = IMG+"03_chest_closed.png"; img.className=""; frame.classList.add("chest-tap");
+    img.src = IMG+"03_chest_closed.png"+IMG_EXT; img.className=""; frame.classList.add("chest-tap");
     hint.style.display="block"; hint.textContent="Tap the chest to claim your reward.";
     body.style.display="none";
     frame.onclick = openChest; frame.setAttribute("role","button"); frame.setAttribute("tabindex","0");
@@ -703,7 +704,7 @@ function openChest(){
   var frame=$("#chestFrame"), img=$("#chestImg");
   frame.classList.add("opening");
   setTimeout(function(){
-    img.src = IMG+"04_chest_open.png";
+    img.src = IMG+"04_chest_open.png"+IMG_EXT;
     state.chestOpened=true; state.finished=true; saveState();
     $("#chestHint").style.display="none";
     $("#promoBody").style.display="block";
