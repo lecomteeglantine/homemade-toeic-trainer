@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Homemade TOEIC Trainer</title>
+<!--
+  FLASHCARDS À RÉVISION ESPACÉE (système de Leitner)
+  ==================================================
+  - Réutilise la banque partagée toeic-bank.js (VOCAB) → aucune liste à part.
+  - Relié à "My Words" : lit/écrit la MÊME donnée que le site
+    (localStorage "l1toeic.v1", propriété "mywords", champ "box" 1→5).
+  - Réviser mes mots : ne montre que les cartes "dues" du jour.
+  - Apprendre de nouveaux mots : pioche dans VOCAB et ajoute à My Words.
+  Intervalles par boîte (jours) : 1→1, 2→2, 3→4, 4→7, 5→15.
+-->
+<style>
+:root{
+  --bg:#FFFDF8; --bg2:#F8F4EC; --card:#FFFFFF;
+  --ink:#22324B; --ink-soft:#5A6B82; --line:#ECE6DA;
+  --blue:#4F7CFF; --teal:#2EC4B6; --coral:#FF7F6A; --yellow:#FFD166; --green:#6BCB77;
+  --blue-soft:#EAF0FF; --teal-soft:#E2F7F4; --coral-soft:#FFEDE9; --yellow-soft:#FFF6DF; --green-soft:#EAF7EC;
+  --r:22px; --r-sm:14px; --shadow:0 10px 30px rgba(34,50,75,.08), 0 2px 8px rgba(34,50,75,.05);
+  --display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --num:"Montserrat",system-ui,sans-serif; --tap:52px;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:var(--body); color:var(--ink); line-height:1.55; min-height:100vh; background:
+  radial-gradient(60vw 40vw at 110% -10%, var(--blue-soft), transparent 60%),
+  radial-gradient(50vw 40vw at -10% 0%, var(--teal-soft), transparent 55%), var(--bg); }
+.wrap{ max-width:760px; margin:0 auto; padding:20px 18px 70px; }
+h1,h2,h3{ font-family:var(--display); line-height:1.15; }
+a{ color:var(--blue); }
+.eyebrow{ text-transform:uppercase; letter-spacing:.16em; font-size:.72rem; font-weight:700; color:var(--blue); }
+.top{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.home-link{ text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:.9rem; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:8px 14px; }
+.hero{ background:linear-gradient(150deg,var(--blue),#3A63E0); color:#fff; border-radius:var(--r); padding:24px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.hero::after{ content:""; position:absolute; right:-40px; top:-40px; width:180px; height:180px; background:radial-gradient(circle, rgba(255,255,255,.18), transparent 70%); }
+.hero h1{ margin:6px 0; font-size:clamp(1.5rem,4.4vw,2.1rem); }
+.hero p{ margin:0; color:#E7EEFF; max-width:54ch; }
+
+.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0; }
+.stat{ background:var(--card); border:1px solid var(--line); border-radius:var(--r-sm); padding:12px 8px; text-align:center; box-shadow:var(--shadow); }
+.stat .v{ font-family:var(--num); font-weight:800; font-size:1.35rem; }
+.stat .v.blue{color:var(--blue);} .stat .v.coral{color:var(--coral);} .stat .v.green{color:var(--green);} .stat .v.teal{color:var(--teal);}
+.stat .l{ font-size:.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-top:2px; }
+@media (max-width:560px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+
+.controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.seg{ display:inline-flex; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:4px; gap:4px; }
+.seg button{ font:inherit; font-weight:700; border:none; background:transparent; color:var(--ink-soft); border-radius:999px; padding:8px 14px; min-height:42px; cursor:pointer; }
+.seg button.on{ background:var(--blue); color:#fff; }
+select{ font:inherit; padding:9px 12px; min-height:44px; border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); }
+
+/* Carte */
+.deck{ perspective:1200px; }
+.flip{ position:relative; width:100%; min-height:260px; }
+.flip-inner{ position:relative; width:100%; min-height:260px; transition:transform .5s; transform-style:preserve-3d; }
+.flip.flipped .flip-inner{ transform:rotateY(180deg); }
+.face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:26px 22px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:10px; }
+.face.back{ transform:rotateY(180deg); }
+.word{ font-family:var(--display); font-weight:800; font-size:2rem; color:var(--ink); }
+.ipa{ color:var(--ink-soft); font-size:1rem; }
+.boxbadge{ position:absolute; top:14px; left:14px; font-size:.7rem; font-weight:700; color:var(--blue); background:var(--blue-soft); border:1px solid #D5E2FF; border-radius:999px; padding:4px 10px; }
+.audio{ position:absolute; top:12px; right:12px; width:46px; height:46px; border-radius:50%; border:1px solid var(--line); background:var(--card); cursor:pointer; font-size:1.2rem; }
+.audio:hover{ border-color:var(--blue); }
+.fr{ font-size:1.5rem; font-weight:700; color:var(--blue); }
+.ex{ color:var(--ink-soft); font-style:italic; max-width:46ch; }
+.chips{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+.chip{ font-size:.8rem; background:var(--bg2); border:1px solid var(--line); border-radius:999px; padding:3px 10px; color:var(--ink-soft); }
+
+.progress{ text-align:center; color:var(--ink-soft); font-size:.85rem; margin:12px 0 6px; }
+.row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+.btn{ font-family:var(--display); font-weight:700; font-size:1rem; cursor:pointer; border:1px solid transparent; border-radius:999px; min-height:var(--tap); padding:0 22px; display:inline-flex; align-items:center; gap:8px; transition:transform .12s, box-shadow .2s; text-decoration:none; }
+.btn:active{ transform:translateY(1px); }
+.btn.primary{ background:linear-gradient(135deg,var(--blue),#3A63E0); color:#fff; box-shadow:0 8px 20px rgba(79,124,255,.32); }
+.btn.green{ background:var(--green); color:#fff; }
+.btn.coral{ background:var(--coral); color:#fff; }
+.btn.ghost{ background:var(--card); border-color:var(--line); color:var(--ink); }
+.btn.block{ flex:1 1 0; justify-content:center; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+.empty{ background:var(--card); border:1px dashed var(--line); border-radius:var(--r); padding:30px 22px; text-align:center; color:var(--ink-soft); }
+.empty h3{ color:var(--ink); margin:0 0 8px; }
+.foot{ text-align:center; color:var(--ink-soft); font-size:.85rem; margin-top:18px; }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } .flip-inner{ transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a class="home-link" href="index.html">← Retour à l'accueil</a>
+    <span class="eyebrow">Vocabulaire · Révision espacée</span>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow" style="color:#CDD9FF">Mini-jeu</div>
+    <h1>🃏 Flashcards</h1>
+    <p>Révise tes mots au bon moment grâce à la répétition espacée. Les mots que tu connais reviennent de plus en plus rarement ; ceux qui résistent reviennent vite. Relié à ta liste <strong>My Words</strong>.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="v blue" id="stTotal">0</div><div class="l">Mots dans My Words</div></div>
+    <div class="stat"><div class="v coral" id="stDue">0</div><div class="l">À réviser aujourd'hui</div></div>
+    <div class="stat"><div class="v green" id="stMaster">0</div><div class="l">Maîtrisés</div></div>
+    <div class="stat"><div class="v teal" id="stToday">0</div><div class="l">Révisés aujourd'hui</div></div>
+  </div>
+
+  <div class="controls">
+    <div class="seg" role="tablist" aria-label="Mode">
+      <button id="mReview" class="on" role="tab">📖 Réviser mes mots</button>
+      <button id="mLearn" role="tab">✨ Apprendre de nouveaux</button>
+    </div>
+    <select id="themeSel" aria-label="Thème (nouveaux mots)" style="display:none"></select>
+  </div>
+
+  <div id="stage"></div>
+
+  <p class="foot">Tes mots et ta progression sont partagés avec la page <strong>My Words</strong> du site, sur cet appareil.</p>
+</div>
+
+<script src="toeic-bank.js"></script>
+<script>
+"use strict";
+/* ---------- Accès partagé à My Words (même stockage que le site) ---------- */
+var SKEY="l1toeic.v1";
+function loadAll(){ try{ return JSON.parse(localStorage.getItem(SKEY))||{}; }catch(e){ return {}; } }
+function saveAll(o){ try{ localStorage.setItem(SKEY, JSON.stringify(o)); }catch(e){} }
+function getMyWords(){ var o=loadAll(); return Array.isArray(o.mywords)?o.mywords:[]; }
+function setMyWords(arr){ var o=loadAll(); o.mywords=arr; saveAll(o); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysSince(iso){ if(!iso) return 9999; var a=new Date(iso+"T00:00:00"), b=new Date(todayStr()+"T00:00:00"); return Math.round((b-a)/86400000); }
+var INTERVAL={1:1,2:2,3:4,4:7,5:15};
+function isDue(w){ var box=w.box||1; if(!w.last) return true; return daysSince(w.last) >= (INTERVAL[box]||1); }
+
+/* "Révisés aujourd'hui" — stocké dans le même objet, sans écraser le reste */
+function reviewedToday(){ var o=loadAll(); var m=o.flashMeta; return (m&&m.date===todayStr())?(m.count||0):0; }
+function bumpReviewed(){ var o=loadAll(); var m=o.flashMeta; if(!m||m.date!==todayStr()) m={date:todayStr(),count:0}; m.count=(m.count||0)+1; o.flashMeta=m; saveAll(o); }
+
+/* ---------- Audio (synthèse vocale, même accent que le site) ---------- */
+var Speech=(function(){
+  var ok=("speechSynthesis" in window), voices=[];
+  var accent=null; try{ accent=localStorage.getItem("ht_accent"); }catch(e){} accent=accent||"en-US";
+  function refresh(){ try{ voices=window.speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
+  if(ok){ refresh(); try{ window.speechSynthesis.onvoiceschanged=refresh; }catch(e){} }
+  function pick(){ var a=accent.toLowerCase();
+    return voices.find(function(v){return (v.lang||"").replace("_","-").toLowerCase()===a;})
+      || voices.find(function(v){return (v.lang||"").toLowerCase().indexOf("en")===0;}) || voices[0] || null; }
+  return { ok:ok, say:function(t){ if(!ok) return; try{ window.speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(t); var v=pick(); if(v){u.voice=v;u.lang=v.lang;} else u.lang=accent; u.rate=.92; window.speechSynthesis.speak(u); }catch(e){} } };
+})();
+
+/* ---------- Données ---------- */
+var VOCAB=(window.TOEIC_BANK&&window.TOEIC_BANK.VOCAB)||[];
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+/* ---------- État de session ---------- */
+var mode="review";          // "review" | "learn"
+var queue=[], pos=0, flipped=false, sessionDone=0, theme="Tous";
+
+function renderStats(){
+  var mw=getMyWords();
+  $("stTotal").textContent=mw.length;
+  $("stDue").textContent=mw.filter(isDue).length;
+  $("stMaster").textContent=mw.filter(function(w){return (w.box||1)>=5;}).length;
+  $("stToday").textContent=reviewedToday();
+}
+
+function buildThemeOptions(){
+  var sel=$("themeSel"); var themes={}; VOCAB.forEach(function(v){ if(v.t) themes[v.t]=1; });
+  var opts=["Tous"].concat(Object.keys(themes).sort());
+  sel.innerHTML=opts.map(function(t){return '<option>'+esc(t)+'</option>';}).join("");
+}
+
+function buildSession(){
+  pos=0; flipped=false; sessionDone=0;
+  if(mode==="review"){
+    var mw=getMyWords();
+    var due=mw.filter(isDue);
+    // les plus en retard d'abord
+    due.sort(function(a,b){ return (daysSince(b.last)-(INTERVAL[b.box||1]||1)) - (daysSince(a.last)-(INTERVAL[a.box||1]||1)); });
+    queue=due;
+  } else {
+    var have={}; getMyWords().forEach(function(w){ have[w.w]=1; });
+    var cand=VOCAB.filter(function(v){ return !have[v.w] && (theme==="Tous"||v.t===theme); });
+    queue=shuffle(cand).slice(0,20);
+  }
+  render();
+}
+
+function stageEl(){ return $("stage"); }
+
+function render(){
+  renderStats();
+  var st=stageEl();
+  if(pos>=queue.length){ return renderEnd(); }
+  var w=queue[pos];
+  var box=w.box||1;
+  st.innerHTML=
+    '<div class="progress">Carte '+(pos+1)+' / '+queue.length+(mode==="review"?' · révision':' · découverte')+'</div>'
+    +'<div class="deck"><div class="flip" id="flip"><div class="flip-inner">'
+      +'<div class="face front">'
+        + (mode==="review"?'<span class="boxbadge">Boîte '+box+'/5</span>':'<span class="boxbadge">Nouveau</span>')
+        +'<button class="audio" id="audioBtn" aria-label="Écouter">🔊</button>'
+        +'<div class="word">'+esc(w.w)+'</div>'
+        + (w.ipa?'<div class="ipa">'+esc(w.ipa)+'</div>':'')
+        +'<div style="color:var(--ink-soft);font-size:.85rem;margin-top:6px">Touche « Voir la réponse »</div>'
+      +'</div>'
+      +'<div class="face back">'
+        +'<div class="fr">'+esc(w.fr)+'</div>'
+        + (w.ex?'<div class="ex">« '+esc(w.ex)+' »</div>':'')
+        + ((w.col&&w.col.length)?'<div class="chips">'+w.col.map(function(c){return '<span class="chip">'+esc(c)+'</span>';}).join("")+'</div>':'')
+      +'</div>'
+    +'</div></div></div>'
+    +'<div id="actions"></div>';
+  flipped=false;
+  $("audioBtn").addEventListener("click", function(e){ e.stopPropagation(); Speech.say(w.w); });
+  renderActions();
+  // clic sur la carte = retourner
+  $("flip").addEventListener("click", function(){ if(!flipped) flip(); });
+}
+
+function renderActions(){
+  var a=$("actions"); if(!a) return;
+  if(!flipped){
+    a.innerHTML='<div class="row"><button class="btn primary block" id="showBtn">Voir la réponse</button></div>';
+    $("showBtn").addEventListener("click", flip);
+  } else {
+    a.innerHTML='<div class="row">'
+      +'<button class="btn coral block" id="noBtn">✗ Je ne savais pas</button>'
+      +'<button class="btn green block" id="yesBtn">✓ Je savais</button></div>';
+    $("noBtn").addEventListener("click", function(){ rate(false); });
+    $("yesBtn").addEventListener("click", function(){ rate(true); });
+  }
+}
+
+function flip(){ flipped=true; var f=$("flip"); if(f) f.classList.add("flipped"); Speech.say(queue[pos].w); renderActions(); }
+
+function rate(knew){
+  var w=queue[pos];
+  if(mode==="review"){
+    var mw=getMyWords();
+    var it=mw.filter(function(x){return x.w===w.w;})[0];
+    if(it){ it.box = knew ? Math.min(5,(it.box||1)+1) : 1; it.last=todayStr(); setMyWords(mw); }
+  } else {
+    // ajoute le mot à My Words et démarre son cycle
+    var mw2=getMyWords();
+    if(!mw2.some(function(x){return x.w===w.w;})){
+      mw2.push({ w:w.w, ipa:w.ipa, fr:w.fr, ex:w.ex, col:w.col, t:w.t, box:(knew?2:1), added:todayStr(), last:todayStr() });
+      setMyWords(mw2);
+    }
+  }
+  bumpReviewed(); sessionDone++;
+  pos++; flipped=false; render();
+}
+
+function renderEnd(){
+  var st=stageEl();
+  var due=getMyWords().filter(isDue).length;
+  if(queue.length===0){
+    if(mode==="review"){
+      st.innerHTML='<div class="empty"><h3>🎉 Rien à réviser pour le moment</h3>'
+        +'<p>'+ (getMyWords().length===0
+            ? "Tu n'as pas encore de mots. Ajoute-en depuis le Vocabulaire du site, ou commence à en apprendre ici."
+            : "Tous tes mots dus sont révisés. Reviens demain, ou apprends de nouveaux mots.")+'</p>'
+        +'<div class="row"><button class="btn primary" id="goLearn">✨ Apprendre de nouveaux mots</button></div></div>';
+      $("goLearn").addEventListener("click", function(){ setMode("learn"); });
+    } else {
+      st.innerHTML='<div class="empty"><h3>Plus de nouveaux mots'+(theme!=="Tous"?(" dans « "+esc(theme)+" »"):"")+'</h3>'
+        +'<p>Tu les as tous ajoutés à My Words. Change de thème, ou passe en mode révision.</p>'
+        +'<div class="row"><button class="btn ghost" id="goReview">📖 Réviser mes mots</button></div></div>';
+      $("goReview").addEventListener("click", function(){ setMode("review"); });
+    }
+    return;
+  }
+  st.innerHTML='<div class="empty"><h3>✅ Session terminée — '+sessionDone+' carte'+(sessionDone>1?'s':'')+'</h3>'
+    +'<p>'+(mode==="learn"?"Ces mots sont maintenant dans My Words et entreront en révision.":("Il te reste "+due+" mot"+(due>1?"s":"")+" à réviser aujourd'hui."))+'</p>'
+    +'<div class="row"><button class="btn primary" id="again">Continuer</button>'
+    +'<button class="btn ghost" id="other">'+(mode==="review"?"✨ Nouveaux mots":"📖 Réviser")+'</button></div></div>';
+  $("again").addEventListener("click", buildSession);
+  $("other").addEventListener("click", function(){ setMode(mode==="review"?"learn":"review"); });
+}
+
+function setMode(m){
+  mode=m;
+  $("mReview").classList.toggle("on", m==="review");
+  $("mLearn").classList.toggle("on", m==="learn");
+  $("themeSel").style.display = (m==="learn") ? "" : "none";
+  buildSession();
+}
+
+/* ---------- Init ---------- */
+$("mReview").addEventListener("click", function(){ setMode("review"); });
+$("mLearn").addEventListener("click", function(){ setMode("learn"); });
+$("themeSel").addEventListener("change", function(){ theme=this.value; if(mode==="learn") buildSession(); });
+buildThemeOptions();
+setMode("review");
+
+/* Hook de test (n'affecte pas le jeu) */
+window.__FC={ state:function(){return {mode:mode,pos:pos,len:queue.length,cur:queue[pos]||null};}, mw:getMyWords, due:function(){return getMyWords().filter(isDue).length;} };
+</script>
+</body>
+</html>
