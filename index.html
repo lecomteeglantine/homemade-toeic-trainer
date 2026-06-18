@@ -220,6 +220,25 @@ html[data-contrast="high"] .btn.primary{ background:var(--blue); box-shadow:var(
 .feedback.no{ background:var(--coral-soft); border-color:var(--coral); }
 .feedback h4{ margin:0 0 6px; font-family:var(--display); font-size:1rem; display:flex; align-items:center; gap:8px; }
 .feedback p{ margin:0; color:var(--ink); }
+/* Decorticage des distracteurs */
+.decort{ margin-top:14px; border-radius:16px; border:1.5px solid var(--line); background:var(--card); padding:12px 14px; }
+.decort-h{ font-family:var(--display); font-weight:600; font-size:.95rem; color:var(--ink); display:flex; align-items:center; gap:7px; margin:0 0 8px; }
+.dtrap{ display:flex; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+.dtrap:first-of-type{ border-top:0; }
+.dkey{ flex:none; width:26px; height:26px; border-radius:8px; background:var(--bg2); color:var(--ink-soft); font-weight:700; font-family:var(--num); display:inline-flex; align-items:center; justify-content:center; font-size:.85rem; }
+.dtrap.correct .dkey{ background:var(--green-soft); color:var(--green); }
+.dbody{ flex:1; min-width:0; }
+.dtop{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.dopt{ font-weight:600; color:var(--ink); }
+.dnote{ margin-top:5px; color:var(--ink-soft); font-size:.92rem; line-height:1.45; }
+.ttag{ display:inline-flex; align-items:center; gap:5px; font-size:.78rem; font-weight:600; padding:3px 9px; border-radius:999px; white-space:nowrap; border:1px solid transparent; }
+.ttag.good{ background:var(--green-soft); color:var(--green); }
+.ttag[data-tone="blue"]{ background:var(--blue-soft); color:var(--blue); }
+.ttag[data-tone="teal"]{ background:var(--teal-soft); color:var(--teal); }
+.ttag[data-tone="coral"]{ background:var(--coral-soft); color:var(--coral); }
+.ttag[data-tone="yellow"]{ background:var(--yellow-soft); color:#9A6B00; }
+.ttag.picked-tag{ background:transparent; color:var(--ink-soft); border:1px dashed var(--line); }
+.dtrap.picked .dopt{ text-decoration:underline dotted; text-underline-offset:3px; }
 .progress{ height:10px; border-radius:999px; background:var(--bg2); border:1px solid var(--line); overflow:hidden; margin:6px 0 18px; }
 .progress > i{ display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--teal)); transition:width .4s; }
 
@@ -1181,7 +1200,7 @@ const TRAPS = [
 
 /* Diagnostic + practice questions (skill-tagged, from the bank) */
 const QUESTIONS = [
- {id:"A01-001",dom:"Grammaire",skill:"Subject-Verb Agreement",stem:"The manager ____ responsible for the project.",opts:["are","were","is","have been"],a:2,why:"« Manager » est un sujet singulier → verbe singulier → is."},
+ {id:"A01-001",dom:"Grammaire",skill:"Subject-Verb Agreement",stem:"The manager ____ responsible for the project.",opts:["are","were","is","have been"],a:2,why:"« Manager » est un sujet singulier → verbe singulier → is.",dx:{0:{t:"forme",note:"« are » est un pluriel : il ne s'accorde pas avec le sujet singulier *the manager*."},1:{t:"temps",note:"« were » introduit un passe non justifie (et reste un pluriel) : ni le temps ni l'accord ne collent."},3:{t:"temps",note:"« have been » impose un present perfect inutile ici : un present simple suffit."}}},
  {id:"A01-003",dom:"Grammaire",skill:"Subject-Verb Agreement",stem:"The list of applicants ____ available online.",opts:["are","were","have","is"],a:3,why:"Le sujet est « the list » (singulier), pas « applicants » → is."},
  {id:"A03-001",dom:"Grammaire",skill:"Each / Every",stem:"Each employee ____ a company badge.",opts:["have","has","are having","having"],a:1,why:"« Each » est singulier → has."},
  {id:"A05-002",dom:"Grammaire",skill:"The number of",stem:"The number of complaints ____ increasing.",opts:["are","were","have been","is"],a:3,why:"« The number of… » prend un verbe singulier → is."},
@@ -1199,11 +1218,11 @@ const QUESTIONS = [
  {id:"F05-001",dom:"Phrasal verbs",skill:"Call off",stem:"The conference was ____ due to bad weather.",opts:["backed up","called off","filled out","logged in"],a:1,why:"call off = annuler."},
  {id:"G06-001",dom:"Synonymes",skill:"Paraphrases",stem:"« shipment » est le plus proche de :",opts:["delivery","payment","supplier","invoice"],a:0,why:"shipment ≈ delivery (le TOEIC adore reformuler)."},
  {id:"G10-001",dom:"Synonymes",skill:"Paraphrases",stem:"« The event has been postponed » signifie :",opts:["cancelled","delayed","organised","reduced"],a:1,why:"postpone ≈ delay (reporter), pas annuler."},
- {id:"H01-001",dom:"Faux amis",skill:"False friends",stem:"« I attended the meeting » signifie :",opts:["j'ai attendu la réunion","j'ai assisté à la réunion","j'ai annulé la réunion","j'ai organisé la réunion"],a:1,why:"attend = assister à (≠ attendre = wait)."},
- {id:"H02-001",dom:"Faux amis",skill:"False friends",stem:"« Actually » se traduit par :",opts:["actuellement","en fait","finalement","éventuellement"],a:1,why:"actually = en fait (≠ actuellement = currently)."},
+ {id:"H01-001",dom:"Faux amis",skill:"False friends",stem:"« I attended the meeting » signifie :",opts:["j'ai attendu la réunion","j'ai assisté à la réunion","j'ai annulé la réunion","j'ai organisé la réunion"],a:1,why:"attend = assister à (≠ attendre = wait).",dx:{0:{t:"fauxami",note:"Faux ami parfait : *attend* ressemble a « attendre » mais signifie *assister a*. C'est exactement le piege vise."},2:{t:"sens",note:"« annuler » = *cancel/call off* : aucun rapport avec *attend*."},3:{t:"sens",note:"« organiser » = *organise/hold* : sens invente pour ce verbe."}}},
+ {id:"H02-001",dom:"Faux amis",skill:"False friends",stem:"« Actually » se traduit par :",opts:["actuellement","en fait","finalement","éventuellement"],a:1,why:"actually = en fait (≠ actuellement = currently).",dx:{0:{t:"fauxami",note:"Faux ami n°1 : *actually* ne veut PAS dire « actuellement » (= *currently*). C'est la confusion testee."},2:{t:"sens",note:"« finalement » = *eventually/finally* : autre mot."},3:{t:"fauxami",note:"« eventuellement » traduit *possibly*, pas *actually* : deuxieme faux ami glisse dans les choix."}}},
  {id:"I08-001",dom:"Listening",skill:"Réponses indirectes",stem:"« Is the report finished? » → meilleure réponse :",opts:["It's already on her desk.","Yes, the report.","On the desk every day.","She is a manager."],a:0,why:"Réponse indirecte = oui implicite (il est déjà sur le bureau)."},
  {id:"J03-002",dom:"Reading",skill:"Inférence",stem:"« We apologise for any inconvenience caused. » On peut déduire :",opts:["The company changed ownership.","A problem occurred.","Prices increased.","A new manager was hired."],a:1,why:"Une excuse implique qu'un problème a eu lieu."},
- {id:"C07-001",dom:"Grammaire",skill:"Premier conditionnel",stem:"If demand increases, production ____.",opts:["increased","would increase","will increase","increasing"],a:2,why:"1er conditionnel : if + présent, … will + base verbale."},
+ {id:"C07-001",dom:"Grammaire",skill:"Premier conditionnel",stem:"If demand increases, production ____.",opts:["increased","would increase","will increase","increasing"],a:2,why:"1er conditionnel : if + présent, … will + base verbale.",dx:{0:{t:"temps",note:"« increased » met la principale au passe : incompatible avec un *if + present*."},1:{t:"temps",note:"« would increase » est le 2e conditionnel (hypothese irreelle) ; ici le scenario est reel → *will*."},3:{t:"forme",note:"« increasing » n'est pas une forme conjuguee : il manque l'auxiliaire."}}},
  {id:"L08-001",dom:"Stratégie",skill:"Devinette",stem:"Une question sans réponse au TOEIC rapporte :",opts:["25%","50%","0%","75%"],a:2,why:"Réponse vide = 0 %. Au hasard = 25 %. Réponds toujours."},
  {id:"C04-001",dom:"Grammaire",skill:"Relative whose",stem:"The employee ____ application was accepted has already started work.",opts:["who","whose","which","where"],a:1,why:"« whose » marque la possession (dont la candidature)."},
  {id:"B02-001",dom:"Grammaire",skill:"Gérondif après recommend",stem:"The company recommends ____ safety procedures carefully.",opts:["follow","followed","following","to follow"],a:2,why:"« recommend » est suivi du gérondif → following."},
@@ -1253,17 +1272,174 @@ const NUMBERS = [
 ];
 
 const LISTENING = [
- {prompt:"Where is the nearest post office?",opts:["It's on Main Street.","Yesterday afternoon.","By express mail."],a:0,why:"Une question en Where attend un lieu."},
- {prompt:"When does the meeting start?",opts:["In the conference room.","At ten o'clock.","With the manager."],a:1,why:"Une question en When attend un moment."},
- {prompt:"Could you send me the report?",opts:["Sure, I'll do it now.","It's a long report.","No, thank you."],a:0,why:"À une demande polie, on répond par l'acceptation."},
- {prompt:"Why was the shipment delayed?",opts:["To the warehouse.","Because of the weather.","Yes, it was."],a:1,why:"Une question en Why attend une raison (because of...)."},
- {prompt:"Who's giving the presentation?",opts:["In about an hour.","Our new manager.","At the office."],a:1,why:"Une question en Who attend une personne."},
- {prompt:"How was the conference?",opts:["Very informative.","On Tuesday.","In Paris."],a:0,why:"How was...? attend une appréciation."},
- {prompt:"Would you like coffee or tea?",opts:["Tea, please.","Yes, I would.","At the café."],a:0,why:"Question alternative (A ou B) → on choisit une option."},
- {prompt:"Isn't the deadline tomorrow?",opts:["Actually, it's Friday.","A new project.","On the desk."],a:0,why:"Question négative : on confirme ou on corrige l'information."},
- {prompt:"The printer isn't working again.",opts:["I'll call technical support.","It's a new printer.","Yes, please."],a:0,why:"Face à un problème, la bonne réponse propose une solution."},
- {prompt:"Do you know where Mr. Tanaka is?",opts:["He's in a meeting.","At three o'clock.","It's his office."],a:0,why:"Where + personne → on indique où elle se trouve."}
+ {prompt:"Where is the nearest post office?",opts:["It's on Main Street.","Yesterday afternoon.","By express mail."],a:0,why:"Une question en Where attend un lieu.",dx:{1:{t:"type",note:"« Yesterday afternoon » repond a un *when*, pas a un *where* : piege classique de la mauvaise categorie."},2:{t:"type",note:"« By express mail » repond a un *how* et rejoue le theme du courrier pour t'attirer vers le hors-sujet."}}},
+ {prompt:"When does the meeting start?",opts:["In the conference room.","At ten o'clock.","With the manager."],a:1,why:"Une question en When attend un moment.",dx:{0:{t:"type",note:"« In the conference room » repond a un *where* ; on rejoue le theme de la reunion pour tromper l'oreille."},2:{t:"type",note:"« With the manager » repond a un *with whom*, pas a un *when*."}}},
+ {prompt:"Could you send me the report?",opts:["Sure, I'll do it now.","It's a long report.","No, thank you."],a:0,why:"À une demande polie, on répond par l'acceptation.",dx:{1:{t:"repete",note:"« report » est repete mot pour mot : un mot deja entendu dans la question est presque toujours un leurre."},2:{t:"type",note:"« No, thank you » decline une offre, alors qu'ici on te demande un service : la fonction de la reponse ne colle pas."}}},
+ {prompt:"Why was the shipment delayed?",opts:["To the warehouse.","Because of the weather.","Yes, it was."],a:1,why:"Une question en Why attend une raison (because of...).",dx:{0:{t:"type",note:"« To the warehouse » indique une destination (*where to*), pas une raison."},2:{t:"type",note:"« Yes, it was » : une question en *Why* ne se repond jamais par oui/non."}}},
+ {prompt:"Who's giving the presentation?",opts:["In about an hour.","Our new manager.","At the office."],a:1,why:"Une question en Who attend une personne.",dx:{0:{t:"type",note:"« In about an hour » repond a un *when*, pas a un *who*."},2:{t:"type",note:"« At the office » repond a un *where*, pas a un *who*."}}},
+ {prompt:"How was the conference?",opts:["Very informative.","On Tuesday.","In Paris."],a:0,why:"How was...? attend une appréciation.",dx:{1:{t:"type",note:"« On Tuesday » repond a un *when* ; *How was...?* attend une appreciation."},2:{t:"type",note:"« In Paris » repond a un *where*, pas a une appreciation."}}},
+ {prompt:"Would you like coffee or tea?",opts:["Tea, please.","Yes, I would.","At the café."],a:0,why:"Question alternative (A ou B) → on choisit une option.",dx:{1:{t:"type",note:"« Yes, I would » : une question alternative (A ou B) ne se tranche pas par oui/non."},2:{t:"son",note:"« café » est pose la pour son echo sonore avec *coffee* — meme son, mauvaise reponse."}}},
+ {prompt:"Isn't the deadline tomorrow?",opts:["Actually, it's Friday.","A new project.","On the desk."],a:0,why:"Question négative : on confirme ou on corrige l'information.",dx:{1:{t:"sens",note:"« A new project » est hors-sujet : aucun lien avec l'echeance demandee."},2:{t:"type",note:"« On the desk » repond a un *where* ; on joue sur la proximite deadline → desk."}}},
+ {prompt:"The printer isn't working again.",opts:["I'll call technical support.","It's a new printer.","Yes, please."],a:0,why:"Face à un problème, la bonne réponse propose une solution.",dx:{1:{t:"repete",note:"« printer » est repete : reprendre un mot entendu est un reflexe-piege a eviter."},2:{t:"sens",note:"« Yes, please » accepte une offre, alors qu'on te signale un probleme : la reponse ne propose aucune solution."}}},
+ {prompt:"Do you know where Mr. Tanaka is?",opts:["He's in a meeting.","At three o'clock.","It's his office."],a:0,why:"Where + personne → on indique où elle se trouve.",dx:{1:{t:"type",note:"« At three o'clock » repond a un *when*, pas a *ou il se trouve*."},2:{t:"repete",note:"« office » rejoue le theme du lieu, mais « It's his office » repond a *whose office*, pas a *ou il est*."}}}
 ];
+
+/* ============================================================
+   Decorticage des distracteurs — moteur d'analyse des pieges
+   ============================================================ */
+const Distractors = (function(){
+  const TYPES = {
+    son:    {label:"Piege du meme son",             icon:"\uD83D\uDD0A", tone:"blue"},
+    repete: {label:"Mot repete entendu",            icon:"\uD83D\uDD01", tone:"teal"},
+    fauxami:{label:"Faux ami",                       icon:"\uD83C\uDFAD", tone:"coral"},
+    temps:  {label:"Temps verbal incorrect",         icon:"\u23F1\uFE0F", tone:"yellow"},
+    forme:  {label:"Forme grammaticale incorrecte",  icon:"\uD83D\uDD27", tone:"blue"},
+    prepo:  {label:"Preposition incorrecte",         icon:"\uD83D\uDD17", tone:"teal"},
+    type:   {label:"Mauvais type de reponse",        icon:"\uD83C\uDFAF", tone:"coral"},
+    sens:   {label:"Sens / collocation incorrect",   icon:"\uD83D\uDCA1", tone:"yellow"}
+  };
+  const STOP = new Set("the a an of to in on at by for and or but is are was were be been being do does did will would can could should shall may might must have has had it its he she they we you i me him her them us your my our their this that these those there here as with from not no yes please".split(/\s+/));
+
+  function falseFriendSet(){
+    const m = {};
+    try{ (typeof TRAPS!=="undefined"?TRAPS:[]).forEach(function(t){ m[(t.bad||"").toLowerCase().split(/[ (]/)[0]] = true; }); }catch(e){}
+    ["actuellement","eventuellement","sensible","librairie","attendu","attendre","location","lecture","avertissement","supporter","realiser","pretendre","assister","fabrique","resumer","comprehensif"].forEach(function(w){ m[w]=true; });
+    return m;
+  }
+  const HOMO = [
+    ["coffee","cafe"],["coffee","copy"],["fine","find"],["where","wear"],["here","hear"],
+    ["write","right"],["week","weak"],["mail","male"],["buy","by"],["sale","sail"],
+    ["our","hour"],["new","knew"],["quiet","quite"],["dessert","desert"],["affect","effect"],
+    ["accept","except"],["loose","lose"],["weather","whether"],["principal","principle"],
+    ["desk","disk"],["walk","work"],["live","leave"],["fill","feel"]
+  ];
+  function norm(s){ return String(s||"").toLowerCase().replace(/[.,!?;:\u00ab\u00bb"'\u2019()*]/g," ").replace(/\s+/g," ").trim(); }
+  function content(s){ return norm(s).split(" ").filter(function(w){ return w.length>=3 && !STOP.has(w); }); }
+  function lev(a,b){ var m=a.length,n=b.length; if(!m)return n; if(!n)return m; var p=[],c=[],i,j; for(j=0;j<=n;j++)p[j]=j;
+    for(i=1;i<=m;i++){ c[0]=i; for(j=1;j<=n;j++){ var k=a[i-1]===b[j-1]?0:1; c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+k);} var t=p;p=c;c=t; } return p[n]; }
+  function similar(a,b){ if(a===b)return false; if(a.length<4||b.length<4)return false; if(Math.abs(a.length-b.length)>2)return false; return a[0]===b[0] && lev(a,b)<=2; }
+
+  function qword(q){
+    var n=norm(q), head=n.split(" ")[0]||"";
+    if(/^where/.test(head)) return "where";
+    if(/^when/.test(head)) return "when";
+    if(/^(who|whose|whom)/.test(head)) return "who";
+    if(/^why/.test(head)) return "why";
+    if(/^how/.test(head)) return "how";
+    if(/^(what|which)/.test(head)) return "what";
+    if(/\bor\b/.test(n) && /\?\s*$/.test(String(q))) return "alt";
+    if(/^(is|are|was|were|do|does|did|can|could|would|will|have|has|should|isn|aren|don|doesn|didn|wasn|weren)/.test(head)) return "yesno";
+    return "";
+  }
+  function answerCat(o){
+    var n=norm(o);
+    if(/^(yes|no)\b/.test(n)) return "yesno";
+    if(/\b(o clock|yesterday|tomorrow|tonight|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday|minutes?|hours?|days?)\b/.test(n) || /\bnext week\b/.test(n) || /\bin (an|about|a few)\b/.test(n) || /\bat (one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d)/.test(n)) return "time";
+    if(/\b(street|room|office|building|warehouse|floor|downstairs|upstairs|here|there|paris|london|tokyo|cafe|airport|station|hotel|lobby|desk)\b/.test(n) || /^(in the|on the|at the|to the|near the)\b/.test(n)) return "place";
+    if(/\b(manager|director|colleague|he|she|they)\b/.test(n) || /^with /.test(n) || /\bmr\b|\bmrs\b|\bms\b|\bdr\b/.test(n)) return "person";
+    if(/^because\b/.test(n)) return "reason";
+    return "";
+  }
+  function mismatch(qw, cat){
+    if(!qw||!cat) return false;
+    if(qw==="alt" && cat==="yesno") return true;
+    if(["where","when","who","why","how","what"].indexOf(qw)>=0 && cat==="yesno") return true;
+    if(qw==="where" && (cat==="time"||cat==="person")) return true;
+    if(qw==="when" && (cat==="place"||cat==="person")) return true;
+    if(qw==="who" && (cat==="time"||cat==="place")) return true;
+    if(qw==="why" && (cat==="time"||cat==="place"||cat==="person")) return true;
+    if(qw==="how" && (cat==="time"||cat==="place")) return true;
+    if(qw && qw!=="why" && cat==="reason") return true;
+    return false;
+  }
+  function fill(type, note){ var t=TYPES[type]||TYPES.sens; return {type:type,label:t.label,icon:t.icon,tone:t.tone,note:note}; }
+
+  function auto(opt, qtext, q){
+    var dom=q.dom||"", skill=q.skill||"", correct=q.opts[q.a]||"";
+    var oWords=content(opt), qWords=content(qtext);
+
+    if(/faux ami/i.test(dom)){
+      return fill("fauxami","Faux ami : ce choix ressemble a un mot francais mais ne traduit pas le sens reel. Bon sens : « "+correct+" ».");
+    }
+    var listening = /listening|ecoute/i.test(dom) || dom==="";
+    var rep = oWords.find(function(w){ return qWords.indexOf(w)>=0; });
+    if(rep && listening){
+      return fill("repete","« "+rep+" » a deja ete entendu dans la question : reprendre un mot du texte est un reflexe-piege, rarement la bonne reponse.");
+    }
+    for(var i=0;i<oWords.length;i++){ for(var j=0;j<qWords.length;j++){
+      var wo=oWords[i], wq=qWords[j];
+      var homo = HOMO.some(function(p){ return (p[0]===wo&&p[1]===wq)||(p[1]===wo&&p[0]===wq); });
+      if(homo || similar(wo,wq)){
+        return fill("son","« "+wo+" » joue sur la ressemblance sonore avec « "+wq+" » : meme son, mais ce n'est pas la reponse.");
+      }
+    }}
+    var qw=qword(qtext), cat=answerCat(opt);
+    if(mismatch(qw,cat)){
+      var need={where:"un lieu",when:"un moment",who:"une personne",why:"une raison",how:"une appreciation/maniere",alt:"un choix entre les options",what:"une information precise"}[qw]||"autre chose";
+      var got={time:"un moment (when)",place:"un lieu (where)",person:"une personne (who)",reason:"une raison (why)",yesno:"un oui/non"}[cat]||"une info hors-sujet";
+      return fill("type","Mauvaise categorie : la question attend "+need+", mais ce choix donne "+got+".");
+    }
+    if(/grammaire|grammar/i.test(dom)){
+      if(/conditionnel|conditional|futur|future|pass[ee]|past|present perfect|preterit|temps|tense/i.test(skill))
+        return fill("temps","Le verbe est le bon, mais le temps/aspect ne convient pas ici. Forme correcte : « "+correct+" ».");
+      if(/agreement|accord|number|each|every/i.test(skill))
+        return fill("forme","Accord sujet-verbe incorrect : la forme ne s'accorde pas avec le sujet. Correct : « "+correct+" ».");
+      if(/passi|passive|modal/i.test(skill))
+        return fill("forme","Mauvaise voix/forme verbale (actif vs passif). Forme attendue : « "+correct+" ».");
+      return fill("forme","Forme grammaticale incorrecte dans ce contexte. Attendu : « "+correct+" ».");
+    }
+    if(/connecteur|preposition/i.test(dom)){
+      return fill("prepo","Connecteur/preposition inadapte ici. Correct : « "+correct+" ».");
+    }
+    if(/collocation/i.test(dom)) return fill("sens","Mot existant mais mauvaise collocation : il ne se combine pas naturellement ici. Correct : « "+correct+" ».");
+    if(/phrasal/i.test(dom)) return fill("sens","Phrasal verb au sens different : ce choix ne veut pas dire « "+correct+" ».");
+    if(/synonyme|vocab|reading/i.test(dom)) return fill("sens","Sens proche en apparence, mais ce n'est pas l'equivalent attendu. Correct : « "+correct+" ».");
+    return fill("sens","Ce choix ne correspond pas au sens demande ici. Correct : « "+correct+" ».");
+  }
+
+  function analyze(q, qtext){
+    qtext = qtext || q.prompt || q.stem || "";
+    var out=[];
+    (q.opts||[]).forEach(function(o,i){
+      if(i===q.a){ out.push({correct:true,text:o,idx:i}); return; }
+      var res;
+      if(q.dx && q.dx[i]){ var t=TYPES[q.dx[i].t]||TYPES.sens; res={type:q.dx[i].t,label:t.label,icon:t.icon,tone:t.tone,note:q.dx[i].note}; }
+      else res = auto(o, qtext, q);
+      res.text=o; res.idx=i; out.push(res);
+    });
+    return out;
+  }
+  return {TYPES:TYPES, analyze:analyze};
+})();
+
+/* Construit le bloc visuel « Decorticage des distracteurs » */
+function renderDecort(q, selIdx, qtext){
+  var items = Distractors.analyze(q, qtext);
+  var box = el("div",{class:"decort"});
+  box.appendChild(el("div",{class:"decort-h"},'<span aria-hidden="true">\uD83D\uDD0E</span> D\u00e9corticage des distracteurs'));
+  items.forEach(function(it){
+    var i=it.idx, key="ABCD"[i]||"?";
+    if(it.correct){
+      var row=el("div",{class:"dtrap correct"});
+      row.innerHTML='<span class="dkey">'+key+'</span><div class="dbody"><div class="dtop">'
+        +'<span class="ttag good"><span aria-hidden="true">\u2713</span> Bonne r\u00e9ponse</span> '
+        +'<span class="dopt">'+esc(it.text)+'</span></div>'
+        +(q.why?'<div class="dnote">'+esc(q.why)+'</div>':'')+'</div>';
+      box.appendChild(row);
+    } else {
+      var picked = selIdx===i;
+      var r2=el("div",{class:"dtrap"+(picked?" picked":"")});
+      r2.innerHTML='<span class="dkey">'+key+'</span><div class="dbody"><div class="dtop">'
+        +'<span class="ttag" data-tone="'+it.tone+'"><span aria-hidden="true">'+it.icon+'</span> '+esc(it.label)+'</span>'
+        +(picked?' <span class="ttag picked-tag">ton choix</span>':'')
+        +' <span class="dopt">'+esc(it.text)+'</span></div>'
+        +'<div class="dnote">'+esc(it.note)+'</div></div>';
+      box.appendChild(r2);
+    }
+  });
+  return box;
+}
+
 
 const FULLMOCK = {
  listening: [
@@ -1924,8 +2100,9 @@ function answerPrac(idx,opts,card,q){
   recordAnswer(q.skill+" ("+q.dom+")", ok); if(ok) pracState.ok++;
   if(window.HTErr) HTErr.onAnswer(q, ok, "Entraînement");
   const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
-  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bien vu':'<span aria-hidden="true">&#10007;</span> Pas encore')+' — '+esc(q.skill)+'</h4><p>'+esc(q.why)+'</p>';
+  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bien vu':'<span aria-hidden="true">&#10007;</span> Pas encore')+' — '+esc(q.skill)+'</h4>';
   card.appendChild(fb);
+  fb.appendChild(renderDecort(q, idx));
   const next=el("button",{class:"btn primary block",style:"margin-top:14px"}, pracState.i===pracState.pool.length-1?"Voir le bilan":"Continuer");
   next.addEventListener("click",()=>{ pracState.i++; if(pracState.i>=pracState.pool.length) pracDone(); else renderPracQ(); });
   card.appendChild(next);
@@ -2148,7 +2325,7 @@ function finishExam(timedOut){
   r.appendChild(dl);
   if(review.length){
     const rv=el("div",{class:"card",style:"margin-top:16px"}); rv.innerHTML="<h3>\u00c0 revoir ("+review.length+")</h3>";
-    review.forEach(x=>{ rv.appendChild(el("div",{style:"border-top:1px solid var(--line);padding:12px 0"},'<div class="q-stem" style="font-size:1rem;margin:0 0 6px">'+formatStem(x.q.stem)+'</div><p style="margin:.2em 0;color:var(--green);font-weight:600">\u2713 '+esc(x.q.opts[x.q.a])+'</p><p style="margin:0">'+esc(x.q.why)+'</p>')); });
+    review.forEach(x=>{ const item=el("div",{style:"border-top:1px solid var(--line);padding:12px 0"}); item.appendChild(el("div",{class:"q-stem",style:"font-size:1rem;margin:0 0 6px"}, formatStem(x.q.stem))); item.appendChild(renderDecort(x.q, x.sel)); rv.appendChild(item); });
     r.appendChild(rv);
   }
   const cta=el("div",{style:"display:flex;gap:12px;flex-wrap:wrap;margin-top:16px"});
@@ -2200,8 +2377,9 @@ function answerListen(idx,opts,card,q){
   recordAnswer("Écoute (Part 2)", ok); if(ok) listenState.ok++;
   if(window.HTErr) HTErr.onAnswer(q, ok, "Écoute");
   const fb=el("div",{class:"feedback "+(ok?"ok":"no"),role:"status"});
-  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bonne réponse':'<span aria-hidden="true">&#10007;</span> Pas tout à fait')+'</h4><p><strong>Question :</strong> '+esc(q.prompt)+'<br><strong>Bonne réponse :</strong> '+esc(q.opts[q.a])+'<br>'+esc(q.why)+'</p>';
+  fb.innerHTML='<h4>'+(ok?'<span aria-hidden="true">&#10003;</span> Bonne réponse':'<span aria-hidden="true">&#10007;</span> Pas tout à fait')+'</h4><p><strong>Question :</strong> '+esc(q.prompt)+'</p>';
   card.appendChild(fb);
+  fb.appendChild(renderDecort(q, idx, q.prompt));
   const next=el("button",{class:"btn primary block",style:"margin-top:14px"}, listenState.i===listenState.pool.length-1?"Voir le bilan":"Question suivante");
   next.addEventListener("click",()=>{ listenState.i++; if(listenState.i>=listenState.pool.length) listenDone(); else renderListen(); });
   card.appendChild(next); next.focus();
@@ -2305,7 +2483,7 @@ function finishMock(){
         const good=sel===q.a; if(good) ok++;
         recordAnswer("TOEIC blanc · "+partName, good);
         (byPart[block.part]=byPart[block.part]||{ok:0,n:0}); byPart[block.part].n++; if(good) byPart[block.part].ok++;
-        if(!good) review.push({q:q});
+        if(!good) review.push({q:q, sel:sel, qtext:(block.audio||q.stem||"")});
       });
     });
   });
@@ -2320,7 +2498,7 @@ function finishMock(){
   r.appendChild(dl);
   if(review.length){
     const rv=el("div",{class:"card",style:"margin-top:16px"}); rv.innerHTML="<h3>À revoir ("+review.length+")</h3>";
-    review.forEach(x=>{ rv.appendChild(el("div",{style:"border-top:1px solid var(--line);padding:12px 0"},'<div class="q-stem" style="font-size:1rem;margin:0 0 6px">'+formatStem(x.q.stem||"")+'</div><p style="margin:.2em 0;color:var(--green);font-weight:600">&#10003; '+esc(x.q.opts[x.q.a])+'</p><p style="margin:0">'+esc(x.q.why||"")+'</p>')); });
+    review.forEach(x=>{ const item=el("div",{style:"border-top:1px solid var(--line);padding:12px 0"}); const qt=x.qtext||x.q.stem||""; if(x.q.stem) item.appendChild(el("div",{class:"q-stem",style:"font-size:1rem;margin:0 0 6px"}, formatStem(x.q.stem))); else if(qt) item.appendChild(el("div",{class:"q-stem",style:"font-size:1rem;margin:0 0 6px"}, esc(qt))); item.appendChild(renderDecort(x.q, x.sel, qt)); rv.appendChild(item); });
     r.appendChild(rv);
   }
   const cta=el("div",{style:"display:flex;gap:12px;flex-wrap:wrap;margin-top:16px"});
