@@ -250,7 +250,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="home" class="screen active" aria-labelledby="home-h">
     <div class="hero">
       <div class="hero-img-wrap framed" style="border:0">
-        <img class="banner-img" src="images/detective/01_home_screen.png.png" alt="Detective Academy — bureau d'enquête" onerror="this.classList.add('img-missing')">
+        <img class="banner-img" src="images/detective/01_home_screen.png" alt="Detective Academy — bureau d'enquête" onerror="this.classList.add('img-missing')">
         <div class="overlay">
           <span class="case-stamp">Confidential · Case #24-17-B</span>
           <h1>Detective Academy<br>Escape Game</h1>
@@ -268,7 +268,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="briefing" class="screen" aria-labelledby="brief-h">
     <div class="panel">
       <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img" src="images/detective/02_briefing_screen.png.png" alt="Briefing de l'enquête" onerror="this.classList.add('img-missing')">
+        <img class="banner-img" src="images/detective/02_briefing_screen.png" alt="Briefing de l'enquête" onerror="this.classList.add('img-missing')">
       </div>
       <div class="story">
         <span class="eyebrow">Case briefing</span>
@@ -319,7 +319,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
   <section id="final" class="screen" aria-labelledby="final-h">
     <div class="panel">
       <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img square" src="images/detective/06_final_suspect.png.png" alt="Identifier le suspect" onerror="this.classList.add('img-missing')">
+        <img class="banner-img square" src="images/detective/06_final_suspect.png" alt="Identifier le suspect" onerror="this.classList.add('img-missing')">
       </div>
       <div class="story">
         <span class="eyebrow">Final deduction</span>
@@ -341,7 +341,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
     <div class="panel">
       <div class="reward-stage" style="padding-top:18px">
         <div class="framed" id="chestFrame">
-          <img id="chestImg" src="images/detective/03_chest_closed.png.png" alt="Reward chest" onerror="this.classList.add('img-missing')">
+          <img id="chestImg" src="images/detective/03_chest_closed.png" alt="Reward chest" onerror="this.classList.add('img-missing')">
         </div>
         <p class="muted" id="chestHint" style="margin:10px 0 0">Tap the chest to claim your reward.</p>
       </div>
@@ -350,7 +350,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
         <h2 id="promo-h" style="color:var(--gold-2);margin:6px 0 4px">Congratulations, Detective!</h2>
         <p>You solved the case and earned your promotion.</p>
         <div class="framed" style="max-width:520px;margin:8px auto;border:0">
-          <img src="images/detective/05_promotion_screen.png.png" alt="Promotion unlocked" style="width:100%;display:block;border-radius:var(--r)" onerror="this.classList.add('img-missing')">
+          <img src="images/detective/05_promotion_screen.png" alt="Promotion unlocked" style="width:100%;display:block;border-radius:var(--r)" onerror="this.classList.add('img-missing')">
         </div>
         <div class="medal" id="promoMedal">New rank</div>
         <p class="muted" id="promoScore"></p>
@@ -374,7 +374,7 @@ h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em;
    CONFIG — chemins des médias (relatifs pour GitHub Pages)
    ================================================================= */
 var IMG = "images/detective/";
-var IMG_EXT = ".png";   // tes fichiers se terminent par .png.png -> on ajoute un .png
+var IMG_EXT = "";   // images nommées en .png simple
 var MUSIC_SRC = "audio/theme_detective_jazz_vintage_poirot_style.mp3?v=2";
 
 /* =================================================================
@@ -608,7 +608,7 @@ function showMissionResult(m){
   if(passed){
     if(first) awardMission(m);
     html += '<div class="clue-reveal"><div class="ci">'
-      + '<img src="'+IMG+'clue_unlocked.png.png" alt="Clue unlocked" onerror="this.style.display=\'none\'">'
+      + '<img src="'+IMG+'clue_unlocked.png" alt="Clue unlocked" onerror="this.style.display=\'none\'">'
       + '<div class="ct"><span class="tag">🔓 '+esc(m.clue.title)+'</span><p style="margin:10px 0 0">'+esc(m.clue.text)+'</p></div>'
       + '</div></div>';
     var last = (state.current >= MISSIONS.length-1);
