@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Time Machine — Homemade TOEIC Trainer</title>
+<!--
+  GRAMMAR TIME MACHINE — jeu de grammaire TOEIC (autonome, HTML/CSS/JS).
+  =====================================================================
+  - Assets attendus :
+      images/grammar-time-machine/*.jpg   (fournis)
+      audio/theme_grammar_journey_main.mp3
+  - Sauvegarde locale : localStorage "grammarTimeMachine_v1".
+  - Pour AJOUTER DES QUESTIONS : repère "var BANK =" plus bas et ajoute
+    des lignes ["question", ["A","B","C","D"], index_bonne_réponse, "explication"].
+  - Si tu REMPLACES une image/son : monte la version dans "var V" ci-dessous.
+-->
+<style>
+:root{
+  --bg:#EEE9F7; --ink:#3A2E5C; --ink-soft:#6B6088; --line:#E0D7F0; --card:#FFFFFF;
+  --purple:#8B7DD8; --purple-d:#6C5CC4; --pink:#E7A6C9; --blue:#7FB3E8; --teal:#6FD0C5; --gold:#E6B84C; --coral:#F08A8A; --green:#86CBA0;
+  --purple-soft:#F1ECFB; --r:22px; --r-sm:14px; --shadow:0 14px 40px rgba(58,46,92,.18);
+  --display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --tap:54px;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; }
+body{ font-family:var(--body); color:var(--ink); background:var(--bg); line-height:1.55; min-height:100vh; overflow-x:hidden; }
+h1,h2,h3{ font-family:var(--display); line-height:1.12; margin:0; }
+.wrap{ max-width:1000px; margin:0 auto; min-height:100vh; position:relative; }
+
+/* écrans */
+.screen{ display:none; min-height:100vh; padding:22px 18px 40px; }
+.screen.active{ display:block; animation:fade .4s ease; }
+@keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+/* fond illustré + voile lisibilité */
+.bg{ position:fixed; inset:0; background-size:cover; background-position:center; z-index:-2; transition:opacity .5s; }
+.bg-veil{ position:fixed; inset:0; background:linear-gradient(180deg, rgba(238,233,247,.62), rgba(238,233,247,.86)); z-index:-1; }
+
+/* panneaux verre */
+.panel{ background:rgba(255,255,255,.86); backdrop-filter:blur(6px); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; }
+.center{ text-align:center; }
+.eyebrow{ text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; font-weight:800; color:var(--purple-d); }
+
+/* boutons */
+.btn{ font-family:var(--display); font-weight:700; font-size:1rem; cursor:pointer; border:1px solid transparent; border-radius:999px; min-height:var(--tap); padding:0 26px; display:inline-flex; align-items:center; justify-content:center; gap:9px; transition:transform .12s, box-shadow .2s, background .2s; text-decoration:none; color:#fff; }
+.btn:active{ transform:translateY(1px); }
+.btn.primary{ background:linear-gradient(135deg,var(--purple),var(--purple-d)); box-shadow:0 10px 24px rgba(108,92,196,.38); }
+.btn.gold{ background:linear-gradient(135deg,#F0CB6A,var(--gold)); color:#5b4a12; box-shadow:0 10px 24px rgba(230,184,76,.4); }
+.btn.ghost{ background:rgba(255,255,255,.9); border-color:var(--line); color:var(--ink); }
+.btn.ghost:hover{ border-color:var(--purple); }
+.btn.block{ width:100%; }
+.btn.small{ min-height:42px; font-size:.92rem; padding:0 16px; }
+.btn:disabled{ opacity:.55; cursor:default; }
+
+/* MENU */
+#menu .hero-card{ max-width:520px; margin:8vh auto 0; }
+#menu h1{ font-size:clamp(1.8rem,6vw,3rem); background:linear-gradient(120deg,var(--purple-d),var(--pink)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+#menu .sub{ color:var(--ink-soft); margin:8px 0 22px; }
+.menu-btns{ display:flex; flex-direction:column; gap:12px; }
+.music-toggle{ position:fixed; top:14px; right:14px; z-index:5; min-height:44px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.92); color:var(--ink); font-family:var(--display); font-weight:700; padding:0 16px; cursor:pointer; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:8px; }
+.volwrap{ position:fixed; top:14px; right:160px; z-index:5; }
+
+/* TIMELINE */
+.timeline{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+.era{ width:172px; background:rgba(255,255,255,.9); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; cursor:pointer; transition:transform .15s, box-shadow .2s, opacity .2s; text-align:left; padding:0; color:inherit; font:inherit; }
+.era:hover:not(.locked){ transform:translateY(-4px); box-shadow:0 20px 46px rgba(58,46,92,.24); }
+.era .thumb{ height:96px; background-size:cover; background-position:center; position:relative; }
+.era .yr{ position:absolute; left:10px; top:8px; background:rgba(58,46,92,.74); color:#fff; font-family:var(--display); font-weight:800; border-radius:999px; padding:3px 12px; font-size:.95rem; }
+.era .ic{ position:absolute; right:10px; top:8px; font-size:1.3rem; filter:drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+.era .meta{ padding:12px 14px; }
+.era .gr{ font-weight:700; font-size:.95rem; }
+.era .st{ font-size:.78rem; color:var(--ink-soft); margin-top:3px; display:flex; align-items:center; gap:6px; }
+.era.locked{ opacity:.55; cursor:not-allowed; filter:grayscale(.4); }
+.era.done{ border-color:var(--green); box-shadow:0 0 0 2px rgba(134,203,160,.5), var(--shadow); }
+.era.done .thumb::after{ content:"✓"; position:absolute; right:8px; bottom:6px; width:26px; height:26px; background:var(--green); color:#fff; border-radius:50%; display:grid; place-items:center; font-weight:800; }
+
+/* HUD quiz */
+.hud{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.hud .chip{ background:rgba(255,255,255,.92); border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-weight:700; font-size:.9rem; }
+.hud .chip b{ color:var(--purple-d); }
+.stability{ height:12px; border-radius:999px; background:#E7DFF3; overflow:hidden; border:1px solid var(--line); margin:2px 0 16px; }
+.stability > i{ display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--teal),var(--green)); transition:width .35s, background .35s; }
+.combo{ font-weight:800; color:var(--coral); font-family:var(--display); }
+
+.q{ font-size:1.18rem; font-weight:700; margin:6px 0 4px; }
+.q .tag{ display:inline-block; font-size:.66rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--purple-d); background:var(--purple-soft); border-radius:999px; padding:3px 10px; margin-bottom:8px; }
+.opts{ display:grid; gap:10px; margin-top:12px; }
+.opt{ text-align:left; font:inherit; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 15px; min-height:48px; cursor:pointer; display:flex; gap:11px; align-items:center; transition:border-color .15s, background .15s, transform .1s; }
+.opt:hover:not(:disabled){ border-color:var(--purple); transform:translateX(2px); }
+.opt:disabled{ cursor:default; }
+.opt .k{ width:26px; height:26px; flex:none; border-radius:7px; background:var(--purple-soft); color:var(--purple-d); font-weight:800; display:grid; place-items:center; font-size:.82rem; }
+.opt.ok{ background:rgba(134,203,160,.18); border-color:var(--green); } .opt.ok .k{ background:var(--green); color:#fff; }
+.opt.no{ background:rgba(240,138,138,.16); border-color:var(--coral); } .opt.no .k{ background:var(--coral); color:#fff; }
+.why{ margin-top:14px; background:var(--purple-soft); border:1px solid var(--line); border-radius:12px; padding:12px 15px; font-size:.95rem; display:none; }
+.why.show{ display:block; }
+.why b{ color:var(--purple-d); }
+.next-row{ margin-top:16px; display:flex; justify-content:flex-end; }
+
+/* loading */
+#loading .panel{ max-width:460px; margin:14vh auto 0; }
+.bar{ height:14px; border-radius:999px; background:#E7DFF3; overflow:hidden; border:1px solid var(--line); margin-top:14px; }
+.bar > i{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--purple),var(--pink)); transition:width .25s; }
+
+/* passport / résultats */
+.stats-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:16px 0; }
+.sbox{ background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); padding:12px 8px; text-align:center; }
+.sbox .v{ font-family:var(--display); font-weight:800; font-size:1.4rem; color:var(--purple-d); }
+.sbox .l{ font-size:.62rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-top:2px; }
+@media (max-width:620px){ .stats-grid{ grid-template-columns:repeat(2,1fr); } .timeline{ gap:10px; } .era{ width:46%; } }
+.badges{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
+.badge{ width:120px; text-align:center; opacity:.4; filter:grayscale(1); transition:.3s; }
+.badge.earned{ opacity:1; filter:none; }
+.badge .ic{ font-size:2rem; }
+.badge .nm{ font-size:.74rem; font-weight:700; margin-top:2px; }
+.confetti{ position:fixed; inset:0; pointer-events:none; z-index:50; }
+.title-img{ width:100%; max-height:230px; object-fit:cover; border-radius:var(--r-sm); margin-bottom:14px; border:1px solid var(--line); }
+.foot{ text-align:center; color:var(--ink-soft); font-size:.84rem; margin-top:18px; }
+.link-home{ color:var(--purple-d); text-decoration:none; font-weight:700; }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms!important; transition-duration:.001ms!important; } }
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="bg-veil"></div>
+
+<button class="music-toggle" id="musicToggle">🔇 Music OFF</button>
+<div class="volwrap"><input type="range" id="vol" min="0" max="100" value="55" aria-label="Volume" style="display:none"></div>
+
+<div class="wrap">
+
+  <!-- ===================== MENU ===================== -->
+  <section class="screen active" id="menu">
+    <div class="panel hero-card center">
+      <div class="eyebrow">Homemade TOEIC Trainer</div>
+      <h1>⏳ Grammar Time Machine</h1>
+      <p class="sub">The timeline is broken. As a Time Grammar Agent, travel through five eras of work and repair history — one grammar question at a time.</p>
+      <div class="menu-btns">
+        <button class="btn primary block" id="btnStart">🚀 Start journey</button>
+        <button class="btn ghost block" id="btnPassport">📖 Grammar passport</button>
+        <button class="btn ghost block" id="btnHow">❓ How to play</button>
+        <a class="btn ghost block" href="index.html">← Back to site</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW TO PLAY ===================== -->
+  <section class="screen" id="how">
+    <div class="panel" style="max-width:620px;margin:8vh auto 0">
+      <div class="eyebrow">How to play</div>
+      <h2 style="margin:6px 0 12px">Repair the timeline</h2>
+      <p>Five eras of work are damaged: <b>1850, 1995, TODAY, 2035, 2050</b>. Each era tests a grammar point.</p>
+      <ul style="color:var(--ink-soft);line-height:1.8">
+        <li>Answer the grammar questions. Each correct answer earns <b>+10 points</b> (more with combos).</li>
+        <li>Watch the <b>Time Stability</b> bar: wrong answers make it drop. If it hits zero, the timeline collapses.</li>
+        <li>Finish an era to earn its <b>badge</b> and unlock the next era.</li>
+        <li>Restore all five eras to win. Your progress is saved automatically on this device.</li>
+      </ul>
+      <div class="next-row" style="justify-content:center"><button class="btn primary" data-go="menu">Got it</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== TIMELINE ===================== -->
+  <section class="screen" id="timeline">
+    <div class="panel">
+      <div class="hud">
+        <div><div class="eyebrow">Mission control</div><h2>Choose an era to repair</h2></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="chip">Score <b id="tlScore">0</b></span>
+          <span class="chip">Eras <b id="tlEras">0/5</b></span>
+          <button class="btn ghost small" data-go="passport">📖 Passport</button>
+          <button class="btn ghost small" data-go="menu">Menu</button>
+        </div>
+      </div>
+      <div class="timeline" id="eraList"></div>
+      <p class="foot">Locked eras open once you repair the previous one.</p>
+    </div>
+  </section>
+
+  <!-- ===================== LOADING ===================== -->
+  <section class="screen" id="loading">
+    <div class="panel center">
+      <div class="eyebrow">Travelling through time…</div>
+      <h2 id="loadTitle" style="margin:8px 0">Preparing your journey</h2>
+      <div class="bar"><i id="loadBar"></i></div>
+      <p class="foot" id="loadTip">Tip: read carefully and pay attention to context.</p>
+    </div>
+  </section>
+
+  <!-- ===================== ERA / QUIZ ===================== -->
+  <section class="screen" id="era">
+    <div class="panel">
+      <div class="hud">
+        <div><div class="eyebrow" id="eraYear">1850</div><h2 id="eraGrammar">Past Simple</h2></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span class="chip">Q <b id="qNum">1/10</b></span>
+          <span class="chip">Score <b id="qScore">0</b></span>
+          <span class="chip">Accuracy <b id="qAcc">100%</b></span>
+          <span class="combo" id="qCombo"></span>
+        </div>
+      </div>
+      <div class="stability" title="Time stability"><i id="stabBar"></i></div>
+      <div id="quizArea"></div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSPORT ===================== -->
+  <section class="screen" id="passport">
+    <div class="panel">
+      <img class="title-img" id="passImg" alt="Grammar Passport">
+      <div class="hud">
+        <div><div class="eyebrow">Time traveler</div><h2>Grammar Passport</h2></div>
+        <button class="btn ghost small" data-go="menu">Menu</button>
+      </div>
+      <div class="stats-grid">
+        <div class="sbox"><div class="v" id="pLevels">0/5</div><div class="l">Levels completed</div></div>
+        <div class="sbox"><div class="v" id="pScore">0</div><div class="l">Total score</div></div>
+        <div class="sbox"><div class="v" id="pAcc">0%</div><div class="l">Accuracy</div></div>
+        <div class="sbox"><div class="v" id="pStreak">0</div><div class="l">Best streak</div></div>
+        <div class="sbox"><div class="v" id="pBadges">0/5</div><div class="l">Badges</div></div>
+      </div>
+      <h3 class="center" style="color:var(--purple-d);margin-top:6px">Badges collection</h3>
+      <div class="badges" id="badgeList"></div>
+      <div class="next-row" style="justify-content:center;margin-top:18px">
+        <button class="btn primary" data-go="timeline">Continue journey</button>
+        <button class="btn ghost small" id="btnReset" style="margin-left:10px">Reset progress</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VICTORY ===================== -->
+  <section class="screen" id="victory">
+    <div class="panel center">
+      <img class="title-img" id="winImg" alt="Timeline restored">
+      <div class="eyebrow">Mission complete</div>
+      <h1 style="color:var(--purple-d)">🎉 Timeline restored!</h1>
+      <p class="sub">You repaired all five eras of work. History is safe, Agent.</p>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);max-width:520px;margin:16px auto">
+        <div class="sbox"><div class="v" id="vScore">0</div><div class="l">Final score</div></div>
+        <div class="sbox"><div class="v" id="vAcc">0%</div><div class="l">Accuracy</div></div>
+        <div class="sbox"><div class="v" id="vBadges">5/5</div><div class="l">Badges</div></div>
+      </div>
+      <div class="next-row" style="justify-content:center">
+        <button class="btn gold" data-go="passport">See passport</button>
+        <button class="btn ghost" data-go="timeline" style="margin-left:10px">Replay an era</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GAME OVER ===================== -->
+  <section class="screen" id="gameover">
+    <div class="panel center">
+      <img class="title-img" id="overImg" alt="Time paradox">
+      <div class="eyebrow" style="color:var(--coral)">Time paradox</div>
+      <h1 style="color:var(--coral)">⚠️ Timeline collapsed</h1>
+      <p class="sub">Too many errors destabilised this era. Don't worry — you can travel back and try again.</p>
+      <div class="next-row" style="justify-content:center">
+        <button class="btn primary" id="btnRetry">↺ Retry era</button>
+        <button class="btn ghost" data-go="timeline" style="margin-left:10px">Back to timeline</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+/* ===== Assets ===== */
+var IMG="images/grammar-time-machine/", AUD="audio/", V="?v=1"; // monte V si tu remplaces un fichier
+var BG={
+  menu:IMG+"time_machine_dashboard.jpg"+V,
+  timeline:IMG+"timeline_grammar_journey_pastel.jpg"+V,
+  loading:IMG+"timeline_loading.jpg"+V,
+  passport:IMG+"grammar_passport.jpg"+V,
+  victory:IMG+"victory_timeline_restored.jpg"+V,
+  gameover:IMG+"time_paradox.jpg"+V,
+  how:IMG+"timeline_grammar_journey_pastel.jpg"+V
+};
+
+/* ===== Eras ===== */
+var ERAS=[
+  {key:"e1", year:"1850",  title:"Industrial Era", grammar:"Past Simple",                    bg:IMG+"era_1850.jpg"+V, badge:"Industrial Expert", icon:"🏭"},
+  {key:"e2", year:"1995",  title:"Office Era",     grammar:"Past Continuous & Past Perfect",  bg:IMG+"era_1995.jpg"+V, badge:"Office Historian",  icon:"💻"},
+  {key:"e3", year:"TODAY", title:"Modern Era",     grammar:"Present Simple & Continuous",     bg:IMG+"era_today.jpg"+V, badge:"Modern Worker",    icon:"👥"},
+  {key:"e4", year:"2035",  title:"AI Era",         grammar:"Will / Going to / Modals",        bg:IMG+"era_2035.jpg"+V, badge:"AI Specialist",     icon:"🧠"},
+  {key:"e5", year:"2050",  title:"Space Era",      grammar:"Future Passive",                  bg:IMG+"era_2050.jpg"+V, badge:"Space Executive",   icon:"🪐"}
+];
+var BADGE_ICON={ "Industrial Expert":"🏭","Office Historian":"💻","Modern Worker":"👥","AI Specialist":"🧠","Space Executive":"🪐" };
+
+/* ===== Banque de questions : [question, [options], indexBonneRéponse, explication] =====
+   Ajoute des lignes ici pour enrichir un niveau. */
+var BANK={
+e1:[
+ ["The clerk ____ the daily report yesterday.",["writes","wrote","has written","write"],1,"Past simple : action terminée (yesterday) → wrote."],
+ ["They ____ the goods to London last week.",["ship","shipped","were shipping","shipped goods"],1,"Action passée datée → shipped."],
+ ["Choose the correct sentence.",["He didn't signed the ledger.","He didn't sign the ledger.","He not signed the ledger.","He no sign the ledger."],1,"did/didn't + base verbale (sign), jamais signed."],
+ ["The factory ____ in 1851.",["opens","opened","has opened","open"],1,"Date passée précise → opened."],
+ ["____ you receive the telegram this morning?",["Do","Did","Have","Are"],1,"Question au passé → Did + base verbale."],
+ ["The manager ____ to the workers an hour ago.",["speaks","spoke","has spoken","speak"],1,"\u00ab ago \u00bb → past simple irrégulier : spoke."],
+ ["We ____ not record the payment correctly.",["do","did","were","have"],1,"Négation au passé : did not (didn't) + base."],
+ ["Last year, the company ____ a new branch.",["build","built","builds","building"],1,"Past simple de build → built."],
+ ["Correct the verb: \u00ab She go to the office every day last month. \u00bb",["go","goes","went","gone"],2,"Période passée (last month) → went."],
+ ["The train ____ at six o'clock.",["arrive","arrived","arrives","has arrived"],1,"Récit passé → arrived."],
+ ["He ____ the invoice before lunch.",["sended","sent","send","sends"],1,"Past de send → sent (pas \u00ab sended \u00bb)."],
+ ["During the Industrial Revolution, people ____ very hard.",["work","worked","working","works"],1,"Fait passé → worked."]
+],
+e2:[
+ ["While she ____ the report, the fax arrived.",["wrote","was writing","has written","writes"],1,"Action en cours (past continuous) interrompue par une action courte."],
+ ["By the time we arrived, the meeting ____.",["started","had started","was starting","starts"],1,"Action antérieure à une autre action passée → past perfect (had started)."],
+ ["They ____ on the project when the power went out.",["worked","were working","had worked","work"],1,"Action en déroulement → past continuous (were working)."],
+ ["He realised he ____ the document.",["forgot","had forgotten","was forgetting","forgets"],1,"Le fait d'oublier précède le fait de réaliser → past perfect."],
+ ["Choose the correct sentence.",["While I typed, the phone was ringing.","While I was typing, the phone rang.","While I am typing, the phone rang.","While I was typing, the phone was rang."],1,"Action longue (was typing) interrompue par une action courte (rang)."],
+ ["The clients ____ for an hour before the manager came.",["waited","had been waiting","were waiting","wait"],1,"Durée + antériorité → past perfect continuous : had been waiting."],
+ ["She was tired because she ____ all day.",["worked","had worked","was working","works"],1,"Cause antérieure → past perfect (had worked)."],
+ ["At 9 a.m. yesterday, I ____ a fax to the client.",["sent","was sending","had sent","send"],1,"Action en cours à un moment précis du passé → past continuous."],
+ ["After he ____ the email, he printed it.",["had checked","checked","was checking","checks"],0,"\u00ab After \u00bb + action antérieure → past perfect (had checked)."],
+ ["The printer broke while it ____ the documents.",["printed","was printing","had printed","prints"],1,"Action en cours → past continuous (was printing)."],
+ ["Before 1995, they ____ never ____ the internet.",["have / used","had / used","did / use","were / using"],1,"Past perfect négatif : had never used."],
+ ["I couldn't open the office because I ____ my keys.",["lost","had lost","was losing","lose"],1,"Cause antérieure au passé → past perfect (had lost)."]
+],
+e3:[
+ ["She usually ____ her emails in the morning.",["answer","answers","is answering","answered"],1,"Habitude → present simple, 3e personne : answers."],
+ ["Right now, the team ____ a video call.",["has","is having","have","had"],1,"\u00ab Right now \u00bb → present continuous : is having."],
+ ["Our company ____ products to thirty countries.",["export","exports","is exporting","exported"],1,"Fait général → present simple : exports."],
+ ["Look! The manager ____ the new plan.",["presents","is presenting","present","presented"],1,"\u00ab Look! \u00bb → action en ce moment → present continuous."],
+ ["He ____ not work on Fridays.",["do","does","is","are"],1,"Négation present simple, 3e pers. : does not (doesn't)."],
+ ["Choose the correct sentence.",["I am usually starting at nine.","I usually start at nine.","I usually starting at nine.","I am usually start at nine."],1,"Habitude (usually) → present simple, pas continuous."],
+ ["The clients ____ for the report at the moment.",["wait","waits","are waiting","waited"],2,"\u00ab At the moment \u00bb → present continuous : are waiting."],
+ ["Water ____ at 100 degrees.",["boil","boils","is boiling","boiled"],1,"Vérité générale → present simple : boils."],
+ ["____ she speak English fluently?",["Do","Does","Is","Are"],1,"Question present simple, 3e pers. : Does + base."],
+ ["We ____ a team meeting every Monday.",["have","are having","has","having"],0,"Habitude régulière (every Monday) → present simple : have."],
+ ["Why ____ you ____ so hard today?",["do / work","are / working","is / working","do / working"],1,"\u00ab Today \u00bb (temporaire) → present continuous : are working."],
+ ["The system ____ the data automatically.",["process","processes","is processing","processed"],1,"Fait général → present simple : processes."]
+],
+e4:[
+ ["I think robots ____ many tasks in the future.",["are doing","will do","did","do"],1,"Prédiction/opinion → will + base : will do."],
+ ["Look at those clouds — it ____ rain.",["will","is going to","would","shall"],1,"Indice présent → be going to : is going to rain."],
+ ["You ____ submit the form before Friday. It's mandatory.",["might","can","must","would"],2,"Obligation forte → must."],
+ ["It's planned: we ____ launch the app next month.",["will","are going to","would","can"],1,"Intention/plan décidé → be going to : are going to."],
+ ["____ you help me with this AI report, please?",["Will","Do","Are","Did"],0,"Requête polie → Will you …?"],
+ ["A good assistant ____ speak several languages.",["must","can","should","will"],1,"Capacité → can."],
+ ["Choose the correct sentence.",["He will to call you tomorrow.","He will call you tomorrow.","He will calling you tomorrow.","He will calls you tomorrow."],1,"will + base verbale (sans \u00ab to \u00bb)."],
+ ["You ____ not park here — it is strictly forbidden.",["must","can","will","did"],0,"Interdiction → must not (mustn't)."],
+ ["I'm not sure, but I ____ visit the space office next year.",["will","might","must","am going to"],1,"Possibilité incertaine → might."],
+ ["According to the timetable, the shuttle ____ at 8 a.m.",["will leave","is going to leave","leaves","leave"],2,"Horaire fixe → present simple : leaves."],
+ ["____ I open the window for you?",["Shall","Will","Do","Am"],0,"Proposition/offre → Shall I …?"],
+ ["Don't worry, I ____ help you with that.",["am going to","will","must","can"],1,"Décision spontanée au moment de parler → will."]
+],
+e5:[
+ ["The report ____ by the AI tomorrow.",["will write","will be written","is writing","wrote"],1,"Future passif : will be + participe passé (written)."],
+ ["The new space station ____ in 2051.",["will build","will be built","builds","is built"],1,"Future passif : will be built."],
+ ["Choose the correct sentence.",["The data will be analyse next week.","The data will be analysed next week.","The data will analysed next week.","The data will being analysed next week."],1,"will be + participe passé : will be analysed."],
+ ["All passengers ____ before departure.",["will check","will be checked","checks","checked"],1,"Le sujet subit l'action → passif : will be checked."],
+ ["The results ____ to every team next week.",["will send","will be sent","send","sent"],1,"Future passif : will be sent."],
+ ["The contract ____ by the director soon.",["will sign","will be signed","signs","signed"],1,"Future passif : will be signed."],
+ ["The rockets ____ from the orbital base at dawn.",["will launch","will be launched","launch","launched"],1,"Future passif : will be launched."],
+ ["____ the meeting ____ online next Monday?",["Will / be held","Will / held","Is / held","Will / holding"],0,"Question au future passif : Will … be held?"],
+ ["The samples ____ in the lab next month.",["will test","will be tested","test","tested"],1,"Future passif : will be tested."],
+ ["The final decision ____ by the board next year.",["will make","will be made","makes","made"],1,"Future passif : will be made."],
+ ["Thousands of new jobs ____ by space companies.",["will create","will be created","create","created"],1,"Future passif : will be created."],
+ ["The system ____ automatically every night.",["will update","will be updated","updates","updated"],1,"Le système subit la mise à jour → passif : will be updated."]
+]
+};
+
+/* ===== State + storage ===== */
+var SKEY="grammarTimeMachine_v1";
+function load(){ try{ return JSON.parse(localStorage.getItem(SKEY))||null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+var S = load() || { completed:{}, badges:[], totalScore:0, bestStreak:0, totalCorrect:0, totalAnswered:0, music:false };
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function accPct(){ return S.totalAnswered? Math.round(100*S.totalCorrect/S.totalAnswered):0; }
+function eraIndex(key){ for(var i=0;i<ERAS.length;i++) if(ERAS[i].key===key) return i; return -1; }
+function unlocked(i){ return i===0 || !!S.completed[ERAS[i-1].key]; }
+function badgesEarned(){ return S.badges.length; }
+
+/* ===== Navigation d'écrans + fond ===== */
+function showScreen(id){
+  var secs=document.querySelectorAll(".screen"); for(var i=0;i<secs.length;i++) secs[i].classList.toggle("active", secs[i].id===id);
+  var bg=$("bg");
+  var src = (id==="era" && curEra)? curEra.bg : (BG[id]||BG.menu);
+  bg.style.backgroundImage="url('"+src+"')";
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ var d=b.getAttribute("data-go"); if(d==="timeline") renderTimeline(); if(d==="passport") renderPassport(); showScreen(d); }); });
+
+/* ===== Musique ===== */
+var audio=new Audio(AUD+"theme_grammar_journey_main.mp3"+V); audio.loop=true; audio.preload="auto"; audio.volume=0.55;
+function reflectMusicBtn(){ $("musicToggle").textContent = S.music ? "🔊 Music ON" : "🔇 Music OFF"; $("vol").style.display = S.music?"":"none"; }
+function startMusic(){ try{ audio.play().catch(function(){}); }catch(e){} }
+function setMusic(on){ S.music=on; save(); reflectMusicBtn(); if(on) startMusic(); else audio.pause(); }
+$("musicToggle").addEventListener("click", function(){ setMusic(!S.music); });
+$("vol").addEventListener("input", function(){ audio.volume=this.value/100; });
+// l'autoplay est bloqué tant que l'utilisateur n'a pas cliqué : on relance au 1er clic
+window.addEventListener("pointerdown", function once(){ if(S.music) startMusic(); window.removeEventListener("pointerdown", once); }, {once:true});
+
+/* ===== Menu ===== */
+$("btnStart").addEventListener("click", function(){ if(S.music) startMusic(); renderTimeline(); showScreen("timeline"); });
+$("btnPassport").addEventListener("click", function(){ renderPassport(); showScreen("passport"); });
+$("btnHow").addEventListener("click", function(){ showScreen("how"); });
+
+/* ===== Timeline ===== */
+function renderTimeline(){
+  $("tlScore").textContent=S.totalScore;
+  $("tlEras").textContent=Object.keys(S.completed).filter(function(k){return S.completed[k];}).length+"/5";
+  var host=$("eraList"); host.innerHTML="";
+  ERAS.forEach(function(e,i){
+    var open=unlocked(i), done=!!S.completed[e.key];
+    var b=document.createElement("button");
+    b.className="era"+(open?"":" locked")+(done?" done":"");
+    b.innerHTML='<div class="thumb" style="background-image:url(\''+e.bg+'\')"><span class="yr">'+e.year+'</span><span class="ic">'+e.icon+'</span></div>'
+      +'<div class="meta"><div class="gr">'+esc(e.grammar)+'</div>'
+      +'<div class="st">'+(done?'✓ Repaired':(open?'▶ '+BANK[e.key].length+' questions':'🔒 Locked'))+'</div></div>';
+    if(open) b.addEventListener("click", function(){ goLoading(i); });
+    host.appendChild(b);
+  });
+}
+
+/* ===== Loading puis era ===== */
+var LOAD_MS=1100;
+function goLoading(i){
+  showScreen("loading");
+  $("loadTitle").textContent="Travelling to "+ERAS[i].year+"…";
+  var bar=$("loadBar"); bar.style.width="0";
+  var p=0; var iv=setInterval(function(){ p+=Math.random()*22+8; if(p>=100){p=100;} bar.style.width=p+"%"; if(p>=100){ clearInterval(iv);} },120);
+  setTimeout(function(){ startEra(i); }, LOAD_MS);
+}
+
+/* ===== Quiz ===== */
+var curEra=null, curIdx=-1, queue=[], qpos=0, eraScore=0, combo=0, stability=100, answered=false;
+var SESSION=10;
+function startEra(i){
+  curIdx=i; curEra=ERAS[i];
+  var pool=BANK[curEra.key].map(function(r){ return {q:r[0],opts:r[1],a:r[2],why:r[3]}; });
+  queue=shuffle(pool).slice(0, Math.min(SESSION, pool.length));
+  qpos=0; eraScore=0; combo=0; stability=100;
+  $("eraYear").textContent=curEra.year+" · "+curEra.title;
+  $("eraGrammar").textContent=curEra.grammar;
+  showScreen("era");
+  renderQuestion();
+}
+function renderQuestion(){
+  answered=false;
+  var item=queue[qpos];
+  $("qNum").textContent=(qpos+1)+"/"+queue.length;
+  $("qScore").textContent=eraScore;
+  $("qAcc").textContent=accPct()+"%";
+  $("qCombo").textContent = combo>=2 ? ("🔥 x"+combo) : "";
+  $("stabBar").style.width=stability+"%";
+  $("stabBar").style.background = stability<35 ? "linear-gradient(90deg,#F0A86A,var(--coral))" : "linear-gradient(90deg,var(--teal),var(--green))";
+  var opts="";
+  item.opts.forEach(function(o,k){ opts+='<button class="opt" data-k="'+k+'"><span class="k">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'; });
+  $("quizArea").innerHTML='<p class="q"><span class="tag">'+esc(curEra.grammar)+'</span><br>'+esc(item.q)+'</p>'
+    +'<div class="opts">'+opts+'</div>'
+    +'<div class="why" id="why"></div>'
+    +'<div class="next-row" id="nextRow" style="display:none"><button class="btn primary" id="nextBtn">Next →</button></div>';
+  Array.prototype.forEach.call($("quizArea").querySelectorAll(".opt"), function(btn){ btn.addEventListener("click", function(){ answer(+btn.getAttribute("data-k")); }); });
+  var nb=$("nextBtn"); if(nb) nb.addEventListener("click", nextQuestion);
+}
+function answer(k){
+  if(answered) return; answered=true;
+  var item=queue[qpos];
+  var ok=(k===item.a);
+  var btns=$("quizArea").querySelectorAll(".opt");
+  Array.prototype.forEach.call(btns,function(b){ b.disabled=true; var bk=+b.getAttribute("data-k"); if(bk===item.a) b.classList.add("ok"); else if(bk===k) b.classList.add("no"); });
+  S.totalAnswered++;
+  if(ok){
+    S.totalCorrect++; combo++;
+    var bonus = combo>=2 ? (combo>=5?10:5) : 0;
+    var gained=10+bonus; eraScore+=gained; S.totalScore+=gained;
+    stability=Math.min(100, stability+5);
+    if(combo>S.bestStreak) S.bestStreak=combo;
+  } else {
+    combo=0; stability-=15;
+  }
+  save();
+  var why=$("why"); why.className="why show";
+  why.innerHTML="<b>"+(ok?("Correct! +"+(10+(combo>=2?(combo>=5?10:5):0))+(combo>=2?(" · combo x"+combo):"")):"Not quite.")+"</b> "+esc(item.why);
+  $("qScore").textContent=eraScore; $("qAcc").textContent=accPct()+"%";
+  $("qCombo").textContent = combo>=2 ? ("🔥 x"+combo) : "";
+  $("stabBar").style.width=Math.max(0,stability)+"%";
+  $("stabBar").style.background = stability<35 ? "linear-gradient(90deg,#F0A86A,var(--coral))" : "linear-gradient(90deg,var(--teal),var(--green))";
+  if(stability<=0){ setTimeout(gameOver, 650); return; }
+  $("nextRow").style.display="flex";
+}
+function nextQuestion(){
+  qpos++;
+  if(qpos>=queue.length){ completeEra(); return; }
+  renderQuestion();
+}
+function completeEra(){
+  S.completed[curEra.key]=true;
+  if(S.badges.indexOf(curEra.badge)<0) S.badges.push(curEra.badge);
+  save();
+  // dernier era ? -> victoire
+  if(ERAS.every(function(e){ return S.completed[e.key]; })){ renderVictory(); showScreen("victory"); fireConfetti(); return; }
+  // sinon : petit récap puis timeline
+  renderTimeline();
+  showScreen("timeline");
+  flash("✅ Era repaired! Badge earned: "+curEra.badge);
+}
+function gameOver(){ showScreen("gameover"); }
+$("btnRetry").addEventListener("click", function(){ if(curIdx>=0) goLoading(curIdx); else { renderTimeline(); showScreen("timeline"); } });
+
+/* ===== Passport ===== */
+function renderPassport(){
+  $("passImg").src=BG.passport;
+  $("pLevels").textContent=Object.keys(S.completed).filter(function(k){return S.completed[k];}).length+"/5";
+  $("pScore").textContent=S.totalScore;
+  $("pAcc").textContent=accPct()+"%";
+  $("pStreak").textContent=S.bestStreak;
+  $("pBadges").textContent=badgesEarned()+"/5";
+  var host=$("badgeList"); host.innerHTML="";
+  ERAS.forEach(function(e){
+    var earned=S.badges.indexOf(e.badge)>=0;
+    var d=document.createElement("div"); d.className="badge"+(earned?" earned":"");
+    d.innerHTML='<div class="ic">'+(BADGE_ICON[e.badge]||"🏅")+'</div><div class="nm">'+esc(e.badge)+'</div>';
+    host.appendChild(d);
+  });
+}
+$("btnReset").addEventListener("click", function(){
+  if(confirm("Reset all progress, badges and scores?")){ S={ completed:{}, badges:[], totalScore:0, bestStreak:0, totalCorrect:0, totalAnswered:0, music:S.music }; save(); renderPassport(); }
+});
+
+/* ===== Victory ===== */
+function renderVictory(){ $("winImg").src=BG.victory; $("vScore").textContent=S.totalScore; $("vAcc").textContent=accPct()+"%"; $("vBadges").textContent=badgesEarned()+"/5"; }
+$("overImg") && ($("overImg").src=BG.gameover);
+
+/* ===== petites animations ===== */
+function flash(msg){
+  var t=document.createElement("div"); t.textContent=msg;
+  t.style.cssText="position:fixed;left:50%;top:18px;transform:translateX(-50%);background:var(--purple-d);color:#fff;padding:12px 20px;border-radius:999px;font-family:var(--display);font-weight:700;z-index:60;box-shadow:var(--shadow)";
+  document.body.appendChild(t); setTimeout(function(){ t.style.transition="opacity .5s"; t.style.opacity="0"; setTimeout(function(){ t.remove(); },500); }, 1900);
+}
+function fireConfetti(){
+  var c=document.createElement("canvas"); c.className="confetti"; document.body.appendChild(c);
+  var ctx=c.getContext&&c.getContext("2d"); if(!ctx){ c.remove(); return; } function rs(){ c.width=innerWidth; c.height=innerHeight; } rs();
+  var cols=["#8B7DD8","#E7A6C9","#7FB3E8","#6FD0C5","#E6B84C"];
+  var P=[]; for(var i=0;i<140;i++) P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:4+Math.random()*6,vy:2+Math.random()*4,vx:-1+Math.random()*2,col:cols[i%cols.length],a:Math.random()*6});
+  var t0=Date.now();
+  (function loop(){ ctx.clearRect(0,0,c.width,c.height); P.forEach(function(p){ p.y+=p.vy; p.x+=p.vx; p.a+=.1; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.col; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); if(p.y>c.height) p.y=-10; });
+    if(Date.now()-t0<3500) requestAnimationFrame(loop); else c.remove(); })();
+}
+
+/* ===== Test hook (sans incidence sur le jeu) ===== */
+window.__GTM={ S:function(){return S;}, eras:ERAS, screen:function(){var a=document.querySelector(".screen.active");return a&&a.id;},
+  startEra:startEra, correct:function(){return queue[qpos]?queue[qpos].a:null;}, answer:answer, next:nextQuestion, qlen:function(){return queue.length;} };
+
+/* ===== Init ===== */
+reflectMusicBtn();
+showScreen("menu");
+</script>
+</body>
+</html>
