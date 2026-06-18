@@ -373,6 +373,7 @@ details.teacher[open]>summary{ border-bottom:1px solid var(--line); }
    CONFIG — chemins des médias (modifiables ici en une ligne)
    ================================================================= */
 var IMG_DIR   = "images/escape-game/";
+var IMG_V    = "?v=2"   /* casse le cache: passe à v3, v4… si tu changes une image */;
 var MUSIC_SRC = "audio/escape-game-theme.mp3";
 
 /* =================================================================
@@ -637,7 +638,7 @@ function renderMission(){
     +     '<div><div class="mt-eyebrow">'+esc(m.eyebrow)+'</div><h2>'+m.emoji+' '+esc(m.title)+'</h2></div>'
     +   '</div>'
     +   '<div class="mission-illu">'
-    +     '<img src="'+m.image+'" alt="Illustration: '+esc(m.title)+'" '
+    +     '<img src="'+m.image+IMG_V+'" alt="Illustration: '+esc(m.title)+'" '
     +          'onerror="this.classList.add(\'img-missing\');this.alt=\'(image: '+esc(m.image)+')\'">'
     +   '</div>'
     +   '<div class="mission-body">'
@@ -855,7 +856,7 @@ function renderVictory(){
   var z = $("#victoryZone");
   var html = ""
     + '<div class="victory">'
-    +   '<img src="'+VICTORY_IMG+'" alt="Congratulations, you got the job!" '
+    +   '<img src="'+VICTORY_IMG+IMG_V+'" alt="Congratulations, you got the job!" '
     +        'onerror="this.classList.add(\'img-missing\')">'
     +   '<div class="v-body">'
     +     '<div class="eyebrow" style="color:var(--gold)">Final rank · Hired</div>'
