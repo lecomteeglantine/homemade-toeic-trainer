@@ -174,19 +174,22 @@ a{ color:var(--navy); }
 .mission-top .mt-eyebrow{ font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; }
 
 /* Illustration de mission (image fournie, affichée en grand) */
-.mission-illu{ background:var(--parchment-2); }
+.mission-illu{
+  background:var(--parchment-2); overflow:hidden;
+  display:flex; justify-content:center; align-items:center;
+  padding:12px; border-bottom:1px solid var(--line);
+}
 .mission-illu img{
-  display:block; width:100%; height:auto; object-fit:cover;
-  border-bottom:1px solid var(--line);
+  display:block; width:auto; max-width:100%; height:auto; max-height:480px;
+  border-radius:14px; box-shadow:var(--shadow);
   transition:transform .5s cubic-bezier(.2,.8,.2,1);
 }
-.mission-illu{ overflow:hidden; }
-.mission-illu img:hover{ transform:scale(1.035); }
+.mission-illu img:hover{ transform:scale(1.03); }
 .mission-illu img.img-missing{ /* filet de sécurité si le fichier manque : panneau neutre */
-  min-height:160px; background:var(--parchment-2);
+  min-height:160px; min-width:220px; background:var(--parchment-2);
 }
 @media (max-width:640px){
-  .mission-illu img{ max-height:210px; }
+  .mission-illu img{ max-height:320px; }
 }
 
 .mission-body{ padding:20px; }
