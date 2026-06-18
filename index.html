@@ -292,6 +292,40 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
   *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
 .scene-img{background:var(--bg2,#f4f6fb);border:1px solid var(--line,#e6e9f2);border-radius:16px;padding:8px;margin-bottom:12px}.scene-img img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px}
+
+/* ===== START HERE — onboarding guidé (ajouté) ===== */
+.starthere{ margin-top:22px; border-radius:var(--r); border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--blue-soft),var(--card) 72%); padding:22px; }
+.starthere .sh-head h2{ margin:8px 0 4px; font-size:clamp(1.3rem,3.6vw,1.85rem); }
+.starthere .sh-sub{ margin:0; color:var(--ink-soft); max-width:60ch; }
+.youhere{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:16px 0 4px; }
+.youhere .yh{ display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:600; color:var(--ink-soft);
+  background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; }
+.youhere .yh .n{ width:20px; height:20px; border-radius:50%; background:var(--line); color:#fff; display:grid; place-items:center; font-size:.72rem; font-weight:700; }
+.youhere .yh.active{ border-color:var(--blue); color:var(--blue); background:var(--blue-soft); }
+.youhere .yh.active .n{ background:var(--blue); }
+.youhere .arrow{ color:var(--ink-soft); opacity:.55; }
+.sh-steps{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px; }
+.sh-step{ position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px 16px 58px; }
+.sh-step .badge{ position:absolute; left:16px; top:16px; width:30px; height:30px; border-radius:50%; background:var(--blue); color:#fff; font-weight:700; display:grid; place-items:center; font-family:var(--display); }
+.sh-step.s2{ border-color:var(--coral); box-shadow:0 8px 22px rgba(255,127,106,.12); }
+.sh-step.s2 .badge{ background:var(--coral); }
+.sh-step h3{ margin:0 0 4px; font-size:1.12rem; }
+.sh-step p{ margin:0 0 10px; color:var(--ink-soft); }
+.sh-step .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin:0; }
+.btn.small{ min-height:40px; font-size:.92rem; padding:0 16px; }
+.sh-paths{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.sh-path{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg2,transparent); }
+.sh-path .pl{ font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.sh-path .lk{ display:flex; gap:8px; flex-wrap:wrap; }
+.sh-goals{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.sh-goal{ text-align:left; cursor:pointer; font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px; transition:border-color .15s, transform .1s, box-shadow .15s; }
+.sh-goal:hover{ border-color:var(--blue); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+.sh-goal .ic{ font-size:1.5rem; }
+.sh-goal b{ display:block; margin:6px 0 2px; }
+.sh-goal span{ color:var(--ink-soft); font-size:.9rem; }
+@media (max-width:680px){ .sh-paths{ grid-template-columns:1fr; } .sh-goals{ grid-template-columns:1fr; } }
+
 </style>
 <link rel="stylesheet" href="ht-kit.css">
 </head>
@@ -339,6 +373,79 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
       <a class="btn ghost" href="detective-game.html" style="text-decoration:none"><span aria-hidden="true">&#128373;</span> Detective game</a>
     </div>
   </div>
+
+  <!-- =================== START HERE — onboarding guidé (ajouté) =================== -->
+  <section class="starthere" aria-labelledby="sh-h">
+    <div class="sh-head">
+      <span class="pill blue">Nouveau ici&nbsp;? Commence par là</span>
+      <h2 id="sh-h">🚦 Start here — 15 minutes pour savoir quoi faire</h2>
+      <p class="sh-sub">Pas besoin de tout explorer d'un coup. Suis ces 4 étapes dans l'ordre&nbsp;: en un quart d'heure, tu sauras exactement quoi travailler.</p>
+    </div>
+
+    <div class="youhere" aria-label="Ton parcours">
+      <span class="yh active"><span class="n">1</span> Comprendre</span>
+      <span class="arrow" aria-hidden="true">→</span>
+      <span class="yh"><span class="n">2</span> Diagnostiquer</span>
+      <span class="arrow" aria-hidden="true">→</span>
+      <span class="yh"><span class="n">3</span> S'entraîner</span>
+      <span class="arrow" aria-hidden="true">→</span>
+      <span class="yh"><span class="n">4</span> Suivre ses progrès</span>
+    </div>
+
+    <div class="sh-steps">
+      <div class="sh-step s1">
+        <span class="badge">1</span>
+        <h3>Comprendre le TOEIC en 3 minutes</h3>
+        <p>De quoi est fait l'examen (Listening &amp; Reading), le nombre de parties et la façon dont il est noté.</p>
+        <div class="btn-row"><button class="btn ghost small" data-nav="whatis"><span aria-hidden="true">📘</span> Découvrir le TOEIC</button></div>
+      </div>
+
+      <div class="sh-step s2">
+        <span class="badge">2</span>
+        <h3>Faire le mini-diagnostic</h3>
+        <p>Quelques questions pour repérer ton point faible et estimer ton score. C'est le meilleur point de départ.</p>
+        <div class="btn-row">
+          <button class="btn coral small" data-nav="diagnostic"><span aria-hidden="true">⚡</span> Faire mon diagnostic</button>
+          <a class="btn ghost small" href="#sh-parcours">Voir le parcours conseillé</a>
+        </div>
+      </div>
+
+      <div class="sh-step s3" id="sh-parcours">
+        <span class="badge">3</span>
+        <h3>Recevoir son parcours conseillé</h3>
+        <p>Après le diagnostic, suis le chemin qui correspond à ton point faible&nbsp;:</p>
+        <div class="sh-paths">
+          <div class="sh-path">
+            <div class="pl"><span aria-hidden="true">🎧</span> Listening faible</div>
+            <div class="lk"><button class="btn ghost small" data-nav="listening">Part 1 / Part 2</button><button class="btn ghost small" data-nav="pron">Pronunciation Academy</button></div>
+          </div>
+          <div class="sh-path">
+            <div class="pl"><span aria-hidden="true">📖</span> Reading faible</div>
+            <div class="lk"><button class="btn ghost small" data-nav="practice">Part 5 (exercices)</button><button class="btn ghost small" data-nav="grammar">Grammaire TOEIC</button></div>
+          </div>
+          <div class="sh-path">
+            <div class="pl"><span aria-hidden="true">📚</span> Vocabulaire faible</div>
+            <div class="lk"><button class="btn ghost small" data-nav="vocab">Vocabulaire essentiel</button><button class="btn ghost small" data-nav="mywords">My Words</button></div>
+          </div>
+          <div class="sh-path">
+            <div class="pl"><span aria-hidden="true">🆘</span> Étudiant perdu</div>
+            <div class="lk"><button class="btn ghost small" data-nav="examday">Survie TOEIC (conseils Jour J)</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh-step s4">
+        <span class="badge">4</span>
+        <h3>Choisir son objectif</h3>
+        <p>Pas encore sûr·e&nbsp;? Choisis ce qui te ressemble&nbsp;:</p>
+        <div class="sh-goals">
+          <button class="sh-goal" data-nav="whatis"><span class="ic" aria-hidden="true">🧭</span><b>Je découvre le TOEIC</b><span>On t'explique tout depuis le début.</span></button>
+          <button class="sh-goal" data-nav="practice"><span class="ic" aria-hidden="true">🚀</span><b>Je veux gagner des points rapidement</b><span>Exercices ciblés et pièges à éviter.</span></button>
+          <button class="sh-goal" data-nav="diagnostic"><span class="ic" aria-hidden="true">🎯</span><b>Je vise un score précis</b><span>Diagnostic puis suivi de progression.</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <div class="card" style="margin-top:22px;border-left:5px solid var(--coral)">
     <span class="pill coral">À lire avant de commencer</span>
