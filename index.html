@@ -2936,7 +2936,8 @@ go("home");
   }
 
   function injectHomeCard(){
-    var grid = document.querySelector("#home .grid");
+    var grids = document.querySelectorAll("#home .grid"), grid = null;
+    for(var gi=0; gi<grids.length; gi++){ if(!grids[gi].closest || !grids[gi].closest(".games-zone")){ grid = grids[gi]; break; } }
     if(!grid || grid.querySelector('[data-nav="grammar"]')) return;
     var card = ce("button","card focus-hide");
     card.setAttribute("data-nav","grammar");
