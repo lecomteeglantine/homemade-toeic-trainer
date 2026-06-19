@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phrasal Verb City — Homemade TOEIC Trainer</title>
+<!--
+  PHRASAL VERB CITY — jeu de phrasal verbs TOEIC (autonome, HTML/CSS/JS).
+  =====================================================================
+  Assets attendus :
+     images/phrasal-verb-city/*.jpg   (fournis)
+     audio/theme_phrasal_verb_city_main.mp3
+  Sauvegarde locale : localStorage "phrasalVerbCity_v1".
+  Pour AJOUTER/CORRIGER un phrasal verb : repère "var BANK =" et modifie la ligne
+     [verbe, sens_anglais, traduction_FR, "exemple avec ___", explication].
+  Si tu REMPLACES une image/son : monte la version dans "var V" ci-dessous.
+-->
+<style>
+:root{
+  --bg:#EAF2F8; --ink:#22364A; --ink-soft:#5C708A; --line:#DCE6EF; --card:#FFFFFF;
+  --blue:#4F8FE0; --blue-d:#356FC0; --teal:#3FB6A8; --green:#6BC68B; --coral:#F0876F; --gold:#E7B54C; --purple:#9B86D6; --pink:#E79BC0;
+  --blue-soft:#E6F0FB; --teal-soft:#E0F5F2; --green-soft:#E8F6ED; --coral-soft:#FDECE6; --gold-soft:#FBF1D8;
+  --r:22px; --r-sm:14px; --shadow:0 14px 40px rgba(34,54,74,.16);
+  --display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --tap:54px;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; }
+body{ font-family:var(--body); color:var(--ink); background:var(--bg); line-height:1.55; min-height:100vh; overflow-x:hidden; }
+h1,h2,h3{ font-family:var(--display); line-height:1.12; margin:0; }
+.wrap{ max-width:1000px; margin:0 auto; min-height:100vh; }
+.screen{ display:none; padding:22px 18px 48px; min-height:100vh; }
+.screen.active{ display:block; animation:fade .35s ease; }
+@keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+.bg{ position:fixed; inset:0; background-size:cover; background-position:center; z-index:-2; }
+.bg-veil{ position:fixed; inset:0; background:linear-gradient(180deg, rgba(234,242,248,.55), rgba(234,242,248,.85)); z-index:-1; }
+.panel{ background:rgba(255,255,255,.9); backdrop-filter:blur(6px); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; }
+.eyebrow{ text-transform:uppercase; letter-spacing:.16em; font-size:.72rem; font-weight:800; color:var(--blue-d); }
+.center{ text-align:center; }
+.muted{ color:var(--ink-soft); }
+
+.btn{ font-family:var(--display); font-weight:700; font-size:1rem; cursor:pointer; border:1px solid transparent; border-radius:999px; min-height:var(--tap); padding:0 24px; display:inline-flex; align-items:center; justify-content:center; gap:9px; transition:transform .12s, box-shadow .2s, background .2s; text-decoration:none; color:#fff; }
+.btn:active{ transform:translateY(1px); }
+.btn:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+.btn.primary{ background:linear-gradient(135deg,var(--blue),var(--blue-d)); box-shadow:0 10px 24px rgba(53,111,192,.34); }
+.btn.teal{ background:linear-gradient(135deg,var(--teal),#2DA395); }
+.btn.gold{ background:linear-gradient(135deg,#F0CB6A,var(--gold)); color:#5b4a12; }
+.btn.coral{ background:linear-gradient(135deg,var(--coral),#E06A4E); }
+.btn.ghost{ background:rgba(255,255,255,.92); border-color:var(--line); color:var(--ink); }
+.btn.ghost:hover{ border-color:var(--blue); }
+.btn.block{ width:100%; }
+.btn.small{ min-height:42px; font-size:.92rem; padding:0 16px; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+.music-toggle{ position:fixed; top:14px; right:14px; z-index:6; min-height:44px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.95); color:var(--ink); font-family:var(--display); font-weight:700; padding:0 16px; cursor:pointer; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:8px; }
+
+/* MENU */
+#menu .hero-card{ max-width:520px; margin:7vh auto 0; }
+#menu h1{ font-size:clamp(1.9rem,6vw,3rem); background:linear-gradient(120deg,var(--blue-d),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.menu-btns{ display:flex; flex-direction:column; gap:11px; margin-top:18px; }
+
+/* MAP */
+.map-banner{ width:100%; max-height:240px; object-fit:cover; border-radius:var(--r-sm); border:1px solid var(--line); margin-bottom:14px; }
+.districts{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+.district{ text-align:left; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); box-shadow:var(--shadow); overflow:hidden; cursor:pointer; transition:transform .15s, box-shadow .2s; padding:0; }
+.district:hover:not(.locked){ transform:translateY(-3px); box-shadow:0 18px 40px rgba(34,54,74,.2); }
+.district .thumb{ height:84px; background-size:cover; background-position:center; position:relative; }
+.district .num{ position:absolute; left:8px; top:8px; width:24px; height:24px; border-radius:50%; background:rgba(34,54,74,.8); color:#fff; font-weight:800; font-size:.78rem; display:grid; place-items:center; }
+.district .ic{ position:absolute; right:8px; top:6px; font-size:1.25rem; filter:drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+.district .meta{ padding:10px 12px; }
+.district .nm{ font-weight:700; font-size:.95rem; }
+.district .st{ font-size:.76rem; color:var(--ink-soft); margin-top:2px; }
+.district.locked{ opacity:.55; cursor:not-allowed; filter:grayscale(.4); }
+.district.done{ border-color:var(--green); box-shadow:0 0 0 2px rgba(107,198,139,.45), var(--shadow); }
+.district.done .thumb::after{ content:"✓"; position:absolute; right:8px; bottom:6px; width:24px; height:24px; background:var(--green); color:#fff; border-radius:50%; display:grid; place-items:center; font-weight:800; }
+
+/* HUD + quiz */
+.hud{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.chip{ background:rgba(255,255,255,.95); border:1px solid var(--line); border-radius:999px; padding:7px 13px; font-weight:700; font-size:.86rem; }
+.chip b{ color:var(--blue-d); }
+.bar{ height:10px; border-radius:999px; background:#DCE6EF; overflow:hidden; border:1px solid var(--line); margin:2px 0 14px; }
+.bar > i{ display:block; height:100%; background:linear-gradient(90deg,var(--teal),var(--green)); transition:width .35s; }
+.q{ font-size:1.14rem; font-weight:700; margin:4px 0; }
+.q .tag{ display:inline-block; font-size:.64rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-d); background:var(--blue-soft); border-radius:999px; padding:3px 10px; margin-bottom:8px; }
+.opts{ display:grid; gap:10px; margin-top:12px; }
+.opt{ text-align:left; font:inherit; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 15px; min-height:48px; cursor:pointer; display:flex; gap:11px; align-items:center; transition:border-color .15s, background .15s, transform .1s; }
+.opt:hover:not(:disabled){ border-color:var(--blue); transform:translateX(2px); }
+.opt:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+.opt:disabled{ cursor:default; }
+.opt .k{ width:26px; height:26px; flex:none; border-radius:7px; background:var(--blue-soft); color:var(--blue-d); font-weight:800; display:grid; place-items:center; font-size:.82rem; }
+.opt.ok{ background:var(--green-soft); border-color:var(--green); } .opt.ok .k{ background:var(--green); color:#fff; }
+.opt.no{ background:var(--coral-soft); border-color:var(--coral); } .opt.no .k{ background:var(--coral); color:#fff; }
+.why{ margin-top:14px; background:var(--blue-soft); border:1px solid var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; display:none; }
+.why.show{ display:block; }
+.why .pv{ font-family:var(--display); font-weight:800; color:var(--blue-d); }
+.why .fr{ color:var(--ink); } .why .ex{ font-style:italic; color:var(--ink-soft); }
+.action-row{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; }
+.learn{ display:grid; gap:8px; margin-top:12px; }
+.learn .lv{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 13px; }
+.learn .lv b{ color:var(--blue-d); font-family:var(--display); }
+.learn .lv .fr{ color:var(--ink-soft); }
+
+/* stats / passport-like */
+.stats-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:16px 0; }
+.sbox{ background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); padding:12px 8px; text-align:center; }
+.sbox .v{ font-family:var(--display); font-weight:800; font-size:1.35rem; color:var(--blue-d); }
+.sbox .l{ font-size:.62rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-top:2px; }
+@media (max-width:620px){ .stats-grid{ grid-template-columns:repeat(2,1fr); } }
+.badges{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+.badge{ width:108px; text-align:center; opacity:.4; filter:grayscale(1); transition:.3s; }
+.badge.earned{ opacity:1; filter:none; }
+.badge .ic{ font-size:1.8rem; }
+.badge .nm{ font-size:.72rem; font-weight:700; margin-top:2px; }
+.title-img{ width:100%; max-height:240px; object-fit:cover; border-radius:var(--r-sm); margin-bottom:14px; border:1px solid var(--line); }
+.confetti{ position:fixed; inset:0; pointer-events:none; z-index:50; }
+.foot{ text-align:center; color:var(--ink-soft); font-size:.84rem; margin-top:18px; }
+.lives{ font-size:1.1rem; letter-spacing:2px; }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms!important; transition-duration:.001ms!important; } }
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="bg-veil"></div>
+<button class="music-toggle" id="musicToggle" aria-label="Activer ou couper la musique">🔇 Music OFF</button>
+
+<div class="wrap">
+
+  <!-- MENU -->
+  <section class="screen active" id="menu">
+    <div class="panel hero-card center">
+      <div class="eyebrow">Homemade TOEIC Trainer</div>
+      <h1>🏙️ Phrasal Verb City</h1>
+      <p class="muted">Explore the city. Unlock districts. Master phrasal verbs.</p>
+      <div class="menu-btns">
+        <button class="btn primary block" id="btnStart">▶ Start game</button>
+        <button class="btn ghost block" id="btnContinue">↩ Continue</button>
+        <button class="btn ghost block" id="btnMap">🗺️ City map</button>
+        <button class="btn ghost block" id="btnHow">❓ How to play</button>
+        <button class="btn ghost block" id="btnReset">🗑️ Reset progress</button>
+        <a class="btn ghost block" href="index.html">← Back to site</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO PLAY -->
+  <section class="screen" id="how">
+    <div class="panel" style="max-width:640px;margin:7vh auto 0">
+      <div class="eyebrow">How to play</div>
+      <h2 style="margin:6px 0 12px">Save the city, one district at a time</h2>
+      <ul class="muted" style="line-height:1.8">
+        <li>The city has <b>10 districts</b>. Each teaches <b>10 useful phrasal verbs</b> for the TOEIC.</li>
+        <li>Answer the exercises. <b>+10</b> per correct answer, and a <b>+5 bonus</b> for every 3 correct in a row.</li>
+        <li>Stuck? Use the <b>Hint</b> button to see the meaning (it costs <b>−2 points</b>).</li>
+        <li>Finish a district to earn its <b>badge</b> and unlock the next one.</li>
+        <li>Complete all 10 to <b>save the city</b>, then try the optional <b>Challenge mode</b> (3 lives!).</li>
+        <li>Your progress is saved automatically on this device.</li>
+      </ul>
+      <div class="center" style="margin-top:14px"><button class="btn primary" data-go="menu">Got it</button></div>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="screen" id="map">
+    <div class="panel">
+      <div class="hud">
+        <div><div class="eyebrow">City map</div><h2>Choose a district</h2></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span class="chip">Score <b id="mapScore">0</b></span>
+          <span class="chip">Districts <b id="mapDone">0/10</b></span>
+          <button class="btn gold small" id="btnChallenge" style="display:none">⚡ Challenge</button>
+          <button class="btn ghost small" data-go="menu">Menu</button>
+        </div>
+      </div>
+      <img class="map-banner" id="mapImg" alt="Map of Phrasal Verb City">
+      <div class="districts" id="districtList"></div>
+      <p class="foot">Locked districts open once you complete the previous one.</p>
+    </div>
+  </section>
+
+  <!-- DISTRICT INTRO -->
+  <section class="screen" id="intro">
+    <div class="panel">
+      <img class="title-img" id="introImg" alt="">
+      <div class="eyebrow" id="introTheme">Theme</div>
+      <h2 id="introName" style="margin:4px 0 6px">District</h2>
+      <p class="muted" id="introDesc">Learn 10 phrasal verbs, then take on the exercises.</p>
+      <div class="action-row">
+        <button class="btn ghost small" id="btnLearn">📖 See the 10 phrasal verbs</button>
+        <button class="btn primary" id="btnBeginEx">Start exercises →</button>
+      </div>
+      <div class="learn" id="learnList" style="display:none"></div>
+      <div style="margin-top:14px"><button class="btn ghost small" data-go="map">← Back to map</button></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="quiz">
+    <div class="panel">
+      <div class="hud">
+        <div><div class="eyebrow" id="quizDistrict">District</div><h2 id="quizTheme">Exercises</h2></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <span class="chip">Q <b id="qNum">1/10</b></span>
+          <span class="chip">Score <b id="qScore">0</b></span>
+          <span class="chip">Acc <b id="qAcc">100%</b></span>
+          <span class="chip" id="qStreakChip" style="display:none">🔥 <b id="qStreak">0</b></span>
+          <span class="chip lives" id="qLives" style="display:none"></span>
+        </div>
+      </div>
+      <div class="bar"><i id="qBar" style="width:0"></i></div>
+      <div id="quizArea"></div>
+    </div>
+  </section>
+
+  <!-- VICTORY -->
+  <section class="screen" id="victory">
+    <div class="panel center">
+      <img class="title-img" id="winImg" alt="City saved">
+      <div class="eyebrow">Mission complete</div>
+      <h1 style="color:var(--blue-d)">🎉 CITY SAVED!</h1>
+      <p class="muted">You mastered Phrasal Verb City.</p>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);max-width:540px;margin:16px auto">
+        <div class="sbox"><div class="v" id="vScore">0</div><div class="l">Final score</div></div>
+        <div class="sbox"><div class="v" id="vAcc">0%</div><div class="l">Accuracy</div></div>
+        <div class="sbox"><div class="v" id="vBadges">0/10</div><div class="l">Badges</div></div>
+      </div>
+      <p class="muted" id="vBestWeak" style="margin:0"></p>
+      <div class="center" style="margin-top:16px">
+        <button class="btn gold" id="btnChallenge2">⚡ Challenge mode</button>
+        <button class="btn ghost" data-go="map" style="margin-left:8px">City map</button>
+        <button class="btn ghost" id="btnRestartAll" style="margin-left:8px">Restart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME OVER (challenge fail) -->
+  <section class="screen" id="gameover">
+    <div class="panel center">
+      <img class="title-img" id="overImg" alt="City overrun">
+      <div class="eyebrow" style="color:var(--coral)">Challenge failed</div>
+      <h1 style="color:var(--coral)">⚠️ CITY OVERRUN!</h1>
+      <p class="muted">The phrasal verbs escaped. Don't worry — try again, Agent.</p>
+      <div class="center" style="margin-top:14px">
+        <button class="btn primary" id="btnTryAgain">↺ Try again</button>
+        <button class="btn ghost" data-go="map" style="margin-left:8px">Return to map</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+var IMG="images/phrasal-verb-city/", AUD="audio/", V="?v=1";
+var BG={ menu:IMG+"phrasal_verb_city_map.jpg"+V, map:IMG+"phrasal_verb_city_map.jpg"+V, how:IMG+"city_park.jpg"+V,
+  victory:IMG+"victory_city_saved.jpg"+V, gameover:IMG+"game_over_city_overrun.jpg"+V };
+var DISTRICTS=[
+ {key:"d1", name:"Office Tower",         theme:"Work, business, meetings, projects", img:IMG+"office_tower.jpg"+V,         badge:"Office Strategist",   icon:"\uD83C\uDFE2"},
+ {key:"d2", name:"Airport",              theme:"Travel, transport, business trips",  img:IMG+"airport.jpg"+V,              badge:"Travel Expert",       icon:"\u2708\uFE0F"},
+ {key:"d3", name:"Hospital",             theme:"Health, recovery, emergencies",      img:IMG+"hospital.jpg"+V,             badge:"Health Guardian",     icon:"\uD83C\uDFE5"},
+ {key:"d4", name:"Police Station",       theme:"Investigation, problems, evidence",  img:IMG+"police_station.jpg"+V,       badge:"Investigation Master",icon:"\uD83D\uDE93"},
+ {key:"d5", name:"Shopping Mall",        theme:"Shopping, customers, money",         img:IMG+"shopping_mall.jpg"+V,        badge:"Smart Shopper",       icon:"\uD83D\uDECD\uFE0F"},
+ {key:"d6", name:"Factory",              theme:"Production, logistics, operations",  img:IMG+"factory.jpg"+V,              badge:"Operations Expert",   icon:"\uD83C\uDFED"},
+ {key:"d7", name:"Residential District", theme:"Daily life, home, neighbours",       img:IMG+"residential_district.jpg"+V, badge:"Neighbourhood Hero",  icon:"\uD83C\uDFD8\uFE0F"},
+ {key:"d8", name:"University",           theme:"Study, learning, academic life",     img:IMG+"university.jpg"+V,           badge:"Study Champion",      icon:"\uD83C\uDF93"},
+ {key:"d9", name:"Train Station",        theme:"Commuting, schedules, delays",       img:IMG+"train_station.jpg"+V,        badge:"Commuter Pro",        icon:"\uD83D\uDE89"},
+ {key:"d10",name:"City Park",            theme:"Free time, movement, social life",   img:IMG+"city_park.jpg"+V,            badge:"City Explorer",       icon:"\uD83C\uDF33"}
+];
+var BADGE_ICON={}; DISTRICTS.forEach(function(d){ BADGE_ICON[d.badge]=d.icon; });
+
+var BANK={
+ d1:[
+  ["carry out","do or perform (a task, plan)","réaliser, effectuer","The team will ___ a full safety audit next week.","carry out = perform a task, plan or order."],
+  ["set up","arrange or establish","mettre en place, organiser","We need to ___ a meeting with the new client.","set up = arrange or establish something."],
+  ["take over","take control of","reprendre, prendre le contrôle de","A larger firm will ___ our company next year.","take over = take control of something."],
+  ["bring up","mention or raise a topic","soulever, aborder","She will ___ the budget problem at the meeting.","bring up = introduce a topic in conversation."],
+  ["follow up","take further action; check progress","faire un suivi, relancer","Please ___ on the client's email by Friday.","follow up (on) = take further action about something."],
+  ["put forward","propose or suggest","proposer, soumettre","He wants to ___ a new plan to cut costs.","put forward = propose an idea or plan."],
+  ["deal with","handle or manage","gérer, s'occuper de","Customer service will ___ the complaint today.","deal with = handle a problem or task."],
+  ["look over","review or examine quickly","parcourir, examiner","Could you ___ this report before I send it?","look over = examine or review something."],
+  ["call off","cancel","annuler","They had to ___ the meeting because of the storm.","call off = cancel a planned event."],
+  ["work out","find a solution; calculate","trouver une solution, calculer","Let's ___ the details of the contract together.","work out = solve or figure something out."]
+ ],
+ d2:[
+  ["check in","register on arrival","s'enregistrer","You should ___ at least two hours before the flight.","check in = register at an airport or hotel."],
+  ["take off","leave the ground (plane)","décoller","The plane will ___ at nine o'clock.","take off = (for a plane) leave the ground."],
+  ["get on","board a large vehicle","monter (dans)","Passengers can ___ the plane now.","get on = board a plane, bus or train."],
+  ["get off","leave a large vehicle","descendre (de)","We will ___ the plane as soon as it lands.","get off = leave a plane, bus or train."],
+  ["set off","begin a journey","se mettre en route, partir","We need to ___ early to avoid the traffic.","set off = start a journey."],
+  ["see off","say goodbye to a traveller","accompagner (dire au revoir)","Her family came to ___ her at the airport.","see off = go with someone to say goodbye."],
+  ["pick up","collect someone or something","récupérer, aller chercher","I'll ___ you at the arrivals gate.","pick up = collect someone or something."],
+  ["drop off","leave someone or something at a place","déposer","Can you ___ me at the terminal?","drop off = leave someone/something somewhere."],
+  ["hold up","delay","retarder","Bad weather may ___ the flight.","hold up = cause a delay."],
+  ["come back","return","revenir","She will ___ from her trip on Monday.","come back = return to a place."]
+ ],
+ d3:[
+  ["pass out","faint, lose consciousness","s'évanouir","He might ___ if he doesn't drink some water.","pass out = lose consciousness."],
+  ["come round","regain consciousness","reprendre connaissance","The patient began to ___ after the operation.","come round = become conscious again."],
+  ["get over","recover from an illness","se remettre de","It took her a week to ___ the flu.","get over = recover from an illness or problem."],
+  ["fight off","resist or defeat an illness","combattre, repousser","Vitamin C can help you ___ a cold.","fight off = resist an illness."],
+  ["look after","take care of","s'occuper de, prendre soin de","Nurses ___ their patients day and night.","look after = take care of someone."],
+  ["bring around","make someone conscious again","ranimer","The doctors managed to ___ the patient.","bring around = make an unconscious person wake up."],
+  ["check up on","make sure someone is okay","prendre des nouvelles de","The nurse will ___ the patient every hour.","check up on = check someone's condition."],
+  ["calm down","become or make less upset","se calmer","Try to ___ before the examination.","calm down = relax, stop being upset."],
+  ["break down","collapse; stop working","s'effondrer; tomber en panne","She might ___ from stress and exhaustion.","break down = collapse emotionally, or stop working."],
+  ["cut down on","reduce the amount of","réduire (sa consommation de)","The doctor told him to ___ salt and sugar.","cut down on = reduce how much you use."]
+ ],
+ d4:[
+  ["look into","investigate","enquêter sur","The police will ___ the robbery.","look into = investigate something."],
+  ["find out","discover information","découvrir, apprendre","We need to ___ who sent the message.","find out = discover a fact."],
+  ["track down","find after searching","retrouver, localiser","They managed to ___ the suspect.","track down = find after a long search."],
+  ["give away","reveal a secret","révéler, trahir","One small detail can ___ the thief's identity.","give away = reveal something accidentally."],
+  ["break into","enter by force","entrer par effraction","Someone tried to ___ the office last night.","break into = enter a place illegally."],
+  ["turn up","appear or arrive","apparaître, se présenter","The missing files finally ___ in a drawer.","turn up = appear, often unexpectedly."],
+  ["point out","draw attention to","faire remarquer, signaler","She ___ a serious mistake in the report.","point out = mention or indicate something."],
+  ["make up","invent a story","inventer","He ___ an excuse for being late.","make up = invent something untrue."],
+  ["cover up","hide the truth","dissimuler, étouffer","They tried to ___ the scandal.","cover up = hide something dishonest."],
+  ["get away with","escape punishment for","s'en tirer (sans punition)","He thought he could ___ cheating.","get away with = do wrong without being punished."]
+ ],
+ d5:[
+  ["try on","put on clothes to test them","essayer (un vêtement)","Can I ___ these shoes in size 40?","try on = put on clothes to see if they fit."],
+  ["pay for","give money for","payer","You can ___ your items at the counter.","pay for = give money to buy something."],
+  ["sell out","be completely sold","être épuisé (vendu)","The concert tickets ___ in one hour.","sell out = be sold completely."],
+  ["run out of","have no more of","être à court de","The shop ___ that model last week.","run out of = have none left."],
+  ["pick out","choose, select","choisir, sélectionner","Help me ___ a gift for my colleague.","pick out = choose from several options."],
+  ["give back","return something","rendre","Please ___ the receipt to the cashier.","give back = return something to someone."],
+  ["take back","return to the shop","rapporter, retourner","I want to ___ this jacket; it's too small.","take back = return goods to a store."],
+  ["look for","search for","chercher","I'm ___ a present for my manager.","look for = try to find something."],
+  ["queue up","wait in line","faire la queue","Customers had to ___ outside the store.","queue up = wait in a line."],
+  ["check out","pay and leave; have a look","passer en caisse; regarder","You can ___ at the self-service tills.","check out = pay and leave (a shop/hotel)."]
+ ],
+ d6:[
+  ["carry out","perform a task","effectuer","Workers ___ safety checks every morning.","carry out = perform a task or procedure."],
+  ["shut down","stop operating, close","arrêter, fermer","They will ___ the plant for maintenance.","shut down = stop a machine or close operations."],
+  ["start up","begin operating, launch","démarrer, lancer","It takes an hour to ___ the machines.","start up = begin operating."],
+  ["speed up","go faster","accélérer","We must ___ production to meet the deadline.","speed up = increase the speed."],
+  ["slow down","go slower","ralentir","Please ___ the line to reduce errors.","slow down = reduce the speed."],
+  ["cut back","reduce","réduire","The company had to ___ on spending.","cut back (on) = reduce an amount."],
+  ["bring in","introduce, bring inside","introduire, faire entrer","They will ___ new equipment next month.","bring in = introduce something new."],
+  ["send out","dispatch, distribute","envoyer, expédier","We ___ the orders every Friday.","send out = dispatch to many people."],
+  ["take over","take control of","reprendre","A new manager will ___ the night shift.","take over = take control of something."],
+  ["phase out","gradually stop using","supprimer progressivement","The factory will ___ old machines by 2026.","phase out = remove gradually."]
+ ],
+ d7:[
+  ["look after","take care of","s'occuper de","Could you ___ my plants while I'm away?","look after = take care of someone/something."],
+  ["grow up","become an adult","grandir","Children ___ so fast these days.","grow up = develop from child to adult."],
+  ["clean up","make tidy","nettoyer, ranger","Let's ___ the kitchen after dinner.","clean up = make a place tidy and clean."],
+  ["throw away","put in the bin","jeter","Don't ___ those old documents yet.","throw away = get rid of, discard."],
+  ["get along with","have a good relationship with","bien s'entendre avec","I ___ my neighbours very well.","get along with = have a friendly relationship."],
+  ["drop by","visit briefly","passer (rapidement)","Feel free to ___ this weekend.","drop by = make a short, casual visit."],
+  ["come over","visit someone's home","venir (chez quelqu'un)","Why don't you ___ for dinner tonight?","come over = come to someone's home."],
+  ["move in","start living in a new home","emménager","Our new neighbours will ___ next week.","move in = start living somewhere."],
+  ["move out","leave a home","déménager (partir)","They decided to ___ of the old flat.","move out = leave the place where you live."],
+  ["wake up","stop sleeping","se réveiller","I ___ at six o'clock every morning.","wake up = stop sleeping."]
+ ],
+ d8:[
+  ["find out","discover","découvrir","I need to ___ the exact exam date.","find out = discover information."],
+  ["look into","research, examine","se pencher sur, étudier","The professor will ___ the topic further.","look into = examine or research."],
+  ["go over","review","revoir, réviser","Let's ___ the lecture notes before the test.","go over = review carefully."],
+  ["write down","note in writing","noter, écrire","Remember to ___ the assignment details.","write down = record in writing."],
+  ["hand in","submit","rendre, remettre","You must ___ your essay by Monday.","hand in = give work to a teacher."],
+  ["point out","draw attention to","faire remarquer","The tutor ___ several errors in my work.","point out = indicate something."],
+  ["catch up","get up to date","rattraper (son retard)","I missed a class and need to ___.","catch up = reach the same level as others."],
+  ["read through","read carefully from start to end","lire en entier","Please ___ the instructions before starting.","read through = read something completely."],
+  ["work out","solve, understand","résoudre, comprendre","I can't ___ this difficult problem.","work out = solve or figure out."],
+  ["figure out","understand or solve","comprendre, trouver","She finally ___ how to use the software.","figure out = understand after thinking."]
+ ],
+ d9:[
+  ["get on","board","monter dans","Hurry up, let's ___ the train!","get on = board a train, bus or plane."],
+  ["get off","leave (train)","descendre de","We ___ at the next station.","get off = leave a train, bus or plane."],
+  ["see off","say goodbye to a traveller","accompagner","I went to ___ my friend at the station.","see off = say goodbye to someone leaving."],
+  ["pick up","collect","récupérer","I'll ___ you when your train arrives.","pick up = collect someone."],
+  ["drop off","leave someone at a place","déposer","She ___ her son at the station every day.","drop off = leave someone somewhere."],
+  ["hold up","delay","retarder","An accident ___ all the morning trains.","hold up = cause a delay."],
+  ["set off","begin a journey","partir, se mettre en route","They ___ at dawn to catch the first train.","set off = start a journey."],
+  ["come back","return","revenir","He'll ___ on the last train tonight.","come back = return."],
+  ["run late","be behind schedule","être en retard","Sorry, I'm going to ___ because of the traffic.","run late = be later than planned."],
+  ["turn back","go back the way you came","faire demi-tour","The driver had to ___ because of the floods.","turn back = return the way you came."]
+ ],
+ d10:[
+  ["hang out","spend time relaxing","traîner, passer du temps","We like to ___ in the park on Sundays.","hang out = spend time relaxing with others."],
+  ["walk around","walk in an area","se promener","Let's ___ the park for a while.","walk around = walk in a place casually."],
+  ["run into","meet by chance","tomber sur, croiser","I ___ an old friend near the fountain.","run into = meet someone unexpectedly."],
+  ["come across","find by chance","tomber sur (trouver)","I ___ a lovely café by the lake.","come across = find something by chance."],
+  ["sit down","take a seat","s'asseoir","Let's ___ on this bench for a moment.","sit down = take a seat."],
+  ["stand up","rise to your feet","se lever","Everyone ___ when the concert began.","stand up = rise to your feet."],
+  ["chill out","relax","se détendre","After the exams, I just want to ___.","chill out = relax completely."],
+  ["look around","explore visually","regarder autour, explorer","Take your time and ___ the gardens.","look around = explore a place visually."],
+  ["wander around","walk slowly with no goal","flâner, errer","We spent the afternoon ___ the old town.","wander around = stroll without a plan."],
+  ["stop by","make a short visit","passer (faire un saut)","I'll ___ the park on my way home.","stop by = visit briefly."]
+ ]
+};
+
+/* ===== State ===== */
+var SKEY="phrasalVerbCity_v1";
+function load(){ try{ return JSON.parse(localStorage.getItem(SKEY))||null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+var S = load() || { completed:{}, badges:[], totalScore:0, bestScore:0, totalCorrect:0, totalAnswered:0, music:false, dstats:{} };
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function accPct(){ return S.totalAnswered? Math.round(100*S.totalCorrect/S.totalAnswered):100; }
+function dindex(key){ for(var i=0;i<DISTRICTS.length;i++) if(DISTRICTS[i].key===key) return i; return -1; }
+function unlocked(i){ return i===0 || !!S.completed[DISTRICTS[i-1].key]; }
+function allDone(){ return DISTRICTS.every(function(d){ return S.completed[d.key]; }); }
+
+/* ===== Screens ===== */
+function showScreen(id,bg){ var secs=document.querySelectorAll(".screen"); for(var i=0;i<secs.length;i++) secs[i].classList.toggle("active", secs[i].id===id);
+  $("bg").style.backgroundImage="url('"+(bg||BG[id]||BG.menu)+"')"; window.scrollTo(0,0); }
+document.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ var d=b.getAttribute("data-go"); if(d==="map") renderMap(); showScreen(d); }); });
+
+/* ===== Music ===== */
+var audio=new Audio(AUD+"theme_phrasal_verb_city_main.mp3"+V); audio.loop=true; audio.preload="auto"; audio.volume=0.35;
+function reflectMusic(){ $("musicToggle").textContent = S.music ? "\uD83D\uDD0A Music ON" : "\uD83D\uDD07 Music OFF"; }
+function startMusic(){ try{ audio.play().catch(function(){}); }catch(e){} }
+function setMusic(on){ S.music=on; save(); reflectMusic(); if(on) startMusic(); else audio.pause(); }
+$("musicToggle").addEventListener("click", function(){ setMusic(!S.music); });
+window.addEventListener("pointerdown", function once(){ if(S.music) startMusic(); window.removeEventListener("pointerdown", once); }, {once:true});
+
+/* ===== Menu ===== */
+$("btnStart").addEventListener("click", function(){ if(S.music) startMusic(); renderMap(); showScreen("map"); });
+$("btnContinue").addEventListener("click", function(){ renderMap(); showScreen("map"); });
+$("btnMap").addEventListener("click", function(){ renderMap(); showScreen("map"); });
+$("btnHow").addEventListener("click", function(){ showScreen("how"); });
+$("btnReset").addEventListener("click", function(){ if(confirm("Reset all progress, badges and scores?")){ S={ completed:{}, badges:[], totalScore:0, bestScore:0, totalCorrect:0, totalAnswered:0, music:S.music, dstats:{} }; save(); renderMap(); } });
+
+/* ===== Map ===== */
+function renderMap(){
+  $("mapImg").src=BG.map; $("mapScore").textContent=S.totalScore;
+  $("mapDone").textContent=DISTRICTS.filter(function(d){return S.completed[d.key];}).length+"/10";
+  $("btnChallenge").style.display = allDone()? "" : "none";
+  var host=$("districtList"); host.innerHTML="";
+  DISTRICTS.forEach(function(d,i){
+    var open=unlocked(i), fin=!!S.completed[d.key];
+    var b=document.createElement("button");
+    b.className="district"+(open?"":" locked")+(fin?" done":"");
+    b.setAttribute("aria-label", d.name+(fin?" (completed)":(open?" (open)":" (locked)")));
+    b.innerHTML='<div class="thumb" style="background-image:url(\''+d.img+'\')"><span class="num">'+(i+1)+'</span><span class="ic" aria-hidden="true">'+d.icon+'</span></div>'
+      +'<div class="meta"><div class="nm">'+esc(d.name)+'</div><div class="st">'+(fin?('\u2713 '+esc(d.badge)):(open?'\u25B6 10 phrasal verbs':'\uD83D\uDD12 Locked'))+'</div></div>';
+    if(open) b.addEventListener("click", function(){ openIntro(i); });
+    host.appendChild(b);
+  });
+}
+$("btnChallenge").addEventListener("click", function(){ startChallenge(); });
+$("btnChallenge2") && $("btnChallenge2").addEventListener("click", function(){ startChallenge(); });
+
+/* ===== Intro ===== */
+var curIdx=-1, curD=null;
+function openIntro(i){
+  curIdx=i; curD=DISTRICTS[i];
+  $("introImg").src=curD.img; $("introImg").alt=curD.name;
+  $("introTheme").textContent=curD.theme;
+  $("introName").textContent=(i+1)+". "+curD.name;
+  $("introDesc").textContent="Learn 10 useful phrasal verbs about "+curD.theme.toLowerCase()+", then take the exercises.";
+  var ll=$("learnList"); ll.style.display="none"; ll.innerHTML="";
+  BANK[curD.key].forEach(function(r){ var div=document.createElement("div"); div.className="lv";
+    div.innerHTML='<b>'+esc(r[0])+'</b> \u2014 '+esc(r[1])+' <span class="fr">('+esc(r[2])+')</span>'; ll.appendChild(div); });
+  showScreen("intro", curD.img);
+}
+$("btnLearn").addEventListener("click", function(){ var ll=$("learnList"); ll.style.display = ll.style.display==="none"?"grid":"none"; });
+$("btnBeginEx").addEventListener("click", function(){ startQuiz(curIdx); });
+
+/* ===== Quiz ===== */
+var mode="district", queue=[], pos=0, answered=false, hintUsed=false, streak=0, dKey=null, dCorrect=0, lives=0;
+function makeQ(entry, pool, idx){
+  var v=entry[0], m=entry[1], fr=entry[2], ex=entry[3], expl=entry[4];
+  var others=shuffle(pool.filter(function(p){return p[0]!==v;})).slice(0,3).map(function(p){return p[0];});
+  var opts=shuffle([v].concat(others));
+  var gap=(idx%2===0);
+  var prompt = gap ? ('Complete the sentence:<br><span style="font-weight:600">'+esc(ex.replace("___","______"))+'</span>')
+                   : ('Which phrasal verb means:<br><span style="font-weight:600">\u00ab '+esc(m)+' \u00bb</span>?');
+  return { v:v,m:m,fr:fr,ex:ex,expl:expl, opts:opts, a:opts.indexOf(v), tag:(gap?"Gap fill":"Meaning") , prompt:prompt };
+}
+function startQuiz(i){
+  mode="district"; curIdx=i; var d=DISTRICTS[i]; dKey=d.key; dCorrect=0; streak=0;
+  var pool=BANK[d.key];
+  queue=shuffle(pool.map(function(e){return e;})).map(function(e,k){ return makeQ(e,pool,k); });
+  pos=0; $("quizDistrict").textContent=(i+1)+". "+d.name; $("quizTheme").textContent="Exercises"; $("qLives").style.display="none";
+  showScreen("quiz", d.img); showQ();
+}
+function startChallenge(){
+  mode="challenge"; streak=0; lives=3;
+  var all=[]; DISTRICTS.forEach(function(d){ BANK[d.key].forEach(function(e){ all.push({e:e,pool:BANK[d.key]}); }); });
+  queue=shuffle(all).slice(0,15).map(function(o,k){ return makeQ(o.e,o.pool,k); });
+  pos=0; $("quizDistrict").textContent="\u26A1 Challenge mode"; $("quizTheme").textContent="Random questions"; $("qLives").style.display="";
+  showScreen("quiz", BG.how); showQ();
+}
+function updHud(){
+  $("qNum").textContent=(pos+1)+"/"+queue.length; $("qScore").textContent=S.totalScore; $("qAcc").textContent=accPct()+"%";
+  $("qStreakChip").style.display = streak>=2 ? "" : "none"; $("qStreak").textContent=streak;
+  if(mode==="challenge"){ $("qLives").textContent="\u2764".repeat(lives)+"\u2661".repeat(3-lives); }
+  $("qBar").style.width=Math.round(100*pos/queue.length)+"%";
+}
+function showQ(){
+  answered=false; hintUsed=false; updHud();
+  var q=queue[pos], opts="";
+  q.opts.forEach(function(o,k){ opts+='<button class="opt" data-k="'+k+'"><span class="k">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'; });
+  $("quizArea").innerHTML='<p class="q"><span class="tag">'+q.tag+'</span><br>'+q.prompt+'</p><div class="opts">'+opts+'</div>'
+    +'<div class="why" id="why"></div><div class="action-row"><button class="btn ghost small" id="hintBtn">\uD83D\uDCA1 Hint (\u22122)</button>'
+    +'<button class="btn primary" id="nextBtn" style="display:none">Next \u2192</button></div>';
+  Array.prototype.forEach.call($("quizArea").querySelectorAll(".opt"), function(btn){ btn.addEventListener("click", function(){ answer(+btn.getAttribute("data-k")); }); });
+  $("hintBtn").addEventListener("click", hint); $("nextBtn").addEventListener("click", next);
+}
+function hint(){
+  if(answered||hintUsed) return; hintUsed=true; S.totalScore=Math.max(0,S.totalScore-2); save();
+  var q=queue[pos], w=$("why"); w.className="why show";
+  w.innerHTML='<span class="pv">\uD83D\uDCA1 Hint:</span> it means \u00ab '+esc(q.m)+' \u00bb. <span class="muted">(\u22122 points)</span>';
+  $("hintBtn").disabled=true; updHud();
+}
+function answer(k){
+  if(answered) return; answered=true;
+  var q=queue[pos], ok=(k===q.a);
+  Array.prototype.forEach.call($("quizArea").querySelectorAll(".opt"), function(b){ b.disabled=true; var bk=+b.getAttribute("data-k"); if(bk===q.a) b.classList.add("ok"); else if(bk===k) b.classList.add("no"); });
+  var hb=$("hintBtn"); if(hb) hb.disabled=true;
+  S.totalAnswered++;
+  var bonus=false;
+  if(ok){ S.totalCorrect++; dCorrect++; streak++; S.totalScore+=10; if(streak%3===0){ S.totalScore+=5; bonus=true; } if(S.totalScore>S.bestScore) S.bestScore=S.totalScore; }
+  else { streak=0; if(mode==="challenge") lives--; }
+  save();
+  var ex=q.ex.replace("___","<b>"+esc(q.v)+"</b>");
+  var w=$("why"); w.className="why show";
+  w.innerHTML='<span class="pv">'+(ok?"\u2705 Correct! ":"\u274C Answer: ")+esc(q.v)+'</span> \u2014 <span class="fr">'+esc(q.m)+' ('+esc(q.fr)+')</span>'
+    +(bonus?' <span style="color:var(--coral);font-weight:700">+5 streak bonus \uD83D\uDD25</span>':'')
+    +'<br><span class="ex">'+ex+'</span><br>'+esc(q.expl);
+  updHud();
+  if(mode==="challenge" && lives<=0){ setTimeout(gameover, 850); return; }
+  $("nextBtn").style.display="";
+}
+function next(){ pos++; if(pos>=queue.length){ finish(); return; } showQ(); }
+function finish(){
+  if(mode==="challenge"){ victory(true); return; }
+  S.completed[dKey]=true; var d=DISTRICTS[dindex(dKey)];
+  if(S.badges.indexOf(d.badge)<0) S.badges.push(d.badge);
+  S.dstats[dKey]={correct:dCorrect, total:queue.length}; save();
+  if(allDone()){ victory(false); return; }
+  renderMap(); showScreen("map");
+  flash("\u2705 "+d.name+" repaired! Badge: "+d.badge+" \u2014 "+dCorrect+"/"+queue.length+" correct");
+}
+
+/* ===== Victory / Game over ===== */
+function victory(fromChallenge){
+  showScreen("victory", BG.victory); $("winImg").src=BG.victory;
+  $("vScore").textContent=S.totalScore; $("vAcc").textContent=accPct()+"%"; $("vBadges").textContent=S.badges.length+"/10";
+  var best=null,worst=null;
+  DISTRICTS.forEach(function(d){ var st=S.dstats[d.key]; if(!st) return; var r=st.correct/st.total; if(best===null||r>best.r) best={n:d.name,r:r}; if(worst===null||r<worst.r) worst={n:d.name,r:r}; });
+  $("vBestWeak").textContent = best ? ("Best district: "+best.n+" ("+Math.round(best.r*100)+"%) \u00B7 To review: "+worst.n+" ("+Math.round(worst.r*100)+"%)") : "";
+  fireConfetti();
+}
+function gameover(){ showScreen("gameover", BG.gameover); $("overImg").src=BG.gameover; }
+$("btnTryAgain") && $("btnTryAgain").addEventListener("click", function(){ startChallenge(); });
+$("btnRestartAll") && $("btnRestartAll").addEventListener("click", function(){ if(confirm("Restart from the beginning? (badges and scores will be reset)")){ S.completed={};S.badges=[];S.totalScore=0;S.totalCorrect=0;S.totalAnswered=0;S.dstats={}; save(); renderMap(); showScreen("map"); } });
+
+function flash(msg){
+  var t=document.createElement("div"); t.textContent=msg;
+  t.style.cssText="position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--blue-d);color:#fff;padding:12px 20px;border-radius:999px;font-family:var(--display);font-weight:700;z-index:60;box-shadow:var(--shadow);max-width:92vw;text-align:center";
+  document.body.appendChild(t); setTimeout(function(){ t.style.transition="opacity .5s"; t.style.opacity="0"; setTimeout(function(){ t.remove(); },500); }, 2200);
+}
+function fireConfetti(){
+  var c=document.createElement("canvas"); c.className="confetti"; document.body.appendChild(c);
+  var ctx=c.getContext&&c.getContext("2d"); if(!ctx){ c.remove(); return; }
+  function rs(){ c.width=innerWidth; c.height=innerHeight; } rs();
+  var cols=["#4F8FE0","#3FB6A8","#6BC68B","#E7B54C","#E79BC0","#9B86D6"];
+  var P=[]; for(var i=0;i<150;i++) P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:4+Math.random()*6,vy:2+Math.random()*4,vx:-1+Math.random()*2,col:cols[i%cols.length],a:Math.random()*6});
+  var t0=Date.now();
+  (function loop(){ ctx.clearRect(0,0,c.width,c.height); P.forEach(function(p){ p.y+=p.vy;p.x+=p.vx;p.a+=.1; ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.col;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);ctx.restore(); if(p.y>c.height)p.y=-10; });
+    if(Date.now()-t0<3500) requestAnimationFrame(loop); else c.remove(); })();
+}
+
+/* ===== Test hook ===== */
+window.__PVC={ S:function(){return S;}, startQuiz:startQuiz, startChallenge:startChallenge, openIntro:openIntro,
+  screen:function(){var a=document.querySelector(".screen.active");return a&&a.id;}, correct:function(){return queue[pos]?queue[pos].a:null;},
+  answer:answer, next:next, hint:hint, qlen:function(){return queue.length;}, lives:function(){return lives;}, mode:function(){return mode;} };
+
+/* ===== Init ===== */
+reflectMusic(); showScreen("menu");
+</script>
+</body>
+</html>
