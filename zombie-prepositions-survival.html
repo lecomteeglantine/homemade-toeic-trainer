@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1b1f15" />
+<meta name="description" content="Zombie Grammar Survival — mini-jeu TOEIC pour réviser les prépositions anglaises (temps, lieu, mouvement, monde professionnel). Réponds juste pour renforcer la barricade et sauver la ville !" />
+<title>Zombie Grammar Survival · Homemade TOEIC Trainer</title>
+<style>
+  /* =========================================================
+     ZOMBIE GRAMMAR SURVIVAL — standalone game
+     Single file: HTML + CSS + JS. No frameworks, no libraries.
+     Drop on GitHub Pages alongside:
+        images/zombie_grammar_main.png
+        images/zombie_preposition_bunker.png
+        images/zombie_office_corridor.png
+        images/zombie_victory_survivors.png
+        images/zombie_game_over.png
+        audio/theme_zombie_grammar_survival.mp3
+     ========================================================= */
+
+  :root{
+    --bg:#0c0f0a;
+    --ink:#f2efe6;
+    --muted:#b9c0aa;
+    --green:#8fc93a;       /* acid green - primary */
+    --green-d:#5e8a1f;
+    --blue:#3f7cc4;
+    --purple:#7b5ec4;
+    --orange:#e08a2b;
+    --red:#c0392b;
+    --red-d:#7e2017;
+    --steel:#3a4149;
+    --steel-d:#262b30;
+    --paper:#e9dcc0;
+    --paper-d:#cdbe9c;
+    --gold:#f0c542;
+    --panel:rgba(14,18,12,.82);
+    --panel-line:rgba(143,201,58,.32);
+    --shadow:0 10px 30px rgba(0,0,0,.55);
+    --radius:14px;
+    --font:"Trebuchet MS","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:var(--font);
+    background:#070906;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* The whole game lives in one stage */
+  #stage{
+    position:relative;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---- Screens ---- */
+  .screen{ display:none; position:relative; flex:1; min-height:100vh; min-height:100dvh; }
+  .screen.active{ display:flex; flex-direction:column; }
+  .screen.shake{ animation:shake .42s ease both; }
+  @keyframes shake{
+    0%,100%{transform:translate(0,0)}
+    15%{transform:translate(-9px,3px)}
+    30%{transform:translate(8px,-4px)}
+    45%{transform:translate(-7px,2px)}
+    60%{transform:translate(6px,3px)}
+    75%{transform:translate(-4px,-2px)}
+  }
+
+  /* Background image with dark overlay + graceful fallback */
+  .screen-bg{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; z-index:0;
+  }
+  .screen::before{ /* dark wash for readability + fallback colour if image missing */
+    content:""; position:absolute; inset:0; z-index:1;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(0,0,0,.15), rgba(0,0,0,.72) 70%),
+      linear-gradient(180deg, rgba(8,10,7,.55), rgba(8,10,7,.78));
+  }
+  .screen-inner{
+    position:relative; z-index:2;
+    width:100%; max-width:980px; margin:auto;
+    padding:clamp(16px,4vw,40px);
+  }
+
+  /* ---- Typography helpers ---- */
+  .title{
+    font-weight:900; line-height:.95; letter-spacing:1px;
+    text-transform:uppercase; margin:0;
+  }
+  .glow-green{ color:var(--green); text-shadow:0 2px 0 #2c4310, 0 0 18px rgba(143,201,58,.45); }
+  .glow-red{ color:#ff5a3c; text-shadow:0 2px 0 #4a0f08, 0 0 18px rgba(192,57,43,.5); }
+  .stroke{ -webkit-text-stroke:1px rgba(0,0,0,.6); }
+  .eyebrow{
+    display:inline-block; font-size:.72rem; letter-spacing:3px; text-transform:uppercase;
+    color:var(--green); background:rgba(0,0,0,.45); border:1px solid var(--panel-line);
+    padding:5px 12px; border-radius:999px; margin-bottom:14px; font-weight:700;
+  }
+  .lede{ color:var(--muted); font-size:clamp(.95rem,2.4vw,1.1rem); line-height:1.5; }
+
+  /* ---- Buttons ---- */
+  .btn{
+    display:flex; align-items:center; gap:12px;
+    width:100%; border:0; cursor:pointer;
+    font-family:inherit; font-weight:800; letter-spacing:.6px; text-transform:uppercase;
+    font-size:clamp(1rem,2.6vw,1.18rem); color:#0e1206;
+    padding:16px 20px; border-radius:12px;
+    background:linear-gradient(180deg,#a6dd4d,#73a925); color:#10210a;
+    box-shadow:0 6px 0 #355111, var(--shadow);
+    transition:transform .08s ease, box-shadow .08s ease, filter .15s ease;
+    text-align:left;
+  }
+  .btn .ico{ font-size:1.25em; line-height:1; min-width:1.3em; text-align:center; }
+  .btn:hover{ filter:brightness(1.06); }
+  .btn:active{ transform:translateY(4px); box-shadow:0 2px 0 #355111, var(--shadow); }
+  .btn:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
+  .btn.blue{ background:linear-gradient(180deg,#5f9fe0,#3a6fb0); color:#fff; box-shadow:0 6px 0 #1f3f63, var(--shadow); }
+  .btn.purple{ background:linear-gradient(180deg,#9b7ee0,#6a4fb6); color:#fff; box-shadow:0 6px 0 #3a2870, var(--shadow); }
+  .btn.orange{ background:linear-gradient(180deg,#f0a23f,#cf7918); color:#2a1604; box-shadow:0 6px 0 #804408, var(--shadow); }
+  .btn.steel{ background:linear-gradient(180deg,#5a636d,#39414a); color:#fff; box-shadow:0 6px 0 #1c2127, var(--shadow); }
+  .btn.red{ background:linear-gradient(180deg,#e35a48,#a82b1c); color:#fff; box-shadow:0 6px 0 #5e160e, var(--shadow); }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; filter:grayscale(.4); }
+  .btn.small{ font-size:.95rem; padding:11px 14px; width:auto; box-shadow:0 4px 0 rgba(0,0,0,.4), var(--shadow); }
+
+  .btn-stack{ display:flex; flex-direction:column; gap:14px; max-width:520px; }
+
+  /* ---- Menu ---- */
+  #screen-menu .screen-inner{ display:grid; gap:18px; }
+  .brandline{ font-size:.8rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+  .menu-title{ font-size:clamp(2.4rem,9vw,4.6rem); }
+  .menu-sub{ color:var(--muted); margin:.2rem 0 .4rem; font-weight:700; letter-spacing:1px; }
+  .menu-sub b{ color:var(--green); }
+  .mission-card{
+    background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow); max-width:520px;
+  }
+  .mission-card h3{ margin:0 0 8px; color:var(--green); letter-spacing:1px; font-size:.9rem; text-transform:uppercase;}
+  .mission-card ul{ margin:0; padding-left:1.1em; color:var(--muted); line-height:1.6; font-size:.92rem; }
+
+  /* ---- HUD (gameplay) ---- */
+  #screen-game .screen-inner{ max-width:920px; }
+  .hud{
+    display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between;
+    background:var(--panel); border:1px solid var(--panel-line); border-radius:12px;
+    padding:10px 14px; box-shadow:var(--shadow);
+  }
+  .hud-group{ display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.5px; }
+  .hud-label{ font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+  .hearts{ letter-spacing:2px; font-size:1.05rem; }
+  .heart{ color:var(--red); }
+  .heart.lost{ color:#3a3a3a; }
+  .barricade-wrap{ display:flex; align-items:center; gap:8px; }
+  .barricade-bar{ width:120px; max-width:34vw; height:14px; background:#1a1d16; border:1px solid #000; border-radius:8px; overflow:hidden; box-shadow:inset 0 0 4px #000;}
+  .barricade-fill{ height:100%; width:100%; background:linear-gradient(90deg,#73a925,#a6dd4d); transition:width .5s ease, background .5s ease; }
+  .barricade-fill.warn{ background:linear-gradient(90deg,#e08a2b,#f0c542); }
+  .barricade-fill.danger{ background:linear-gradient(90deg,#a82b1c,#e35a48); }
+  .stat-num{ color:var(--green); }
+  .stat-num.score{ color:var(--gold); }
+
+  .zone-banner{
+    margin:16px 0 10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .zone-banner h2{ margin:0; font-size:clamp(1.1rem,4vw,1.5rem); text-transform:uppercase; letter-spacing:1px; }
+  .qcount{ font-weight:800; color:var(--muted); background:rgba(0,0,0,.5); border:1px solid var(--panel-line); padding:5px 12px; border-radius:999px; font-size:.85rem;}
+
+  /* Question card = parchment */
+  .qcard{
+    background:linear-gradient(180deg,#efe3c8,#d8c8a4);
+    color:#2a2417; border-radius:16px; padding:clamp(16px,3vw,26px);
+    border:2px solid #b09a6c; box-shadow:var(--shadow), inset 0 1px 0 #fff6e0;
+  }
+  .qtext{ font-size:clamp(1.1rem,3.4vw,1.5rem); font-weight:700; line-height:1.45; margin:0 0 16px; }
+  .qtext .blank{ color:#a82b1c; font-weight:900; border-bottom:3px solid #a82b1c; padding:0 .15em; }
+  .answers{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ans{
+    display:flex; align-items:center; gap:12px; text-align:left;
+    background:linear-gradient(180deg,#c8cdc2,#9aa195); color:#1c2118;
+    border:2px solid #6f7568; border-radius:12px; padding:13px 15px;
+    font-family:inherit; font-size:clamp(1rem,2.7vw,1.12rem); font-weight:700; cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,.3); transition:transform .07s, box-shadow .07s, background .2s;
+  }
+  .ans .letter{
+    display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; min-width:30px; border-radius:50%;
+    background:#2a2f25; color:#fff; font-weight:900; font-size:.95rem;
+  }
+  .ans:hover:not([disabled]){ filter:brightness(1.05); }
+  .ans:active:not([disabled]){ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.3); }
+  .ans:focus-visible{ outline:3px solid #1c5fb0; outline-offset:2px; }
+  .ans.correct{ background:linear-gradient(180deg,#a6dd4d,#6fa322); color:#10210a; border-color:#3a5a12; box-shadow:0 4px 0 #2c4310; }
+  .ans.wrong{ background:linear-gradient(180deg,#e35a48,#a82b1c); color:#fff; border-color:#5e160e; box-shadow:0 4px 0 #5e160e; }
+  .ans .mark{ margin-left:auto; font-weight:900; }
+  .ans[disabled]{ cursor:default; }
+
+  .feedback{
+    margin-top:14px; border-radius:12px; padding:12px 14px; font-size:.96rem; line-height:1.45;
+    display:none; border:2px solid;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:#e6f4d4; color:#2e4a10; border-color:#7fae35; }
+  .feedback.bad{ background:#f7dcd6; color:#6b1c12; border-color:#c0392b; }
+  .feedback .tag{ font-weight:900; text-transform:uppercase; letter-spacing:1px; margin-right:6px; }
+
+  .qcard-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .hint-box{
+    margin-top:12px; display:none; background:#2a2f25; color:#f3ecd6; border:1px dashed var(--gold);
+    border-radius:10px; padding:10px 13px; font-size:.92rem;
+  }
+  .hint-box.show{ display:block; }
+  .hint-box b{ color:var(--gold); }
+
+  .game-footer{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:space-between; }
+  .game-footer .left,.game-footer .right{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* ---- Zone select cards ---- */
+  .zones-head{ text-align:center; margin-bottom:18px; }
+  .zone-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .zone-card{
+    position:relative; text-align:left; cursor:pointer;
+    background:var(--panel); border:2px solid var(--panel-line); border-radius:14px;
+    padding:16px 14px 14px; color:var(--ink); font-family:inherit;
+    box-shadow:var(--shadow); transition:transform .1s, border-color .15s;
+    display:flex; flex-direction:column; gap:6px; min-height:170px;
+  }
+  .zone-card:hover:not([disabled]){ transform:translateY(-4px); border-color:var(--green); }
+  .zone-card:focus-visible{ outline:3px solid var(--green); outline-offset:3px; }
+  .zone-card[disabled]{ cursor:not-allowed; opacity:.6; filter:grayscale(.5); }
+  .zone-num{
+    position:absolute; top:-12px; left:14px; width:30px; height:30px; border-radius:8px;
+    background:var(--green); color:#10210a; font-weight:900; display:flex; align-items:center; justify-content:center;
+    border:2px solid #2c4310;
+  }
+  .zone-card.z2 .zone-num{ background:var(--blue); color:#fff;border-color:#1f3f63}
+  .zone-card.z3 .zone-num{ background:var(--purple); color:#fff;border-color:#3a2870}
+  .zone-card.z4 .zone-num{ background:var(--orange); color:#2a1604;border-color:#804408}
+  .zone-ico{ font-size:2rem; }
+  .zone-name{ font-weight:900; text-transform:uppercase; letter-spacing:.5px; font-size:1rem; }
+  .zone-card.z1 .zone-name{ color:var(--green); }
+  .zone-card.z2 .zone-name{ color:#79b0ec; }
+  .zone-card.z3 .zone-name{ color:#b49bf0; }
+  .zone-card.z4 .zone-name{ color:#f0a23f; }
+  .zone-desc{ color:var(--muted); font-size:.82rem; line-height:1.35; }
+  .zone-status{ margin-top:auto; font-size:.78rem; font-weight:800; letter-spacing:.5px; }
+  .zone-status .lock{ color:var(--muted); }
+  .zone-status .done{ color:var(--green); }
+  .zone-status .open{ color:var(--gold); }
+
+  /* ---- Result screens (game over / victory) ---- */
+  .result-card{
+    background:var(--panel); border:1px solid var(--panel-line); border-radius:16px;
+    padding:clamp(16px,3vw,26px); box-shadow:var(--shadow); margin-top:8px;
+  }
+  .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:14px 0; }
+  .stat-box{ background:rgba(0,0,0,.4); border:1px solid var(--panel-line); border-radius:12px; padding:12px 14px; }
+  .stat-box .k{ font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); }
+  .stat-box .v{ font-size:1.5rem; font-weight:900; color:var(--green); }
+  .stat-box .v.score{ color:var(--gold); }
+  .stat-box .v.bad{ color:#ff5a3c; }
+
+  /* ---- Review mistakes ---- */
+  .review-list{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
+  .review-item{ background:rgba(0,0,0,.45); border:1px solid var(--panel-line); border-left:5px solid var(--red); border-radius:10px; padding:12px 14px; }
+  .review-item .rq{ font-weight:700; margin-bottom:8px; }
+  .review-item .rrow{ font-size:.9rem; margin:3px 0; }
+  .review-item .yours{ color:#ff8a78; }
+  .review-item .right{ color:var(--green); }
+  .review-item .exp{ color:var(--muted); font-size:.86rem; margin-top:6px; }
+  .review-empty{ color:var(--muted); }
+
+  .howto-card{ background:var(--panel); border:1px solid var(--panel-line); border-radius:16px; padding:clamp(16px,3vw,24px); box-shadow:var(--shadow); }
+  .howto-card ol{ line-height:1.7; padding-left:1.2em; }
+  .howto-card li b{ color:var(--green); }
+
+  /* ---- Persistent music button ---- */
+  #music-fab{
+    position:fixed; top:12px; right:12px; z-index:50;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(10,14,8,.85); border:1px solid var(--panel-line); color:var(--ink);
+    border-radius:999px; padding:9px 14px; font-family:inherit; font-weight:800; letter-spacing:.5px;
+    cursor:pointer; box-shadow:var(--shadow); font-size:.82rem; text-transform:uppercase;
+  }
+  #music-fab:hover{ border-color:var(--green); }
+  #music-fab:focus-visible{ outline:3px solid var(--green); outline-offset:2px; }
+  #music-fab .dot{ width:9px; height:9px; border-radius:50%; background:#666; }
+  #music-fab.on .dot{ background:var(--green); box-shadow:0 0 8px var(--green); }
+
+  /* toast for streak / events */
+  #toast{
+    position:fixed; left:50%; top:64px; transform:translateX(-50%) translateY(-20px);
+    z-index:60; background:linear-gradient(180deg,#a6dd4d,#6fa322); color:#10210a;
+    font-weight:900; letter-spacing:1px; text-transform:uppercase; padding:12px 22px;
+    border-radius:999px; box-shadow:var(--shadow); opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s; border:2px solid #2c4310;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.danger{ background:linear-gradient(180deg,#e35a48,#a82b1c); color:#fff; border-color:#5e160e; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+
+  /* ---- Responsive ---- */
+  @media (max-width:640px){
+    .zone-grid{ grid-template-columns:1fr 1fr; }
+    .answers{ grid-template-columns:1fr; }    /* stack answers vertically on mobile */
+    .hud{ gap:8px 12px; padding:8px 10px; }
+    .hud-group{ font-size:.92rem; }
+    .barricade-bar{ width:90px; }
+  }
+  @media (max-width:420px){
+    .zone-grid{ grid-template-columns:1fr; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Persistent music control (visible on every screen) -->
+<button id="music-fab" class="on" aria-pressed="true" aria-label="Activer ou couper la musique">
+  <span class="dot" aria-hidden="true"></span><span id="music-fab-text">Music On</span>
+</button>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Hidden audio. Will not crash if the file is missing. -->
+<audio id="bgm" loop preload="auto">
+  <source src="audio/theme_zombie_grammar_survival.mp3" type="audio/mpeg" />
+</audio>
+
+<main id="stage">
+
+  <!-- ============ MAIN MENU ============ -->
+  <section id="screen-menu" class="screen active" aria-label="Menu principal">
+    <img class="screen-bg" src="images/zombie_grammar_main.png"
+         alt="Une rue de ville la nuit envahie par des zombies devant le centre d'entraînement TOEIC."
+         onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <span class="brandline">Homemade TOEIC Trainer · Mini-jeu</span>
+      <h1 class="title menu-title"><span class="glow-green stroke">Zombie</span><br><span class="stroke">Grammar Survival</span></h1>
+      <p class="menu-sub">Survis à l'épidémie de grammaire. <b>Sauve la ville TOEIC&nbsp;!</b></p>
+
+      <div class="btn-stack">
+        <button class="btn" id="btn-start"><span class="ico" aria-hidden="true">🎯</span> Start Survival</button>
+        <button class="btn blue" id="btn-continue"><span class="ico" aria-hidden="true">🎒</span> Continue</button>
+        <button class="btn purple" id="btn-zones"><span class="ico" aria-hidden="true">🗺️</span> Choose Grammar Zone</button>
+        <button class="btn orange" id="btn-howto"><span class="ico" aria-hidden="true">⚙️</span> How to Play</button>
+        <button class="btn steel" id="btn-reset"><span class="ico" aria-hidden="true">🗑️</span> Reset Progress</button>
+        <!-- BACK TO TOEIC TRAINER -->
+        <a class="btn red" id="btn-back-home" href="index.html"><span class="ico" aria-hidden="true">🏠</span> Back to TOEIC Trainer</a>
+      </div>
+
+      <div class="mission-card" style="margin-top:6px">
+        <h3>Your mission</h3>
+        <ul>
+          <li><b>Answer questions</b> — repousse les zombies avec la bonne préposition.</li>
+          <li><b>Earn points</b> — chaque bonne réponse renforce ta barricade.</li>
+          <li><b>Survive</b> — ne les laisse pas entrer&nbsp;!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ZONE SELECT ============ -->
+  <section id="screen-zones" class="screen" aria-label="Choisir une zone de grammaire">
+    <img class="screen-bg" src="images/zombie_preposition_bunker.png"
+         alt="L'intérieur d'un bunker fortifié contre les zombies, avec des panneaux de survie."
+         onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <div class="zones-head">
+        <span class="eyebrow">Preposition Bunker</span>
+        <h2 class="title" style="font-size:clamp(1.6rem,6vw,2.6rem)"><span class="glow-green stroke">Choisis ta zone</span></h2>
+        <p class="lede">Tiens la ligne. Maîtrise les prépositions. Termine une zone pour débloquer la suivante.</p>
+      </div>
+      <div class="zone-grid" id="zone-grid"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;justify-content:center">
+        <button class="btn steel small" data-nav="menu"><span class="ico" aria-hidden="true">←</span> Back to Map</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW TO PLAY ============ -->
+  <section id="screen-howto" class="screen" aria-label="Comment jouer">
+    <img class="screen-bg" src="images/zombie_preposition_bunker.png" alt="" onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <span class="eyebrow">Survival Guide</span>
+      <h2 class="title" style="font-size:clamp(1.6rem,6vw,2.6rem)"><span class="glow-green stroke">How to Play</span></h2>
+      <div class="howto-card" style="margin-top:14px">
+        <ol>
+          <li><b>Choisis une zone</b> de grammaire (Time, Place, Movement, Work).</li>
+          <li><b>Réponds correctement</b> aux questions de prépositions.</li>
+          <li>Une bonne réponse <b>renforce la barricade</b> (+5%) et te donne des points (+10).</li>
+          <li>Une mauvaise réponse <b>laisse les zombies approcher</b> : −1 vie, barricade −20%.</li>
+          <li>Besoin d'aide&nbsp;? Utilise un <b>indice</b> (−2 points), mais avec parcimonie.</li>
+          <li>3 bonnes réponses d'affilée&nbsp;= <b>Survivor streak&nbsp;!</b> (+5 points bonus).</li>
+          <li><b>Termine les 4 zones</b> (40 questions) pour sauver la ville&nbsp;!</li>
+        </ol>
+        <p class="lede" style="margin:6px 0 0">Tu perds si tes vies tombent à 0 <em>ou</em> si la barricade atteint 0%.</p>
+      </div>
+      <div style="margin-top:18px"><button class="btn small" data-nav="menu"><span class="ico" aria-hidden="true">←</span> Back to Menu</button></div>
+    </div>
+  </section>
+
+  <!-- ============ GAMEPLAY ============ -->
+  <section id="screen-game" class="screen" aria-label="Jeu en cours">
+    <img class="screen-bg" src="images/zombie_office_corridor.png"
+         alt="Un couloir de bureau sombre avec des zombies qui avancent vers le joueur."
+         onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <!-- HUD -->
+      <div class="hud" role="region" aria-label="Statistiques de survie">
+        <div class="hud-group" aria-label="Vies">
+          <span class="hud-label">Lives</span>
+          <span class="hearts" id="hud-lives"></span>
+        </div>
+        <div class="hud-group barricade-wrap" aria-label="Barricade">
+          <span class="hud-label">Barricade</span>
+          <span class="barricade-bar"><span class="barricade-fill" id="hud-barricade"></span></span>
+          <span id="hud-barricade-pct" class="stat-num">100%</span>
+        </div>
+        <div class="hud-group" aria-label="Score">
+          <span class="hud-label">Score</span><span class="stat-num score" id="hud-score">0</span>
+        </div>
+        <div class="hud-group" aria-label="Série">
+          <span class="hud-label">Streak</span><span class="stat-num" id="hud-streak">x0</span>
+        </div>
+      </div>
+
+      <div class="zone-banner">
+        <h2 id="game-zone-name" class="glow-green stroke">Time Zone</h2>
+        <span class="qcount" id="game-qcount">Question 1 / 10</span>
+      </div>
+
+      <!-- Question card -->
+      <div class="qcard">
+        <p class="qtext" id="qtext"></p>
+        <div class="answers" id="answers"></div>
+
+        <div class="hint-box" id="hint-box"><b>💡 Indice :</b> <span id="hint-text"></span></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+
+        <div class="qcard-actions">
+          <button class="btn orange small" id="btn-hint"><span class="ico" aria-hidden="true">💡</span> Hint (−2)</button>
+          <button class="btn small" id="btn-next" style="display:none"><span class="ico" aria-hidden="true">▶</span> Continue</button>
+        </div>
+      </div>
+
+      <div class="game-footer">
+        <div class="left">
+          <button class="btn steel small" data-nav="zones"><span class="ico" aria-hidden="true">←</span> Retreat (Map)</button>
+        </div>
+        <div class="right">
+          <a class="btn red small" href="index.html"><span class="ico" aria-hidden="true">🏠</span> TOEIC Trainer</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VICTORY ============ -->
+  <section id="screen-victory" class="screen" aria-label="Victoire">
+    <img class="screen-bg" src="images/zombie_victory_survivors.png"
+         alt="Des survivants célèbrent au lever du soleil sous une bannière 'City Saved'."
+         onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <span class="eyebrow">The zombies are in retreat!</span>
+      <h2 class="title" style="font-size:clamp(2rem,8vw,3.6rem)"><span class="stroke" style="color:#fff">City Saved!</span></h2>
+      <p class="lede">Tu as survécu à l'épidémie de grammaire et maîtrisé toutes les prépositions.</p>
+
+      <div class="result-card">
+        <div class="stats-grid" id="victory-stats"></div>
+        <div class="btn-stack" style="max-width:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+          <button class="btn" data-nav="newgame"><span class="ico" aria-hidden="true">🔄</span> Play Again</button>
+          <button class="btn purple" id="btn-review-victory"><span class="ico" aria-hidden="true">📓</span> Review Mistakes</button>
+          <a class="btn blue" href="index.html"><span class="ico" aria-hidden="true">🏠</span> Back to TOEIC Trainer</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GAME OVER ============ -->
+  <section id="screen-gameover" class="screen" aria-label="Partie terminée">
+    <img class="screen-bg" src="images/zombie_game_over.png"
+         alt="Écran sombre 'Game Over' : la ville a été envahie par les zombies."
+         onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <span class="eyebrow" style="color:#ff5a3c;border-color:rgba(192,57,43,.5)">The zombies broke through</span>
+      <h2 class="title" style="font-size:clamp(2.2rem,9vw,4rem)"><span class="glow-red stroke">Game Over</span></h2>
+      <p class="lede">La ville a été envahie… mais chaque survivant apprend de ses erreurs.</p>
+
+      <div class="result-card">
+        <div class="stats-grid" id="gameover-stats"></div>
+        <div class="btn-stack" style="max-width:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+          <button class="btn" data-nav="newgame"><span class="ico" aria-hidden="true">🔄</span> Try Again</button>
+          <button class="btn orange" id="btn-review-gameover"><span class="ico" aria-hidden="true">📓</span> Review Lessons</button>
+          <a class="btn blue" href="index.html"><span class="ico" aria-hidden="true">🏠</span> Back to TOEIC Trainer</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REVIEW MISTAKES ============ -->
+  <section id="screen-review" class="screen" aria-label="Revoir les erreurs">
+    <img class="screen-bg" src="images/zombie_preposition_bunker.png" alt="" onerror="this.style.display='none'">
+    <div class="screen-inner">
+      <span class="eyebrow">Phrasal Notebook · Review</span>
+      <h2 class="title" style="font-size:clamp(1.6rem,6vw,2.6rem)"><span class="glow-green stroke">Review Mistakes</span></h2>
+      <p class="lede">Relis chaque erreur : ta réponse, la bonne réponse et la règle. C'est là qu'on progresse.</p>
+      <div class="review-list" id="review-list"></div>
+      <div style="margin-top:18px"><button class="btn small" id="btn-review-back"><span class="ico" aria-hidden="true">←</span> Back</button></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+"use strict";
+/* =========================================================
+   DATA — 40 original TOEIC-style preposition questions
+   B1/B2 context: meetings, emails, deadlines, offices, travel...
+   ========================================================= */
+const QUESTIONS = [
+  /* ---------- ZONE 1 — PREPOSITIONS OF TIME ---------- */
+  { zone:"time", question:"The weekly meeting starts ___ 9 a.m. sharp.", options:["in","on","at","by"], correctAnswer:"at",
+    explanation:"On utilise AT pour une heure précise de l'horloge (at 9 a.m., at noon).", hint:"Une heure exacte sur l'horloge." },
+  { zone:"time", question:"We have a video call with the client ___ Monday morning.", options:["in","on","at","since"], correctAnswer:"on",
+    explanation:"On utilise ON pour les jours et les dates (on Monday, on 5 May).", hint:"Pense aux jours de la semaine." },
+  { zone:"time", question:"The company was founded ___ 2008.", options:["on","at","in","by"], correctAnswer:"in",
+    explanation:"On utilise IN pour les années, les mois et les saisons (in 2008, in July).", hint:"Une période longue : une année." },
+  { zone:"time", question:"Please send me the invoice ___ the end of the week.", options:["by","until","at","during"], correctAnswer:"by",
+    explanation:"BY = au plus tard à ce moment (deadline). UNTIL = jusqu'à ce moment de façon continue.", hint:"Une date limite : pas plus tard que…" },
+  { zone:"time", question:"Phones must stay on silent ___ the presentation.", options:["since","during","by","until"], correctAnswer:"during",
+    explanation:"DURING indique 'pendant toute la durée d'un événement' (during the meeting).", hint:"Pendant tout l'événement." },
+  { zone:"time", question:"The reception desk is open ___ 6 p.m. every day.", options:["until","by","since","during"], correctAnswer:"until",
+    explanation:"UNTIL = jusqu'à ce moment (l'action continue jusque-là). BY = au plus tard à ce moment.", hint:"L'ouverture continue jusqu'à cette heure." },
+  { zone:"time", question:"She has worked for this firm ___ 2020.", options:["for","since","in","by"], correctAnswer:"since",
+    explanation:"SINCE marque un point de départ dans le temps (since 2020, since Monday), souvent au present perfect.", hint:"Un point de départ précis dans le passé." },
+  { zone:"time", question:"They negotiated the contract ___ three hours.", options:["since","during","for","by"], correctAnswer:"for",
+    explanation:"FOR indique une durée (for three hours, for two weeks).", hint:"Combien de temps ça a duré ?" },
+  { zone:"time", question:"Let's review the slides ___ the meeting begins.", options:["before","during","until","since"], correctAnswer:"before",
+    explanation:"BEFORE = avant un moment ou un événement (before the meeting).", hint:"Quelque chose qui se passe AVANT." },
+  { zone:"time", question:"We'll discuss the budget ___ lunch.", options:["since","after","until","by"], correctAnswer:"after",
+    explanation:"AFTER = après un moment ou un événement (after lunch, after work).", hint:"Quelque chose qui se passe APRÈS." },
+
+  /* ---------- ZONE 2 — PREPOSITIONS OF PLACE ---------- */
+  { zone:"place", question:"The signed contracts are ___ the top drawer.", options:["on","in","at","above"], correctAnswer:"in",
+    explanation:"IN = à l'intérieur d'un espace fermé (in the drawer, in the box).", hint:"À l'intérieur de quelque chose." },
+  { zone:"place", question:"Your visitor badge is ___ the reception desk.", options:["in","at","on","under"], correctAnswer:"on",
+    explanation:"ON = sur une surface (on the desk, on the table).", hint:"Posé sur une surface plate." },
+  { zone:"place", question:"Let's meet ___ the main entrance at 8.", options:["in","on","at","between"], correctAnswer:"at",
+    explanation:"AT = à un point précis ou un lieu de rendez-vous (at the entrance, at the bus stop).", hint:"Un point de rencontre précis." },
+  { zone:"place", question:"The printer is ___ the coffee machine, on its right.", options:["between","next to","above","in"], correctAnswer:"next to",
+    explanation:"NEXT TO = juste à côté de quelque chose (next to the window).", hint:"Juste à côté." },
+  { zone:"place", question:"Meeting Room B is ___ the two lifts.", options:["between","behind","next to","near"], correctAnswer:"between",
+    explanation:"BETWEEN = entre deux éléments (between the two doors).", hint:"Au milieu de DEUX choses." },
+  { zone:"place", question:"The storage room is ___ the kitchen, you can't see it from here.", options:["on","behind","opposite","above"], correctAnswer:"behind",
+    explanation:"BEHIND = derrière quelque chose (behind the door).", hint:"Caché derrière." },
+  { zone:"place", question:"The lift is ___ the reception, on the other side of the hall.", options:["near","opposite","behind","under"], correctAnswer:"opposite",
+    explanation:"OPPOSITE = en face de, de l'autre côté (opposite the bank).", hint:"Juste en face." },
+  { zone:"place", question:"There is a car park ___ the building, only two minutes away.", options:["near","between","above","on"], correctAnswer:"near",
+    explanation:"NEAR = près de, à proximité (near the station).", hint:"Pas loin, à proximité." },
+  { zone:"place", question:"There is a clock ___ the whiteboard in the boardroom.", options:["under","above","in","between"], correctAnswer:"above",
+    explanation:"ABOVE = au-dessus (sans contact) (above the door).", hint:"Plus haut, au-dessus." },
+  { zone:"place", question:"I found your keys ___ the keyboard on your desk.", options:["under","on","at","opposite"], correctAnswer:"under",
+    explanation:"UNDER = sous quelque chose (under the table).", hint:"En dessous de." },
+
+  /* ---------- ZONE 3 — PREPOSITIONS OF MOVEMENT ---------- */
+  { zone:"movement", question:"She is going ___ the meeting room right now.", options:["to","at","in","on"], correctAnswer:"to",
+    explanation:"TO = direction vers une destination (go to the office).", hint:"On se dirige VERS un endroit." },
+  { zone:"movement", question:"The manager walked ___ the office and closed the door.", options:["to","into","across","along"], correctAnswer:"into",
+    explanation:"INTO = entrer dans un espace fermé (walk into a room).", hint:"Entrer DANS un espace fermé." },
+  { zone:"movement", question:"The CEO just came ___ the boardroom looking pleased.", options:["into","out of","through","towards"], correctAnswer:"out of",
+    explanation:"OUT OF = sortir de l'intérieur (out of the building).", hint:"Sortir de l'intérieur." },
+  { zone:"movement", question:"All visitors must walk ___ the security gate.", options:["across","along","through","past"], correctAnswer:"through",
+    explanation:"THROUGH = traverser un espace fermé/d'un côté à l'autre (through the tunnel).", hint:"Passer à travers." },
+  { zone:"movement", question:"She hurried ___ the lobby to catch the lift.", options:["across","along","into","towards"], correctAnswer:"across",
+    explanation:"ACROSS = traverser d'un côté à l'autre d'une surface (across the street).", hint:"Traverser une surface ouverte." },
+  { zone:"movement", question:"Walk ___ this corridor and Room 12 is on the left.", options:["across","along","through","past"], correctAnswer:"along",
+    explanation:"ALONG = en suivant la longueur de quelque chose (along the river, along the corridor).", hint:"Suivre la longueur d'un chemin." },
+  { zone:"movement", question:"Go ___ the reception desk and turn right at the stairs.", options:["past","into","out of","to"], correctAnswer:"past",
+    explanation:"PAST = passer devant et continuer (past the bank).", hint:"Passer devant, puis continuer." },
+  { zone:"movement", question:"The clients are heading ___ the exit; the talk is over.", options:["into","towards","through","across"], correctAnswer:"towards",
+    explanation:"TOWARDS = en direction de (sans forcément atteindre) (towards the door).", hint:"En direction de." },
+  { zone:"movement", question:"He commutes ___ Lyon to Paris every Monday.", options:["to","from","past","along"], correctAnswer:"from",
+    explanation:"FROM marque le point de départ (from Paris to London).", hint:"Le point de DÉPART du trajet." },
+  { zone:"movement", question:"The new assistant showed the visitors ___ the office.", options:["around","into","past","from"], correctAnswer:"around",
+    explanation:"AROUND = faire le tour, visiter un lieu (show someone around).", hint:"Faire le tour des lieux." },
+
+  /* ---------- ZONE 4 — WORKPLACE PREPOSITIONS ---------- */
+  { zone:"work", question:"As team leader, she is responsible ___ the marketing budget.", options:["of","for","about","to"], correctAnswer:"for",
+    explanation:"Be responsible FOR something = être responsable de quelque chose.", hint:"responsible ___ : une seule préposition possible." },
+  { zone:"work", question:"Are you interested ___ the new sales position?", options:["on","about","in","for"], correctAnswer:"in",
+    explanation:"Be interested IN something = s'intéresser à quelque chose.", hint:"interested ___ : c'est toujours la même." },
+  { zone:"work", question:"He is very good ___ negotiating with difficult clients.", options:["in","at","on","for"], correctAnswer:"at",
+    explanation:"Be good AT something = être doué pour quelque chose (good at maths).", hint:"good ___ doing something." },
+  { zone:"work", question:"The whole team is worried ___ the tight deadline.", options:["for","about","of","on"], correctAnswer:"about",
+    explanation:"Be worried ABOUT something = être inquiet au sujet de quelque chose.", hint:"worried ___ : au sujet de." },
+  { zone:"work", question:"Who is in charge ___ the IT migration project?", options:["for","of","with","on"], correctAnswer:"of",
+    explanation:"Be in charge OF something = être en charge / responsable de quelque chose.", hint:"in charge ___ the project." },
+  { zone:"work", question:"Please make sure all candidates arrive ___ time.", options:["in","at","on","by"], correctAnswer:"on",
+    explanation:"ON time = à l'heure (ponctuel). IN time = juste à temps, avant la limite.", hint:"Être ponctuel = ___ time." },
+  { zone:"work", question:"I'll send you the full report ___ email this afternoon.", options:["by","on","with","in"], correctAnswer:"by",
+    explanation:"BY email / by phone / by post = moyen de communication.", hint:"Le moyen utilisé pour envoyer." },
+  { zone:"work", question:"She isn't available now; she is still ___ work until five.", options:["in","on","at","by"], correctAnswer:"at",
+    explanation:"AT work = au travail (sur le lieu de travail).", hint:"___ work = sur le lieu de travail." },
+  { zone:"work", question:"He can't take your call; he is ___ a meeting.", options:["on","in","at","by"], correctAnswer:"in",
+    explanation:"IN a meeting = en réunion.", hint:"être ___ a meeting." },
+  { zone:"work", question:"Sorry, the director is ___ the phone right now.", options:["in","at","on","by"], correctAnswer:"on",
+    explanation:"ON the phone = au téléphone.", hint:"parler ___ the phone." }
+];
+
+const ZONES = [
+  { key:"time",     n:1, ico:"⏰", name:"Time Zone",     desc:"Prépositions de temps.",            cls:"z1" },
+  { key:"place",    n:2, ico:"📍", name:"Place Zone",    desc:"Prépositions de lieu.",             cls:"z2" },
+  { key:"movement", n:3, ico:"🏃", name:"Movement Zone", desc:"Prépositions de mouvement.",        cls:"z3" },
+  { key:"work",     n:4, ico:"💼", name:"Work Zone",     desc:"Prépositions du monde pro.",         cls:"z4" }
+];
+const ZONE_KEYS = ZONES.map(z=>z.key);
+const Q_PER_ZONE = 10;
+
+/* =========================================================
+   STORAGE — safe wrappers (degrade gracefully if blocked)
+   ========================================================= */
+const SAVE_KEY = "zombieGrammarSurvival_v1";
+let memoryStore = {}; // fallback when localStorage is unavailable
+function storageGet(key){
+  try { const v = localStorage.getItem(key); return v; }
+  catch(e){ return (key in memoryStore) ? memoryStore[key] : null; }
+}
+function storageSet(key,val){
+  try { localStorage.setItem(key,val); }
+  catch(e){ memoryStore[key]=val; }
+}
+function storageRemove(key){
+  try { localStorage.removeItem(key); }
+  catch(e){ delete memoryStore[key]; }
+}
+
+/* =========================================================
+   STATE
+   ========================================================= */
+function freshState(){
+  return {
+    // run stats
+    lives:5, barricade:100, score:0, streak:0, bestStreak:0,
+    totalCorrect:0, totalWrong:0, hintsUsed:0,
+    mistakes:[],                 // {question, options, your, correct, explanation}
+    // progress
+    unlocked:["time"], completed:{}, bestScore:0,
+    // pointer
+    currentZone:null, currentIndex:0,
+    runMode:"survival",          // "survival" (chain zones) | "zone" (single zone)
+    inProgress:false,            // is there a resumable run?
+    musicPref:true
+  };
+}
+let state = loadState();
+
+function loadState(){
+  const raw = storageGet(SAVE_KEY);
+  if(!raw) return freshState();
+  try{
+    const s = JSON.parse(raw);
+    const base = freshState();
+    return Object.assign(base, s);
+  }catch(e){ return freshState(); }
+}
+function saveState(){ storageSet(SAVE_KEY, JSON.stringify(state)); }
+
+/* =========================================================
+   AUDIO / MUSIC
+   ========================================================= */
+const bgm = document.getElementById("bgm");
+const musicFab = document.getElementById("music-fab");
+const musicFabText = document.getElementById("music-fab-text");
+let audioReady = true;
+try { bgm.volume = 0.35; } catch(e){ audioReady = false; }
+bgm.addEventListener("error", ()=>{ audioReady = false; }); // file missing -> don't crash
+
+function reflectMusicButton(){
+  const on = state.musicPref;
+  musicFab.classList.toggle("on", on);
+  musicFab.setAttribute("aria-pressed", on ? "true":"false");
+  musicFabText.textContent = on ? "Music On" : "Music Off";
+}
+function playMusic(){
+  if(!audioReady) return;
+  const p = bgm.play();
+  if(p && p.catch) p.catch(()=>{ /* autoplay blocked: ignore until next interaction */ });
+}
+function setMusic(on){
+  state.musicPref = on;
+  saveState();
+  reflectMusicButton();
+  if(on) playMusic(); else { try{ bgm.pause(); }catch(e){} }
+}
+musicFab.addEventListener("click", ()=> setMusic(!state.musicPref));
+reflectMusicButton();
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+const screens = {
+  menu:     document.getElementById("screen-menu"),
+  zones:    document.getElementById("screen-zones"),
+  howto:    document.getElementById("screen-howto"),
+  game:     document.getElementById("screen-game"),
+  victory:  document.getElementById("screen-victory"),
+  gameover: document.getElementById("screen-gameover"),
+  review:   document.getElementById("screen-review")
+};
+let reviewReturn = "menu";
+function show(name){
+  Object.values(screens).forEach(s=> s.classList.remove("active"));
+  screens[name].classList.add("active");
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll("[data-nav]").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    const target = el.getAttribute("data-nav");
+    if(target==="newgame"){ startSurvival(); return; }
+    if(target==="zones"){ renderZones(); show("zones"); return; }
+    show(target);
+  });
+});
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+let toastTimer=null;
+function toast(msg, danger){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.toggle("danger", !!danger);
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove("show"), 1600);
+}
+
+/* =========================================================
+   MENU BUTTONS
+   ========================================================= */
+document.getElementById("btn-start").addEventListener("click", ()=>{
+  if(state.musicPref) playMusic();   // start music on user interaction if preferred
+  startSurvival();
+});
+document.getElementById("btn-zones").addEventListener("click", ()=>{
+  if(state.musicPref) playMusic();
+  renderZones(); show("zones");
+});
+document.getElementById("btn-howto").addEventListener("click", ()=> show("howto"));
+document.getElementById("btn-continue").addEventListener("click", ()=>{
+  if(!state.inProgress){ toast("Aucune partie à reprendre", true); return; }
+  if(state.musicPref) playMusic();
+  state.runMode = state.runMode || "survival";
+  startZone(state.currentZone, state.currentIndex, false);
+});
+document.getElementById("btn-reset").addEventListener("click", ()=>{
+  if(confirm("Réinitialiser toute ta progression (zones débloquées, meilleur score, sauvegarde) ?")){
+    const music = state.musicPref;        // keep music preference
+    storageRemove(SAVE_KEY);
+    state = freshState();
+    state.musicPref = music;
+    saveState();
+    refreshContinueButton();
+    toast("Progression réinitialisée");
+  }
+});
+function refreshContinueButton(){
+  document.getElementById("btn-continue").disabled = !state.inProgress;
+}
+
+/* =========================================================
+   ZONE SELECT
+   ========================================================= */
+function zoneUnlocked(key){ return state.unlocked.includes(key); }
+function zoneDone(key){ return !!state.completed[key]; }
+
+function renderZones(){
+  const grid = document.getElementById("zone-grid");
+  grid.innerHTML = "";
+  ZONES.forEach(z=>{
+    const unlocked = zoneUnlocked(z.key);
+    const done = zoneDone(z.key);
+    const btn = document.createElement("button");
+    btn.className = "zone-card "+z.cls;
+    btn.type = "button";
+    if(!unlocked){ btn.disabled = true; }
+    let status;
+    if(done){
+      const c = state.completed[z.key];
+      status = '<span class="done">✓ Terminé — '+c.accuracy+'% · '+c.best+' pts</span>';
+    } else if(unlocked){
+      status = '<span class="open">▶ Disponible · 0/'+Q_PER_ZONE+'</span>';
+    } else {
+      status = '<span class="lock">🔒 Verrouillé</span>';
+    }
+    btn.innerHTML =
+      '<span class="zone-num" aria-hidden="true">'+z.n+'</span>'+
+      '<span class="zone-ico" aria-hidden="true">'+z.ico+'</span>'+
+      '<span class="zone-name">'+z.name+'</span>'+
+      '<span class="zone-desc">'+z.desc+'</span>'+
+      '<span class="zone-status">'+status+'</span>';
+    btn.setAttribute("aria-label", z.name+(unlocked?"":" (verrouillé)"));
+    if(unlocked){
+      btn.addEventListener("click", ()=>{
+        if(state.musicPref) playMusic();
+        // playing a single chosen zone keeps current run stats but does not chain
+        if(!state.inProgress){ resetRunStats(); }
+        state.runMode = "zone";
+        startZone(z.key, 0, true);
+      });
+    }
+    grid.appendChild(btn);
+  });
+}
+
+/* =========================================================
+   GAME FLOW
+   ========================================================= */
+function resetRunStats(){
+  state.lives=5; state.barricade=100; state.score=0; state.streak=0; state.bestStreak=0;
+  state.totalCorrect=0; state.totalWrong=0; state.hintsUsed=0; state.mistakes=[];
+}
+function startSurvival(){
+  resetRunStats();
+  state.runMode = "survival";
+  // start at the first not-completed zone (default: time)
+  let startKey = ZONE_KEYS.find(k=> !zoneDone(k)) || "time";
+  if(!zoneUnlocked(startKey)) startKey = "time";
+  startZone(startKey, 0, true);
+}
+function questionsForZone(key){ return QUESTIONS.filter(q=> q.zone===key); }
+
+let current = { list:[], i:0, answered:false, hintUsed:false };
+
+function startZone(zoneKey, index, fresh){
+  state.currentZone = zoneKey;
+  state.currentIndex = index || 0;
+  state.inProgress = true;
+  current.list = questionsForZone(zoneKey);
+  current.i = state.currentIndex;
+  saveState();
+  renderHUD();
+  renderQuestion();
+  show("game");
+}
+
+const zoneNameMap = {}; ZONES.forEach(z=> zoneNameMap[z.key]=z.name);
+
+function renderHUD(){
+  // lives hearts
+  const lh = document.getElementById("hud-lives");
+  let hearts="";
+  for(let i=0;i<5;i++){ hearts += '<span class="heart'+(i<state.lives?'':' lost')+'" aria-hidden="true">❤</span>'; }
+  lh.innerHTML = hearts;
+  lh.setAttribute("aria-label", state.lives+" vies sur 5");
+  // barricade
+  const b = Math.max(0, Math.min(100, state.barricade));
+  const fill = document.getElementById("hud-barricade");
+  fill.style.width = b+"%";
+  fill.classList.toggle("warn", b<=50 && b>25);
+  fill.classList.toggle("danger", b<=25);
+  document.getElementById("hud-barricade-pct").textContent = b+"%";
+  // score / streak
+  document.getElementById("hud-score").textContent = state.score;
+  document.getElementById("hud-streak").textContent = "x"+state.streak;
+}
+
+function renderQuestion(){
+  const q = current.list[current.i];
+  current.answered = false;
+  current.hintUsed = false;
+
+  document.getElementById("game-zone-name").textContent = zoneNameMap[state.currentZone];
+  document.getElementById("game-qcount").textContent = "Question "+(current.i+1)+" / "+Q_PER_ZONE;
+
+  // question text with a visible blank
+  const qtext = document.getElementById("qtext");
+  qtext.innerHTML = q.question.replace("___", '<span class="blank">_____</span>');
+
+  // answers
+  const wrap = document.getElementById("answers");
+  wrap.innerHTML = "";
+  const letters = ["A","B","C","D"];
+  q.options.forEach((opt, idx)=>{
+    const b = document.createElement("button");
+    b.className = "ans";
+    b.type = "button";
+    b.innerHTML = '<span class="letter" aria-hidden="true">'+letters[idx]+'</span><span class="opt">'+opt+'</span><span class="mark" aria-hidden="true"></span>';
+    b.setAttribute("aria-label", "Réponse "+letters[idx]+" : "+opt);
+    b.addEventListener("click", ()=> answer(idx, b));
+    wrap.appendChild(b);
+  });
+
+  // reset hint + feedback + next
+  const hintBox = document.getElementById("hint-box");
+  hintBox.classList.remove("show");
+  document.getElementById("hint-text").textContent = q.hint;
+  const fb = document.getElementById("feedback");
+  fb.className = "feedback"; fb.innerHTML = "";
+  document.getElementById("btn-next").style.display = "none";
+  const hintBtn = document.getElementById("btn-hint");
+  hintBtn.disabled = false;
+
+  renderHUD();
+}
+
+document.getElementById("btn-hint").addEventListener("click", ()=>{
+  if(current.answered || current.hintUsed) return;
+  current.hintUsed = true;
+  state.hintsUsed++;
+  state.score = Math.max(0, state.score - 2);   // never negative
+  document.getElementById("hint-box").classList.add("show");
+  document.getElementById("btn-hint").disabled = true;
+  renderHUD(); saveState();
+  toast("Indice utilisé (−2)");
+});
+
+function answer(idx, btnEl){
+  if(current.answered) return;
+  current.answered = true;
+  const q = current.list[current.i];
+  const chosen = q.options[idx];
+  const correct = chosen === q.correctAnswer;
+
+  // lock all answer buttons, mark correct/wrong
+  const btns = document.querySelectorAll("#answers .ans");
+  btns.forEach((b,i)=>{
+    b.disabled = true;
+    if(q.options[i]===q.correctAnswer){
+      b.classList.add("correct");
+      b.querySelector(".mark").textContent = "✓";
+    }
+  });
+  document.getElementById("btn-hint").disabled = true;
+
+  const fb = document.getElementById("feedback");
+  if(correct){
+    state.score += 10;
+    state.streak += 1;
+    if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+    state.barricade = Math.min(100, state.barricade + 5);
+    state.totalCorrect++;
+    fb.className = "feedback good show";
+    fb.innerHTML = '<span class="tag">✓ Correct</span> La barricade est plus solide. <em>'+q.explanation+'</em>';
+    if(state.streak>0 && state.streak%3===0){
+      state.score += 5;
+      toast("🔥 Survivor streak! +5");
+    } else {
+      toast("✓ +10 · barricade +5%");
+    }
+  } else {
+    btnEl.classList.add("wrong");
+    btnEl.querySelector(".mark").textContent = "✗";
+    state.lives -= 1;
+    state.streak = 0;
+    state.barricade = Math.max(0, state.barricade - 20);
+    state.totalWrong++;
+    fb.className = "feedback bad show";
+    fb.innerHTML = '<span class="tag">✗ Incorrect</span> Bonne réponse : <b>'+q.correctAnswer+'</b>. <em>'+q.explanation+'</em>';
+    state.mistakes.push({
+      question:q.question, your:chosen, correct:q.correctAnswer, explanation:q.explanation
+    });
+    // zombies get closer -> screen shake
+    const g = screens.game;
+    g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake");
+    toast("✗ −1 vie · barricade −20%", true);
+  }
+
+  renderHUD();
+  saveState();
+
+  // lose conditions
+  if(state.lives<=0 || state.barricade<=0){
+    setTimeout(endGame, 900);
+    return;
+  }
+
+  // show continue
+  const nextBtn = document.getElementById("btn-next");
+  nextBtn.style.display = "";
+  nextBtn.textContent = (current.i+1 >= Q_PER_ZONE) ? "▶ Terminer la zone" : "▶ Continue";
+  nextBtn.focus();
+}
+
+document.getElementById("btn-next").addEventListener("click", nextQuestion);
+
+function nextQuestion(){
+  if(current.i+1 < Q_PER_ZONE){
+    current.i++;
+    state.currentIndex = current.i;
+    saveState();
+    renderQuestion();
+    document.getElementById("answers").querySelector(".ans").focus();
+  } else {
+    finishZone();
+  }
+}
+
+function finishZone(){
+  const key = state.currentZone;
+  // record accuracy for THIS zone (answered = correct+wrong within zone is 10)
+  // we approximate zone accuracy from streakless count: compute from mistakes in this run is messy,
+  // so store per-zone accuracy = correct answers in the zone / 10.
+  // Simpler & robust: derive from this zone's mistakes count.
+  const zoneMistakes = state.mistakes.filter(m=> questionTextZone(m.question)===key).length;
+  const zoneCorrect = Q_PER_ZONE - zoneMistakes;
+  const acc = Math.round((zoneCorrect/Q_PER_ZONE)*100);
+  const prev = state.completed[key];
+  state.completed[key] = {
+    accuracy: prev ? Math.max(prev.accuracy, acc) : acc,
+    best: prev ? Math.max(prev.best, state.score) : state.score
+  };
+  // unlock next zone
+  const idx = ZONE_KEYS.indexOf(key);
+  if(idx>=0 && idx<ZONE_KEYS.length-1){
+    const nextKey = ZONE_KEYS[idx+1];
+    if(!state.unlocked.includes(nextKey)) state.unlocked.push(nextKey);
+  }
+  if(state.score>state.bestScore) state.bestScore = state.score;
+  saveState();
+
+  const allDone = ZONE_KEYS.every(k=> zoneDone(k));
+  if(allDone){
+    state.inProgress = false; saveState();
+    showVictory();
+    return;
+  }
+
+  if(state.runMode==="survival"){
+    // chain into the next not-completed unlocked zone
+    const nextKey = ZONE_KEYS.find(k=> !zoneDone(k) && zoneUnlocked(k));
+    if(nextKey){
+      toast("✓ Zone terminée ! Zone suivante…");
+      setTimeout(()=> startZone(nextKey, 0, true), 700);
+      return;
+    }
+    state.inProgress=false; saveState(); showVictory();
+  } else {
+    // single-zone mode -> back to map
+    state.inProgress=false; saveState();
+    toast("✓ Zone terminée !");
+    renderZones(); show("zones");
+  }
+}
+
+// helper: find which zone a question text belongs to
+function questionTextZone(text){
+  const q = QUESTIONS.find(x=> x.question===text);
+  return q ? q.zone : null;
+}
+
+/* =========================================================
+   END SCREENS
+   ========================================================= */
+function accuracyPct(){
+  const total = state.totalCorrect + state.totalWrong;
+  if(total===0) return 0;
+  return Math.round((state.totalCorrect/total)*100);
+}
+function zonesCompletedCount(){ return ZONE_KEYS.filter(k=> zoneDone(k)).length; }
+
+function endGame(){
+  if(state.score>state.bestScore){ state.bestScore = state.score; }
+  state.inProgress = false;       // run is over
+  saveState();
+  const lastZone = zoneNameMap[state.currentZone] || "—";
+  const total = state.totalCorrect + state.totalWrong;
+  document.getElementById("gameover-stats").innerHTML =
+    statBox("Score", state.score, "score") +
+    statBox("Accuracy", accuracyPct()+"%") +
+    statBox("Correct", state.totalCorrect) +
+    statBox("Wrong", state.totalWrong, "bad") +
+    statBox("Last zone", lastZone) +
+    statBox("Best streak", "x"+state.bestStreak);
+  show("gameover");
+}
+
+function showVictory(){
+  if(state.score>state.bestScore){ state.bestScore = state.score; }
+  saveState();
+  const total = state.totalCorrect + state.totalWrong;
+  document.getElementById("victory-stats").innerHTML =
+    statBox("Final score", state.score, "score") +
+    statBox("Accuracy", accuracyPct()+"%") +
+    statBox("Best streak", "x"+state.bestStreak) +
+    statBox("Zones", zonesCompletedCount()+" / "+ZONE_KEYS.length) +
+    statBox("Questions", total+" / 40") +
+    statBox("Hints used", state.hintsUsed);
+  show("victory");
+}
+
+function statBox(k,v,cls){
+  return '<div class="stat-box"><div class="k">'+k+'</div><div class="v '+(cls||"")+'">'+v+'</div></div>';
+}
+
+/* =========================================================
+   REVIEW MISTAKES
+   ========================================================= */
+function renderReview(){
+  const list = document.getElementById("review-list");
+  if(!state.mistakes.length){
+    list.innerHTML = '<p class="review-empty">Aucune erreur enregistrée — beau travail, survivant ! 🎉</p>';
+    return;
+  }
+  list.innerHTML = state.mistakes.map(m=>{
+    const shown = m.question.replace("___", "_____");
+    return '<div class="review-item">'+
+      '<div class="rq">'+shown+'</div>'+
+      '<div class="rrow yours">Ta réponse : '+m.your+'</div>'+
+      '<div class="rrow right">Bonne réponse : '+m.correct+'</div>'+
+      '<div class="exp">'+m.explanation+'</div>'+
+    '</div>';
+  }).join("");
+}
+document.getElementById("btn-review-gameover").addEventListener("click", ()=>{ reviewReturn="gameover"; renderReview(); show("review"); });
+document.getElementById("btn-review-victory").addEventListener("click", ()=>{ reviewReturn="victory"; renderReview(); show("review"); });
+document.getElementById("btn-review-back").addEventListener("click", ()=> show(reviewReturn));
+
+/* =========================================================
+   INIT
+   ========================================================= */
+refreshContinueButton();
+saveState();
+
+// keyboard: 1-4 / A-D to answer when on game screen
+document.addEventListener("keydown", (e)=>{
+  if(!screens.game.classList.contains("active")) return;
+  if(current.answered){
+    if(e.key==="Enter" || e.key===" "){ /* let button handle */ }
+    return;
+  }
+  const map = {"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3,"A":0,"B":1,"C":2,"D":3};
+  if(e.key in map){
+    const btns = document.querySelectorAll("#answers .ans");
+    if(btns[map[e.key]]) btns[map[e.key]].click();
+  }
+});
+
+/* =========================================================
+   INTEGRATION NOTE (for the main site, index.html)
+   ---------------------------------------------------------
+   To add this game to your "Essaie nos jeux !" section, paste a
+   card linking to this file (same pattern as your other games):
+
+   <a class="game-card" href="zombie-prepositions-survival.html">
+     <span class="tag">Grammaire · Jeu de survie</span>
+     <h3>🧟 Zombie Grammar Survival</h3>
+     <p>Survis à l'épidémie de grammaire ! Renforce la barricade en
+        maîtrisant 40 prépositions TOEIC (temps, lieu, mouvement, pro).</p>
+   </a>
+
+   No existing file is modified by this game page.
+   ========================================================= */
+</script>
+</body>
+</html>
