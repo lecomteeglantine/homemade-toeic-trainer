@@ -2367,7 +2367,21 @@ renderChronoMenu();
 const vs=$("#vocSearch"); if(vs) vs.addEventListener("input",e=>{ vocQuery=e.target.value.trim().toLowerCase(); renderVocList(); });
 const sg=$("#saveGoal"); if(sg) sg.addEventListener("click",()=>{ let v=parseInt($("#goalInput").value,10); if(isNaN(v)) v=10; v=Math.max(3,Math.min(100,v)); Store.set("dailyGoal",v); renderDashboard(); toast("Objectif quotidien mis à jour"); });
 const pb=$("#printBilan"); if(pb) pb.addEventListener("click",()=>window.print());
-if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  navigator.serviceWorker.register("./sw.js").catch(function(){});
+  if(navigator.serviceWorker.ready && navigator.serviceWorker.ready.then){
+    navigator.serviceWorker.ready.then(function(){ try{ if(!localStorage.getItem("ht_pwa_offline")){ localStorage.setItem("ht_pwa_offline","1"); if(window.__htToast) window.__htToast("\u2713 Appli pr\u00eate : le site fonctionne d\u00e9sormais hors ligne."); } }catch(e){} }).catch(function(){});
+  }
+}
+/* Bouton "Installer l'appli" + petite confirmation (PWA) */
+(function(){
+  var deferred=null, btn=null;
+  function toast(msg){ if(!document.body) return; var t=document.createElement("div"); t.textContent=msg; t.style.cssText="position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:#22324B;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;z-index:130;box-shadow:0 12px 34px rgba(0,0,0,.25);max-width:92vw;text-align:center;font-family:var(--display,sans-serif)"; document.body.appendChild(t); setTimeout(function(){ t.style.transition="opacity .5s"; t.style.opacity="0"; setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },500); }, 3200); }
+  window.__htToast=toast;
+  function ensureBtn(){ if(btn||!document.body) return; btn=document.createElement("button"); btn.type="button"; btn.id="pwaInstallBtn"; btn.textContent="\uD83D\uDCF2 Installer l'appli"; btn.setAttribute("aria-label","Installer l'application sur l'appareil"); btn.style.cssText="position:fixed;left:14px;bottom:88px;z-index:120;border:1px solid var(--line,#ECE6DA);background:#fff;color:var(--ink,#22324B);font-family:var(--display,sans-serif);font-weight:700;border-radius:999px;padding:10px 16px;box-shadow:0 12px 34px rgba(34,50,75,.18);cursor:pointer"; btn.addEventListener("click", function(){ if(!deferred) return; deferred.prompt(); var d=deferred; deferred=null; if(d.userChoice && d.userChoice.then){ d.userChoice.then(function(){ btn.style.display="none"; }); } else { btn.style.display="none"; } }); document.body.appendChild(btn); }
+  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred=e; ensureBtn(); if(btn) btn.style.display=""; });
+  window.addEventListener("appinstalled", function(){ if(btn) btn.style.display="none"; toast("\u2713 Application install\u00e9e !"); });
+})();
 go("home");
 </script><script>
 (function () {
