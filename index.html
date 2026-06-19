@@ -409,8 +409,6 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
     <div class="cta-row">
       <button class="btn primary" data-nav="diagnostic"><span aria-hidden="true">&#9889;</span> Démarrer mon diagnostic</button>
       <button class="btn ghost" data-nav="vocab">Explorer le vocabulaire</button>
-      <a class="btn coral" href="escape-game-toeic.html" style="text-decoration:none"><span aria-hidden="true">&#127918;</span> Escape Game : Get the Job!</a>
-      <a class="btn ghost" href="detective-game.html" style="text-decoration:none"><span aria-hidden="true">&#128373;</span> Detective game</a>
     </div>
   </div>
 
@@ -507,6 +505,37 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
     <div class="dj-body" id="djBody"></div>
   </section>
 
+  <!-- =================== NOS JEUX (regroupés) =================== -->
+  <section class="games-zone" aria-labelledby="games-h" style="margin-top:18px">
+    <div style="background:linear-gradient(180deg,var(--coral-soft),var(--card) 72%);border:1px solid var(--line);border-radius:var(--r);padding:22px">
+      <span class="pill coral">Apprendre en s'amusant</span>
+      <h2 id="games-h" style="margin:8px 0 4px">🎮 Manque de motivation pour les révisions&nbsp;? Essaie nos jeux&nbsp;!</h2>
+      <p style="margin:0 0 16px;color:var(--ink-soft)">Des mini-jeux pour réviser le TOEIC sans voir le temps passer : grammaire, vocabulaire et enquêtes en anglais.</p>
+      <div class="grid g3">
+    <a class="card focus-hide" href="escape-game-toeic.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
+      <span class="pill coral">Nouveau &middot; Jeu</span>
+      <h3 style="margin-top:12px"><span aria-hidden="true">&#127918;</span> Escape Game : Get the Job!</h3>
+      <p style="margin:0">Cinq missions pro inspirées du TOEIC, un système de carrière (Intern → Director) et des coffres à débloquer.</p>
+    </a>
+    <a class="card focus-hide" href="detective-game.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
+      <span class="pill" style="background:#23304d;color:#E0B64C;border:1px solid #6E5A2A">Enquête &middot; Detective game</span>
+      <h3 style="margin-top:12px"><span aria-hidden="true">&#128373;</span> Detective Academy</h3>
+      <p style="margin:0">Une enquête pour fraude d'entreprise : lis les indices en anglais, démasque le coupable et gravis les rangs jusqu'à Chief Inspector.</p>
+    </a>
+    <a class="card focus-hide" href="grammar-time-machine.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
+      <span class="pill" style="background:#F1ECFB;color:#6C5CC4;border:1px solid #E0D7F0">Grammaire &middot; Escape game</span>
+      <h3 style="margin-top:12px"><span aria-hidden="true">&#9203;</span> Grammar Time Machine</h3>
+      <p style="margin:0">Répare la ligne du temps en traversant 5 époques de travail (1850 → 2050). Chaque époque entraîne un temps grammatical : passé, présent, futur, passif. Badges, score et série.</p>
+    </a>
+    <div class="card" aria-label="Jeu à venir" style="border:1.5px dashed var(--line);background:var(--bg2);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--ink-soft)">
+      <div style="font-size:1.9rem" aria-hidden="true">🚧</div>
+      <h3 style="margin:8px 0 4px">4ᵉ jeu en préparation</h3>
+      <p style="margin:0">Un nouveau jeu arrive bientôt ici. Reviens vite&nbsp;!</p>
+    </div>
+      </div>
+    </div>
+  </section>
+
   <div class="card" style="margin-top:22px;border-left:5px solid var(--coral)">
     <span class="pill coral">À lire avant de commencer</span>
     <h3 style="margin:12px 0 6px">Un kit de démarrage, pas une préparation complète</h3>
@@ -540,16 +569,6 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
       <h3 style="margin-top:12px">Autres ressources</h3>
       <p style="margin:0">Plateformes plus complètes, ouvrages à la BU et conseils de ton enseignant·e.</p>
     </button>
-    <a class="card focus-hide" href="escape-game-toeic.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
-      <span class="pill coral">Nouveau &middot; Jeu</span>
-      <h3 style="margin-top:12px"><span aria-hidden="true">&#127918;</span> Escape Game : Get the Job!</h3>
-      <p style="margin:0">Cinq missions pro inspirées du TOEIC, un système de carrière (Intern → Director) et des coffres à débloquer.</p>
-    </a>
-    <a class="card focus-hide" href="detective-game.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
-      <span class="pill" style="background:#23304d;color:#E0B64C;border:1px solid #6E5A2A">Enquête &middot; Detective game</span>
-      <h3 style="margin-top:12px"><span aria-hidden="true">&#128373;</span> Detective Academy</h3>
-      <p style="margin:0">Une enquête pour fraude d'entreprise : lis les indices en anglais, démasque le coupable et gravis les rangs jusqu'à Chief Inspector.</p>
-    </a>
     <a class="card focus-hide" href="constructeur-de-phrases.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
       <span class="pill teal">Grammaire &middot; Mini-jeu</span>
       <h3 style="margin-top:12px"><span aria-hidden="true">&#129513;</span> Constructeur de phrases</h3>
@@ -559,11 +578,6 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
       <span class="pill blue">Vocabulaire &middot; Révision espacée</span>
       <h3 style="margin-top:12px"><span aria-hidden="true">&#127183;</span> Flashcards</h3>
       <p style="margin:0">Révise tes mots au bon moment : les mots connus reviennent plus rarement, les difficiles plus souvent. Relié à <strong>My Words</strong>.</p>
-    </a>
-    <a class="card focus-hide" href="grammar-time-machine.html" style="text-decoration:none;color:inherit;display:block;text-align:left;border:1px solid var(--line)">
-      <span class="pill" style="background:#F1ECFB;color:#6C5CC4;border:1px solid #E0D7F0">Grammaire &middot; Escape game</span>
-      <h3 style="margin-top:12px"><span aria-hidden="true">&#9203;</span> Grammar Time Machine</h3>
-      <p style="margin:0">Répare la ligne du temps en traversant 5 époques de travail (1850 → 2050). Chaque époque entraîne un temps grammatical : passé, présent, futur, passif. Badges, score et série.</p>
     </a>
   </div>
 
