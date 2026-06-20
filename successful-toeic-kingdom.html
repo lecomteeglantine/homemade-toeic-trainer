@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Successful TOEIC Kingdom — a medieval-fantasy reading adventure that trains TOEIC reading skills: scanning, fast reading, information search, inference, multi-document and time management.">
+<title>Successful TOEIC Kingdom — A Reading Adventure</title>
+<style>
+:root{
+  --purple:#3a2a63; --purple-d:#251a44; --purple-dd:#180f2e;
+  --gold:#d8b54a; --gold-l:#f0d27a; --gold-d:#a8801f;
+  --parch:#efe3c6; --parch-2:#e4d3ac; --parch-edge:#c9b079;
+  --ink:#2c2016; --ink-soft:#5c4a31;
+  --stone:#2a2433; --crimson:#9e2b2b; --crimson-d:#6e1a1a;
+  --green:#3f7d46; --green-d:#2a5530;
+  --shadow:0 12px 34px rgba(0,0,0,.5);
+  --serif:Georgia,'Times New Roman',serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:var(--body);color:var(--ink);background:#120c20;-webkit-font-smoothing:antialiased;overflow:hidden;}
+button{font-family:inherit;cursor:pointer;}
+img{display:block;}
+
+/* screens */
+.screen{position:fixed;inset:0;display:none;background-size:cover;background-position:center;}
+.screen.active{display:block;}
+.scrim{position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 25%,rgba(20,12,32,.30),rgba(15,9,26,.82));}
+.wrap{position:relative;height:100%;width:100%;overflow-y:auto;}
+.center-col{max-width:820px;margin:0 auto;padding:24px 16px 70px;}
+
+/* chrome */
+.banner{
+  background:linear-gradient(180deg,#4a356f,#2c1f50 60%,#1d1438);
+  border:2px solid var(--gold-d);border-radius:14px;
+  box-shadow:inset 0 0 0 1px rgba(216,181,74,.25), inset 0 -8px 18px rgba(0,0,0,.45), var(--shadow);
+}
+.parch{
+  background:radial-gradient(140% 120% at 18% 0%, #f6ecd2, var(--parch) 55%, var(--parch-2));
+  border:2px solid var(--parch-edge);border-radius:12px;
+  box-shadow:inset 0 0 36px rgba(150,120,70,.22), var(--shadow);color:var(--ink);
+}
+.title-illum{
+  font-family:var(--serif);font-weight:700;letter-spacing:.02em;color:var(--gold-l);
+  text-shadow:0 2px 0 #1d1438,0 5px 16px rgba(0,0,0,.7);
+}
+.eyebrow{font-family:var(--serif);font-style:italic;color:#e8d8a8;letter-spacing:.04em;}
+
+/* buttons */
+.btn{
+  font-family:var(--serif);font-weight:700;letter-spacing:.02em;font-size:16px;
+  color:#1d1438;padding:13px 18px;border-radius:11px;border:2px solid var(--gold-d);
+  background:linear-gradient(180deg,var(--gold-l),var(--gold) 60%,var(--gold-d));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -5px 10px rgba(0,0,0,.18);
+  transition:transform .08s,filter .15s;
+}
+.btn:hover{filter:brightness(1.08);}
+.btn:active{transform:translateY(2px);}
+.btn.purple{background:linear-gradient(180deg,#5a4385,#34245f 65%,#241646);color:#f3e9c8;border-color:#1d1438;}
+.btn.crimson{background:linear-gradient(180deg,#c0473f,#7d1f1a 65%,#5a1410);color:#fbe9e2;border-color:#3a0c08;}
+.btn.green{background:linear-gradient(180deg,#54a45c,#2f6e36 65%,#214e26);color:#eafbe9;border-color:#173f1c;}
+.btn.ghost{background:transparent;color:#f3e9c8;border-color:var(--gold-d);box-shadow:none;}
+.btn:focus-visible{outline:3px solid var(--gold-l);outline-offset:2px;}
+.btn[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.4);}
+
+/* persistent controls */
+#musicBtn{
+  position:fixed;top:14px;right:14px;z-index:60;font-family:var(--serif);font-weight:700;font-size:14px;
+  color:#f3e9c8;padding:9px 14px;border-radius:30px;border:2px solid var(--gold-d);
+  background:linear-gradient(180deg,#4a356f,#251a44);box-shadow:var(--shadow);
+}
+#musicBtn:focus-visible{outline:3px solid var(--gold-l);outline-offset:2px;}
+#passBtn{
+  position:fixed;top:14px;left:14px;z-index:60;font-family:var(--serif);font-weight:700;font-size:14px;
+  color:#f3e9c8;padding:9px 14px;border-radius:30px;border:2px solid var(--gold-d);
+  background:linear-gradient(180deg,#4a356f,#251a44);box-shadow:var(--shadow);display:none;
+}
+#passBtn.show{display:block;}
+
+/* ===== MENU ===== */
+#menu .wrap{display:flex;align-items:center;justify-content:center;padding:24px;}
+.menu-card{width:min(480px,94vw);padding:28px;text-align:center;}
+.menu-title{font-family:var(--serif);font-weight:700;font-size:clamp(30px,6.4vw,52px);line-height:1;color:var(--gold-l);text-shadow:0 3px 0 #1d1438,0 7px 18px rgba(0,0,0,.7);margin:0 0 6px;}
+.menu-sub{font-family:var(--serif);font-style:italic;color:#e8d8a8;margin:0 0 22px;font-size:clamp(14px,2.4vw,18px);}
+.menu-btns{display:flex;flex-direction:column;gap:10px;}
+
+/* ===== MAP ===== */
+.map-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.section-title{font-family:var(--serif);font-weight:700;font-size:clamp(24px,4.4vw,38px);color:var(--gold-l);text-shadow:0 2px 0 #1d1438,0 5px 14px rgba(0,0,0,.6);margin:0;}
+.kpis{display:flex;gap:8px;flex-wrap:wrap;}
+.kpi{padding:7px 12px;border-radius:10px;font-family:var(--serif);font-weight:700;font-size:14px;color:#f3e9c8;background:linear-gradient(180deg,#4a356f,#251a44);border:1px solid var(--gold-d);}
+.kpi b{color:var(--gold-l);}
+.trail{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.node{padding:0;overflow:hidden;text-align:left;position:relative;border-radius:14px;}
+.node .ribbon{padding:10px 14px;display:flex;align-items:center;gap:8px;color:#1d1438;font-family:var(--serif);font-weight:700;}
+.node .body{padding:12px 14px 14px;}
+.node h3{margin:0 0 4px;font-family:var(--serif);font-size:17px;}
+.node p{margin:0 0 10px;font-size:13px;color:var(--ink-soft);line-height:1.4;}
+.node .num{width:30px;height:30px;border-radius:50%;background:#1d1438;color:var(--gold-l);display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto;}
+.node .stars{letter-spacing:2px;font-size:15px;color:var(--gold-d);}
+.node .stars .on{color:var(--gold);}
+.node.locked{filter:grayscale(.55);opacity:.7;}
+.node.done .ribbon::after{content:"✓";margin-left:auto;color:var(--green-d);font-size:18px;}
+.node button{width:100%;}
+.node .lockmsg{font-size:12px;color:var(--ink-soft);font-style:italic;}
+
+/* ===== TRIAL ===== */
+#trial .wrap{padding-bottom:30px;}
+.trial-head{position:sticky;top:0;z-index:8;}
+.trial-bar{margin:0 auto;max-width:900px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.trial-bar .tname{font-family:var(--serif);font-weight:700;color:var(--gold-l);font-size:18px;flex:1;min-width:160px;}
+.trial-bar .meta{font-family:var(--serif);color:#e8d8a8;font-size:13px;}
+.pips{display:flex;gap:5px;}
+.pip{width:12px;height:12px;border-radius:50%;background:#1d1438;border:1px solid var(--gold-d);}
+.pip.ok{background:var(--green);} .pip.no{background:var(--crimson);} .pip.cur{box-shadow:0 0 0 2px var(--gold-l);}
+.timer-wrap{height:8px;background:rgba(0,0,0,.4);border-radius:6px;overflow:hidden;flex-basis:100%;margin-top:4px;}
+.timer-wrap i{display:block;height:100%;background:linear-gradient(90deg,#e0b64c,#9e2b2b);width:100%;}
+.badger-wrap{flex-basis:100%;margin-top:6px;}
+.badger-track{height:18px;background:rgba(0,0,0,.4);border-radius:9px;position:relative;overflow:hidden;border:1px solid var(--gold-d);}
+.badger-track .you{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:13px;}
+.badger-track .badger{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:15px;transition:left .4s ease;}
+.badger-cap{font-family:var(--serif);font-size:12px;color:#e8d8a8;margin-top:2px;}
+
+.trial-body{max-width:900px;margin:14px auto 0;padding:0 14px;}
+.docs{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.docs.multi{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+.doc{padding:16px 18px;}
+.doc .doc-kind{font-family:var(--serif);font-style:italic;color:var(--crimson-d);font-size:12px;letter-spacing:.04em;margin-bottom:6px;text-transform:uppercase;}
+.doc h4{font-family:var(--serif);margin:0 0 8px;font-size:17px;border-bottom:1px solid var(--parch-edge);padding-bottom:6px;}
+.doc p{margin:6px 0;line-height:1.5;font-size:14.5px;}
+.doc .row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dotted var(--parch-edge);padding:4px 0;font-size:14px;}
+.doc .row:last-child{border-bottom:none;}
+.doc .sig{font-family:var(--serif);font-style:italic;margin-top:10px;color:var(--ink-soft);}
+.doc table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px;}
+.doc td,.doc th{border:1px solid var(--parch-edge);padding:5px 8px;text-align:left;}
+.doc th{background:rgba(160,128,31,.18);}
+
+.qbox{padding:16px 18px;}
+.qbox .qprompt{font-family:var(--serif);font-weight:700;font-size:16px;margin:0 0 12px;}
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:center;gap:11px;text-align:left;width:100%;
+  background:linear-gradient(180deg,#5a4385,#34245f);border:2px solid #1d1438;border-radius:10px;
+  padding:11px 13px;color:#f3e9c8;font-size:15px;box-shadow:inset 0 2px 0 rgba(255,255,255,.08);transition:filter .12s,transform .06s;}
+.opt:hover:not(:disabled){filter:brightness(1.14);}
+.opt:active:not(:disabled){transform:translateY(1px);}
+.opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:#1d1438;color:var(--gold-l);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;}
+.opt.correct{background:linear-gradient(180deg,#54a45c,#2f6e36);border-color:#173f1c;}
+.opt.wrong{background:linear-gradient(180deg,#c0473f,#7d1f1a);border-color:#3a0c08;}
+.opt:disabled{cursor:default;}
+.opt:focus-visible{outline:3px solid var(--gold-l);outline-offset:2px;}
+
+.feedback{margin-top:14px;padding:12px 14px;border-radius:11px;display:none;font-size:14px;line-height:1.5;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(63,125,70,.16);border:1px solid var(--green);}
+.feedback.no{background:rgba(158,43,43,.16);border:1px solid var(--crimson);}
+.feedback .fh{font-family:var(--serif);font-weight:700;font-size:15px;margin-bottom:4px;}
+.feedback .next{margin-top:11px;}
+
+.abandon{display:block;margin:18px auto 0;}
+
+/* ===== PASSPORT modal ===== */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(10,6,18,.7);}
+.modal.show{display:flex;}
+.modal-card{width:min(460px,94vw);padding:0;overflow:hidden;}
+.passport-cover{background-size:cover;background-position:center;height:120px;border-bottom:2px solid var(--gold-d);}
+.passport-body{padding:20px;}
+.passport-body h3{font-family:var(--serif);margin:0 0 4px;font-size:22px;color:var(--ink);}
+.pp-row{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px dashed var(--parch-edge);font-size:15px;}
+.pp-row:last-child{border-bottom:none;}
+.pp-row b{font-family:var(--serif);}
+.modal .x{position:absolute;top:14px;right:16px;background:none;border:none;color:#f3e9c8;font-size:24px;z-index:101;}
+.name-input{width:100%;padding:12px;border-radius:10px;border:2px solid var(--parch-edge);font-size:16px;font-family:var(--serif);margin:10px 0 14px;background:#fbf4e2;color:var(--ink);}
+
+/* ===== VICTORY / BONUS FAIL ===== */
+.big-banner{font-family:var(--serif);font-weight:700;text-align:center;font-size:clamp(34px,8vw,66px);line-height:.96;margin:0 0 8px;}
+.win .big-banner{color:var(--gold-l);text-shadow:0 3px 0 #1d1438,0 8px 18px rgba(0,0,0,.7);}
+.lose .big-banner{color:#f0a07a;text-shadow:0 3px 0 #3a0c08,0 8px 18px rgba(0,0,0,.7);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:6px;}
+.stat{padding:14px;text-align:center;}
+.stat .v{font-family:var(--serif);font-weight:700;font-size:30px;color:var(--ink);}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-top:5px;}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden;}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;opacity:.9;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(680deg);opacity:.85;}}
+
+/* loading */
+#loading .wrap{display:flex;align-items:center;justify-content:center;}
+.load-card{width:min(440px,92vw);padding:26px;text-align:center;}
+.load-title{font-family:var(--serif);font-weight:700;font-size:30px;color:var(--gold-l);text-shadow:0 2px 0 #1d1438;}
+.load-bar{height:14px;background:rgba(0,0,0,.5);border:2px solid var(--gold-d);border-radius:10px;overflow:hidden;margin:16px 0 12px;}
+.load-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-l));transition:width .25s;}
+.load-msg{font-family:var(--serif);font-style:italic;color:#e8d8a8;min-height:22px;}
+
+.how p{line-height:1.6;font-size:15px;margin:0 0 12px;}
+.how ul{line-height:1.6;font-size:14.5px;padding-left:20px;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+@media (max-width:560px){ .trial-bar .tname{font-size:16px;} }
+</style>
+</head>
+<body>
+
+<button id="musicBtn" aria-pressed="false">🔇 Music off</button>
+<button id="passBtn">📜 Passport</button>
+<audio id="bgm" loop preload="auto" src="audio/theme_successful_toeic_kingdom.mp3"></audio>
+<div id="live" aria-live="polite" class="sr-only"></div>
+
+<!-- LOADING -->
+<section id="loading" class="screen" style="background-image:url('images/loading_walnut_express.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="load-card parch">
+    <div class="load-title">Entering the Kingdom…</div>
+    <div class="load-bar"><i id="loadFill"></i></div>
+    <div class="load-msg" id="loadMsg">Polishing the armour…</div>
+  </div></div>
+</section>
+
+<!-- MENU -->
+<section id="menu" class="screen" style="background-image:url('images/successful_toeic_kingdom_map.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="menu-card banner">
+    <h1 class="menu-title">Successful<br>TOEIC Kingdom</h1>
+    <p class="menu-sub">Read fast. Find the truth. Win the realm.</p>
+    <div class="menu-btns">
+      <button class="btn" data-act="start">▶ Start the Quest</button>
+      <button class="btn purple" data-act="map">🗺 Kingdom Map</button>
+      <button class="btn purple" data-act="passport">📜 My Passport</button>
+      <button class="btn purple" data-act="how">❓ How to Play</button>
+      <button class="btn crimson" data-act="reset">↺ Reset Progress</button>
+      <a class="btn green" href="index.html" style="text-decoration:none;display:block">🏰 Back to TOEIC Trainer</a>
+    </div>
+  </div></div>
+</section>
+
+<!-- HOW TO PLAY -->
+<section id="how" class="screen" style="background-image:url('images/successful_toeic_palace.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="center-col">
+    <h2 class="section-title">How to Play</h2>
+    <div class="parch how" style="padding:22px;margin-top:14px">
+      <p>The realm is in chaos and only a sharp reader can restore order. Travel the kingdom, pass <b>8 trials</b>, brave the bonus <b>Walnut Express</b>, and reach the <b>Successful TOEIC Palace</b>.</p>
+      <p>Every trial trains a real TOEIC reading skill:</p>
+      <ul>
+        <li><b>Scanning</b> — find names, dates, prices, times fast (Crimson Knight, Bridge of Success).</li>
+        <li><b>Prices &amp; schedules</b> — read brochures and notices (British Castle).</li>
+        <li><b>Speed reading</b> — beat the timer (Knights Who Say TOEIC).</li>
+        <li><b>Search under pressure</b> — find facts in long documents before the badger catches you (Badger Cave).</li>
+        <li><b>Inference</b> — what a text <i>suggests / implies / most likely</i> means (Magician Trial).</li>
+        <li><b>Multi-document</b> — cross-check several papers, avoid hasty conclusions (Castle of Wooooow).</li>
+      </ul>
+      <p><b>Stars.</b> Each trial gives up to ⭐⭐⭐ — one for passing, two for passing quickly, three for a perfect run.</p>
+      <p><b>Saved automatically.</b> Progress, stars, score, music and your name live in your browser (LocalStorage). The 📜 Passport (top-left) shows your status any time.</p>
+      <p>Every visit is different: documents, emails, prices and schedules are generated fresh each time.</p>
+      <div style="margin-top:6px"><button class="btn" data-act="menu">‹ Back to Menu</button></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- MAP -->
+<section id="map" class="screen" style="background-image:url('images/successful_toeic_kingdom_map.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="center-col">
+    <div class="map-head">
+      <h2 class="section-title">Kingdom Map</h2>
+      <div class="kpis" id="mapKpis"></div>
+    </div>
+    <div class="trail" id="trail"></div>
+    <div style="margin-top:18px"><button class="btn purple" data-act="menu">‹ Back to Menu</button></div>
+  </div></div>
+</section>
+
+<!-- TRIAL -->
+<section id="trial" class="screen">
+  <div class="scrim"></div>
+  <div class="wrap">
+    <div class="trial-head"><div class="trial-bar banner">
+      <div class="tname" id="trialName">Trial</div>
+      <div class="meta" id="trialSkill">Skill</div>
+      <div class="pips" id="trialPips"></div>
+      <div class="timer-wrap" id="timerWrap" style="display:none"><i id="timerFill"></i></div>
+      <div class="badger-wrap" id="badgerWrap" style="display:none">
+        <div class="badger-track"><span class="badger" id="badger" style="left:0">🦡</span><span class="you">🛡️</span></div>
+        <div class="badger-cap">The badger creeps closer with every wrong answer…</div>
+      </div>
+    </div></div>
+
+    <div class="trial-body">
+      <div class="docs" id="docs"></div>
+      <div class="qbox parch">
+        <p class="qprompt" id="qPrompt"></p>
+        <div class="opts" id="opts"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+      </div>
+      <button class="btn crimson abandon" id="abandonBtn">✕ Abandon Trial</button>
+    </div>
+  </div>
+</section>
+
+<!-- VICTORY -->
+<section id="victory" class="screen win" style="background-image:url('images/victory_successful_toeic.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="center-col">
+    <h2 class="big-banner">Victory!</h2>
+    <p style="text-align:center;font-family:var(--serif);font-style:italic;color:#f0e0a8;margin:0 0 18px;text-shadow:0 2px 8px rgba(0,0,0,.8)">The realm is saved. The crown is yours, champion of reading.</p>
+    <div class="parch" style="padding:20px">
+      <div class="stat-grid" id="winStats"></div>
+      <div style="text-align:center;margin-top:16px;font-family:var(--serif);font-size:18px;color:var(--ink)" id="winTitle"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+      <button class="btn" data-act="start">▶ Play Again</button>
+      <button class="btn purple" data-act="passport">📜 Passport</button>
+      <button class="btn purple" data-act="menu">Return to Menu</button>
+    </div>
+  </div></div>
+</section>
+
+<!-- BONUS FAIL -->
+<section id="bonusfail" class="screen lose" style="background-image:url('images/game_over_walnut_disaster.png')">
+  <div class="scrim"></div>
+  <div class="wrap"><div class="center-col">
+    <h2 class="big-banner">Walnut Disaster!</h2>
+    <p style="text-align:center;font-family:var(--serif);font-style:italic;color:#f4c9be;margin:0 0 18px;text-shadow:0 2px 8px rgba(0,0,0,.8)" id="bonusFailMsg">The royal walnuts are everywhere. The court is in fits of laughter. No harm done — except to your dignity.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn green" data-act="bonus">↺ Try Again</button>
+      <button class="btn purple" data-act="map">Return to Map</button>
+    </div>
+  </div></div>
+</section>
+
+<!-- PASSPORT MODAL -->
+<div class="modal" id="passModal">
+  <button class="x" data-close>✕</button>
+  <div class="modal-card parch">
+    <div class="passport-cover" style="background-image:url('images/knightly_success_passport.png')"></div>
+    <div class="passport-body">
+      <h3 id="ppName">Traveller</h3>
+      <p class="eyebrow" style="margin:0 0 12px;color:var(--ink-soft)">Knightly Success Passport</p>
+      <div class="pp-row"><span>Trials completed</span><b id="ppTrials">0 / 8</b></div>
+      <div class="pp-row"><span>Stars earned</span><b id="ppStars">★ 0</b></div>
+      <div class="pp-row"><span>Total score</span><b id="ppScore">0</b></div>
+      <div class="pp-row"><span>Bonus Walnut Express</span><b id="ppBonus">—</b></div>
+      <div class="pp-row"><span>Rank</span><b id="ppRank">Squire</b></div>
+      <div style="margin-top:16px"><button class="btn purple" data-close style="width:100%">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAME MODAL -->
+<div class="modal" id="nameModal">
+  <div class="modal-card parch" style="padding:22px">
+    <h3 style="font-family:var(--serif);margin:0 0 4px">Welcome, traveller!</h3>
+    <p style="margin:0 0 4px;font-size:14px;color:var(--ink-soft)">By what name shall the kingdom know you?</p>
+    <input class="name-input" id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off">
+    <button class="btn" id="nameOk" style="width:100%">Begin the Quest ▶</button>
+  </div>
+</div>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var KEY="HT_TOEIC_KINGDOM_V1";
+
+/* ============================ TRIALS ============================ */
+var TRIALS=[
+  {id:1,key:"crimson",name:"Crimson Knight Challenge",img:"crimson_knight.png",ribbon:"#c0473f",
+   skill:"Simple scanning",type:"scan",n:5,intro:"The Crimson Knight blocks the path. Find the facts he demands — fast.",timeTarget:80},
+  {id:2,key:"british",name:"British Castle",img:"british_castle.png",ribbon:"#4a7dc0",
+   skill:"Prices, times, bookings",type:"brochure",n:5,intro:"Read the castle's notices: prices, opening times and bookings.",timeTarget:90},
+  {id:3,key:"knights",name:"Knights Who Say TOEIC",img:"knights_who_say_toeic.png",ribbon:"#3f7d46",
+   skill:"Speed reading (timed)",type:"fast",n:6,intro:"They shout TOEIC! Find the answer before the hourglass empties.",perQ:9,timeTarget:54},
+  {id:4,key:"badger",name:"Badger Cave",img:"badger_cave.png",ribbon:"#8a6d3a",
+   skill:"Search under pressure",type:"search",n:6,intro:"A giant badger advances. Search the long scrolls — wrong answers bring it closer.",timeTarget:120},
+  {id:5,key:"magician",name:"Magician Trial",img:"magician_trial.png",ribbon:"#6c4fa0",
+   skill:"Inference",type:"inference",n:5,intro:"The magician is wrongly accused. Read between the lines to prove his innocence.",timeTarget:110},
+  {id:6,key:"wooooow",name:"Castle of Wooooow",img:"castle_of_wooooow.png",ribbon:"#b08a2a",
+   skill:"Multi-document",type:"multidoc",n:5,intro:"The villagers leap to absurd conclusions. Cross-check every document before you agree.",timeTarget:130},
+  {id:7,key:"bridge",name:"Bridge of Success",img:"bridge_of_success.png",ribbon:"#4a7dc0",
+   skill:"Extreme scanning (timed)",type:"fast",n:6,intro:"Cross the swaying bridge. One quick fact per plank — and the timer is merciless.",perQ:7,timeTarget:42},
+  {id:8,key:"palace",name:"Successful TOEIC Palace",img:"successful_toeic_palace.png",ribbon:"#d8b54a",
+   skill:"The ultimate mix",type:"mix",n:7,intro:"The final trial: scanning, inference, speed and multi-document — all at once.",timeTarget:160}
+];
+var BONUS={key:"walnut",name:"Walnut Express",img:"loading_walnut_express.png",ribbon:"#8a6d3a",
+   skill:"Routes, orders, deliveries",type:"walnut",n:6,intro:"Organise the royal walnut deliveries! Three blunders and it's a Walnut Disaster.",maxMiss:3};
+
+/* ============================ POOLS + HELPERS ============================ */
+function rnd(n){return Math.floor(Math.random()*n);}
+function pick(a){return a[rnd(a.length)];}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function rint(lo,hi){return lo+rnd(hi-lo+1);}
+
+var PEOPLE=["Sir Reginald","Lady Beatrice","Sir Cedric","Dame Wexley","Sir Aldric","Lady Morwen","Baron Fitzwilliam","Sir Percival","Dame Ophelia","Sir Tristan","Lady Guinevere","Squire Tomkin","Sir Bartholomew","Lady Rosalind"];
+var ORGS=["Dragonstone Trading Co.","Royal Quill Press","Camelot Catering","Griffin Logistics","The Walnut Guild","Castle Couriers","Avalon Imports","Ironforge Supplies","Thornwood Inn","Silverbrook Mills"];
+var VENUES=["the Great Hall","the Tower Library","the East Barracks","the Royal Market","the Gatehouse Office","the Banquet Hall","the Armoury","the Merchant Quarter","the Guild House"];
+var CITIES=["Camelot","Avalon","Dragonspire","Northgate","Eldermoor","Westhaven","Stonebridge","Ravenhollow","Highmarsh"];
+var DEPTS=["Accounting","Logistics","Catering","Maintenance","Marketing","Records","Procurement","Security"];
+var GOODS=["walnuts","scrolls","barrels of cider","wool bales","beeswax candles","horseshoes","sacks of spices","tapestries","oak planks"];
+var WEEKDAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+var MONTHS=["January","February","March","April","May","June","July","September","October","November"];
+
+function money(base){ if(base==null) base=pick([15,18,20,24,30,35,40,45,50,60,75,90,120]); var cents=pick([".00",".50",".95",".00",".00"]); return "£"+base+cents; }
+function moneyNear(str){ var base=parseInt(str.replace(/[^0-9]/g,""),10)||30; var d=pick([-30,-20,-10,-5,5,10,20,30]); var v=Math.max(5,base+d); return "£"+v+pick([".00",".50",".95"]); }
+function timeStr(){ return rint(1,12)+":"+pick(["00","15","30","45"])+" "+pick(["a.m.","p.m."]); }
+function timeNear(t){ var h=rint(1,12); return h+":"+pick(["00","15","30","45"])+" "+pick(["a.m.","p.m."]); }
+function dateStr(){ return pick(MONTHS)+" "+rint(1,28); }
+function weekdayDate(){ return pick(WEEKDAYS)+", "+pick(MONTHS)+" "+rint(1,28); }
+function phone(){ return "555-0"+String(rint(100,999)); }
+function address(){ return rint(1,99)+" "+pick(["Castle Lane","Dragon Road","Market Street","Tower Way","Mill Court","Abbey Road","Stonebridge Way","Quill Alley"]); }
+function refNo(){ return pick(["RQ","DG","CC","AV","GL"])+"-"+rint(100,999); }
+function pct(){ return pick([10,15,20,25,30,40,50])+"%"; }
+
+/* build 4 options from a correct value + a distractor generator (ensures uniqueness) */
+function makeOpts(correct, gen){
+  var set=[correct], guard=0;
+  while(set.length<4 && guard<60){ var d=gen(); if(set.indexOf(d)<0) set.push(d); guard++; }
+  while(set.length<4){ set.push(correct+" "+set.length); } // safety
+  var opts=shuffle(set);
+  return {opts:opts, answer:opts.indexOf(correct)};
+}
+
+/* ============================ DOCUMENT GENERATORS ============================
+   each returns a question object: {doc, prompt, opts[], answer, exp} */
+
+function gScan(){
+  var who=pick(PEOPLE), where=pick(VENUES), when=weekdayDate(), t=timeStr(), org=pick(ORGS);
+  var doc='<div class="doc parch"><div class="doc-kind">Royal Notice</div>'+
+    '<h4>'+org+' — Meeting Notice</h4>'+
+    '<p>'+who+' will meet the steward in '+where+'.</p>'+
+    '<div class="row"><span>Date</span><b>'+when+'</b></div>'+
+    '<div class="row"><span>Time</span><b>'+t+'</b></div>'+
+    '<div class="row"><span>Location</span><b>'+where+'</b></div>'+
+    '<p class="sig">Posted by the Office of '+pick(DEPTS)+'.</p></div>';
+  var facts=[
+    ["Who will attend the meeting?", who, function(){return pick(PEOPLE);}],
+    ["When is the meeting?", when, function(){return weekdayDate();}],
+    ["At what time does it start?", t, function(){return timeStr();}],
+    ["Where will they meet?", where, function(){return pick(VENUES);}]
+  ];
+  var f=pick(facts), o=makeOpts(f[1],f[2]);
+  return {doc:doc, prompt:f[0], opts:o.opts, answer:o.answer, exp:"Scan the notice for the exact line — the answer is stated directly."};
+}
+
+function gBrochure(){
+  var org=pick(ORGS), price=money(), open=timeStr(), tour=timeStr(), ph=phone();
+  var doc='<div class="doc parch"><div class="doc-kind">Brochure</div>'+
+    '<h4>'+org+' — Visitor Information</h4>'+
+    '<div class="row"><span>Admission</span><b>'+price+'</b></div>'+
+    '<div class="row"><span>Opening time</span><b>'+open+'</b></div>'+
+    '<div class="row"><span>Guided tour</span><b>'+tour+'</b></div>'+
+    '<div class="row"><span>To book, call</span><b>'+ph+'</b></div>'+
+    '<p>Group discounts of '+pct()+' are available with advance booking.</p></div>';
+  var facts=[
+    ["How much is admission?", price, function(){return moneyNear(price);}],
+    ["What time does it open?", open, function(){return timeStr();}],
+    ["When does the guided tour start?", tour, function(){return timeStr();}],
+    ["What number should you call to book?", ph, function(){return phone();}]
+  ];
+  var f=pick(facts), o=makeOpts(f[1],f[2]);
+  return {doc:doc, prompt:f[0], opts:o.opts, answer:o.answer, exp:"Brochures list details in rows — match the label to its value."};
+}
+
+function gFast(){
+  var kind=pick(["price","time","phone","address","dept","date"]);
+  var org=pick(ORGS), val, q, gen, label;
+  if(kind==="price"){ val=money(); label="Total due"; q="What is the total due?"; gen=function(){return moneyNear(val);}; }
+  else if(kind==="time"){ val=timeStr(); label="Departure"; q="What time is departure?"; gen=function(){return timeStr();}; }
+  else if(kind==="phone"){ val=phone(); label="Telephone"; q="What is the telephone number?"; gen=function(){return phone();}; }
+  else if(kind==="address"){ val=address(); label="Address"; q="What is the address?"; gen=function(){return address();}; }
+  else if(kind==="dept"){ val=pick(DEPTS); label="Department"; q="Which department handles this?"; gen=function(){return pick(DEPTS);}; }
+  else { val=dateStr(); label="Date"; q="On what date?"; gen=function(){return dateStr();}; }
+  var doc='<div class="doc parch"><div class="doc-kind">Quick Slip</div>'+
+    '<h4>'+org+'</h4>'+
+    '<div class="row"><span>Ref.</span><b>'+refNo()+'</b></div>'+
+    '<div class="row"><span>'+label+'</span><b>'+val+'</b></div>'+
+    '<div class="row"><span>Clerk</span><b>'+pick(PEOPLE)+'</b></div></div>';
+  var o=makeOpts(val,gen);
+  return {doc:doc, prompt:q, opts:o.opts, answer:o.answer, exp:"Find the one labelled line. Speed comes from looking for the label, not reading every word."};
+}
+
+function gSearch(){
+  // longer document, ask for one buried fact
+  var org=pick(ORGS), who=pick(PEOPLE), city=pick(CITIES), good=pick(GOODS);
+  var qty=rint(20,400), price=money(), when=weekdayDate(), ref=refNo();
+  var doc='<div class="doc parch"><div class="doc-kind">Long Scroll</div>'+
+    '<h4>'+org+' — Shipment Record '+ref+'</h4>'+
+    '<p>Following the council of last week, '+who+' confirmed the order placed by the guild of '+city+'. '+
+    'The shipment of '+qty+' '+good+' is to be prepared and sealed before dispatch. '+
+    'Payment of '+price+' was agreed, payable on delivery, not before.</p>'+
+    '<p>The caravan departs '+when+' and is expected to reach '+city+' within three days, weather and bandits permitting. '+
+    'Any delay must be reported to the Office of '+pick(DEPTS)+'. The steward reminds all clerks that '+
+    'the seal of '+org+' must appear on every crate, in red wax, without exception.</p>';
+  var facts=[
+    ["How many "+good+" are in the shipment?", String(qty), function(){return String(rint(20,400));}],
+    ["When does the caravan depart?", when, function(){return weekdayDate();}],
+    ["Who confirmed the order?", who, function(){return pick(PEOPLE);}],
+    ["What is the agreed payment?", price, function(){return moneyNear(price);}],
+    ["Where is the shipment going?", city, function(){return pick(CITIES);}]
+  ];
+  var f=pick(facts), o=makeOpts(f[1],f[2]);
+  return {doc:doc, prompt:f[0], opts:o.opts, answer:o.answer, exp:"The detail is buried in the paragraph. Scan for the keyword, then read just that sentence."};
+}
+
+function gInference(){
+  var who=pick(PEOPLE), org=pick(ORGS);
+  var scenarios=[
+    {doc:"\u201cI cannot have stolen the royal seal on Tuesday,\u201d wrote "+who+". \u201cI was in "+pick(CITIES)+" all week, as the innkeeper and three merchants will swear. I only returned this morning.\u201d",
+     prompt:"What does the letter most likely suggest?",
+     correct:who+" was away when the seal went missing",
+     wrong:[who+" admits taking the seal",who+" was in the castle on Tuesday",who+" refuses to explain"]},
+    {doc:"Memo from "+org+": \u201cSales of candles have fallen for three months. Yet we keep ordering more wax than ever. The storeroom can barely close.\u201d",
+     prompt:"What does the memo imply?",
+     correct:"The company is over-ordering wax",
+     wrong:["Candle sales are rising","The storeroom is empty","Wax is no longer needed"]},
+    {doc:"\u201cThe bridge tolls doubled, and now the market square is half empty,\u201d "+who+" noted. \u201cThe merchants used to cross daily. Lately I see only a handful.\u201d",
+     prompt:"What can be inferred?",
+     correct:"The higher toll probably discouraged merchants",
+     wrong:["The market is busier than ever","The bridge was destroyed","Merchants never used the bridge"]},
+    {doc:"Note pinned to the door: \u201cGone to the harbour to meet the spice caravan. If the barrels arrive before me, do NOT open them \u2014 last time the seal broke and we lost half. \u2014 "+who+"\u201d",
+     prompt:"Why most likely does "+who+" warn against opening the barrels?",
+     correct:"Opening them carelessly caused losses before",
+     wrong:["The barrels are empty","The harbour is closed","The spices were never ordered"]}
+  ];
+  var s=pick(scenarios);
+  var opts=shuffle([s.correct].concat(s.wrong));
+  var doc='<div class="doc parch"><div class="doc-kind">Testimony</div><h4>Evidence before the court</h4><p>'+s.doc+'</p></div>';
+  return {doc:doc, prompt:s.prompt, opts:opts, answer:opts.indexOf(s.correct),
+    exp:"Inference questions (suggests / implies / most likely) are never copied word-for-word — choose the conclusion the text best supports."};
+}
+
+function gMultiDoc(){
+  var org=pick(ORGS), who=pick(PEOPLE), city=pick(CITIES);
+  var d1Date=weekdayDate(), d2Date=weekdayDate();
+  var price=money(), qty=rint(30,200), good=pick(GOODS);
+  var emailDoc='<div class="doc parch"><div class="doc-kind">Document 1 — Letter</div><h4>From '+who+'</h4>'+
+    '<p>Dear steward, please prepare '+qty+' '+good+' for '+city+'. I will collect them in person and pay on the day. Do not dispatch them by caravan.</p>'+
+    '<p class="sig">— '+who+', '+d1Date+'</p></div>';
+  var schedDoc='<div class="doc parch"><div class="doc-kind">Document 2 — Schedule</div><h4>'+org+' Caravan Schedule</h4>'+
+    '<table><tr><th>Destination</th><th>Departs</th><th>Fee</th></tr>'+
+    '<tr><td>'+city+'</td><td>'+d2Date+'</td><td>'+price+'</td></tr>'+
+    '<tr><td>'+pick(CITIES)+'</td><td>'+weekdayDate()+'</td><td>'+money()+'</td></tr></table></div>';
+  // cross-reference question: the letter says collect in person / not by caravan -> conclusion
+  var correct=who+" will collect the goods personally, not by caravan";
+  var wrong=["The goods will travel on the "+city+" caravan","The order will be cancelled","Payment was made in advance"];
+  var opts=shuffle([correct].concat(wrong));
+  return {doc:emailDoc+schedDoc, multi:true, prompt:"Reading BOTH documents, what is the correct conclusion?",
+    opts:opts, answer:opts.indexOf(correct),
+    exp:"Multi-document questions trap hasty readers: the schedule lists a caravan, but the letter overrides it. Always check every document."};
+}
+
+function gWalnut(){
+  var who=pick(PEOPLE), city=pick(CITIES), qty=rint(3,18), when=pick(WEEKDAYS), ref=refNo();
+  var doc='<div class="doc parch"><div class="doc-kind">Delivery Order — Walnut Express</div>'+
+    '<h4>Order '+ref+'</h4>'+
+    '<div class="row"><span>Customer</span><b>'+who+'</b></div>'+
+    '<div class="row"><span>Destination</span><b>'+city+'</b></div>'+
+    '<div class="row"><span>Sacks of walnuts</span><b>'+qty+'</b></div>'+
+    '<div class="row"><span>Delivery day</span><b>'+when+'</b></div>'+
+    '<p class="sig">Handle with care. The King counts every walnut.</p></div>';
+  var facts=[
+    ["Where must the walnuts go?", city, function(){return pick(CITIES);}],
+    ["How many sacks are ordered?", String(qty), function(){return String(rint(3,18));}],
+    ["On which day is the delivery?", when, function(){return pick(WEEKDAYS);}],
+    ["Who is the customer?", who, function(){return pick(PEOPLE);}]
+  ];
+  var f=pick(facts), o=makeOpts(f[1],f[2]);
+  return {doc:doc, prompt:f[0], opts:o.opts, answer:o.answer, exp:"Read the order slip carefully — the King really does count every walnut."};
+}
+
+/* trial -> question generator(s) */
+function genForType(type){
+  switch(type){
+    case "scan": return gScan();
+    case "brochure": return gBrochure();
+    case "fast": return gFast();
+    case "search": return gSearch();
+    case "inference": return gInference();
+    case "multidoc": return gMultiDoc();
+    case "walnut": return gWalnut();
+    case "mix": return pick([gScan,gBrochure,gFast,gSearch,gInference,gMultiDoc])();
+    default: return gScan();
+  }
+}
+function buildQuestions(trial){
+  var out=[]; for(var i=0;i<trial.n;i++) out.push(genForType(trial.type)); return out;
+}
+
+/* ============================ STATE ============================ */
+function defaultState(){
+  return {name:"", trials:{}, bonusCleared:false, settings:{music:false}};
+  // trials[key] = {stars, score, done}
+}
+var state=load();
+function load(){
+  try{ var raw=localStorage.getItem(KEY); if(raw){ var s=JSON.parse(raw); var d=defaultState();
+    s.trials=s.trials||{}; s.settings=Object.assign(d.settings,s.settings||{}); s.name=s.name||""; s.bonusCleared=!!s.bonusCleared; return s; } }catch(e){}
+  return defaultState();
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+
+function trialIndexByKey(k){ for(var i=0;i<TRIALS.length;i++) if(TRIALS[i].key===k) return i; return -1; }
+function isUnlocked(idx){ if(idx===0) return true; var prev=TRIALS[idx-1]; return !!(state.trials[prev.key] && state.trials[prev.key].done); }
+function totalStars(){ var s=0; for(var k in state.trials) s+=state.trials[k].stars||0; return s; }
+function totalScore(){ var s=0; for(var k in state.trials) s+=state.trials[k].score||0; if(state.bonusCleared) s+=300; return s; }
+function trialsDone(){ var n=0; for(var i=0;i<TRIALS.length;i++){ if(state.trials[TRIALS[i].key]&&state.trials[TRIALS[i].key].done) n++; } return n; }
+function rankName(){ var d=trialsDone(); if(state.trials.palace&&state.trials.palace.done) return "Champion of the Realm"; if(d>=6) return "Royal Knight"; if(d>=4) return "Knight"; if(d>=2) return "Page"; return "Squire"; }
+
+/* ============================ MUSIC ============================ */
+var bgm=$("bgm"), BASE_VOL=0.4; bgm.volume=BASE_VOL;
+function reflectMusic(){ var b=$("musicBtn"); if(state.settings.music){ b.textContent="🔊 Music on"; b.setAttribute("aria-pressed","true"); } else { b.textContent="🔇 Music off"; b.setAttribute("aria-pressed","false"); } }
+function startMusic(){ if(state.settings.music && bgm.paused){ var p=bgm.play(); if(p&&p.catch) p.catch(function(){}); } }
+$("musicBtn").addEventListener("click",function(){ state.settings.music=!state.settings.music; save(); reflectMusic(); if(state.settings.music) startMusic(); else bgm.pause(); });
+function firstGesture(){ startMusic(); document.removeEventListener("pointerdown",firstGesture); document.removeEventListener("keydown",firstGesture); }
+document.addEventListener("pointerdown",firstGesture); document.addEventListener("keydown",firstGesture);
+
+/* ============================ ROUTER ============================ */
+var SCREENS=["loading","menu","how","map","trial","victory","bonusfail"];
+var timerId=null;
+function show(id){
+  SCREENS.forEach(function(s){ var el=$(s); if(el) el.classList.toggle("active",s===id); });
+  $("passBtn").classList.toggle("show", id!=="loading" && id!=="menu");
+  if(id!=="trial"){ clearTimer(); }
+  window.scrollTo(0,0);
+}
+
+/* ============================ MAP ============================ */
+function starStr(n){ var s=""; for(var i=0;i<3;i++) s+='<span class="'+(i<n?"on":"")+'">★</span>'; return s; }
+function renderMap(){
+  $("mapKpis").innerHTML='<span class="kpi">Trials <b>'+trialsDone()+'/8</b></span>'+
+    '<span class="kpi">Stars <b>★ '+totalStars()+'</b></span>'+
+    '<span class="kpi">Score <b>'+totalScore()+'</b></span>';
+  var host=$("trail"); host.innerHTML="";
+  TRIALS.forEach(function(t,idx){
+    var rec=state.trials[t.key], done=rec&&rec.done, unlocked=isUnlocked(idx);
+    var div=document.createElement("div"); div.className="node parch"+(unlocked?"":" locked")+(done?" done":"");
+    var inner='<div class="ribbon" style="background:linear-gradient(180deg,'+t.ribbon+','+shade(t.ribbon,-25)+')">'+
+        '<span class="num">'+t.id+'</span><span>'+t.name+'</span></div>'+
+      '<div class="body"><div class="stars">'+starStr(rec?rec.stars:0)+'</div>'+
+        '<p>'+t.skill+'</p>';
+    if(unlocked){ inner+='<button class="btn '+(done?"green":"")+'" data-trial="'+t.key+'">'+(done?"Replay":"Enter")+' ▶</button>'; }
+    else { inner+='<div class="lockmsg">🔒 Clear the previous trial to unlock.</div>'; }
+    inner+='</div>';
+    div.innerHTML=inner; host.appendChild(div);
+  });
+  // bonus node
+  var allDone=trialsDone()>=8;
+  var b=document.createElement("div"); b.className="node parch"+(state.bonusCleared?" done":"");
+  b.innerHTML='<div class="ribbon" style="background:linear-gradient(180deg,'+BONUS.ribbon+','+shade(BONUS.ribbon,-25)+')">'+
+      '<span class="num">★</span><span>Bonus · '+BONUS.name+'</span></div>'+
+    '<div class="body"><p>'+BONUS.skill+' — a silly royal side-quest. Available any time!</p>'+
+    '<button class="btn purple" data-bonus="1">'+(state.bonusCleared?"Play again":"Try the bonus")+' ▶</button></div>';
+  host.appendChild(b);
+}
+function shade(hex,amt){ var c=hex.replace("#",""); if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2]; var n=parseInt(c,16); var r=clampB((n>>16)+amt),g=clampB(((n>>8)&255)+amt),b=clampB((n&255)+amt); return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
+function clampB(x){ return Math.max(0,Math.min(255,x)); }
+
+/* ============================ TRIAL FLOW ============================ */
+var run=null;
+function startTrial(trial){
+  var sec=$("trial");
+  var img = trial.img ? "url('images/"+trial.img+"')" : "none";
+  // fallback gradient (covers the missing british_castle.png gracefully)
+  sec.style.background="linear-gradient(rgba(20,12,32,.2),rgba(15,9,26,.4)), "+img+" center/cover, linear-gradient(160deg,#3a2a63,#1d1438)";
+  run={trial:trial, qs:buildQuestions(trial), qi:0, correct:0, miss:0, badger:0, start:Date.now()};
+  $("trialName").textContent=trial.name;
+  $("trialSkill").textContent=trial.skill;
+  $("badgerWrap").style.display = (trial.type==="search")?"block":"none";
+  renderPips();
+  show("trial");
+  renderQuestion();
+}
+function renderPips(){
+  var host=$("trialPips"); host.innerHTML="";
+  for(var i=0;i<run.qs.length;i++){ var p=document.createElement("span"); p.className="pip"+(i<run.qi?(run.qs[i]._ok?" ok":" no"):"")+(i===run.qi?" cur":""); host.appendChild(p); }
+}
+function clearTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } $("timerWrap").style.display="none"; }
+
+function renderQuestion(){
+  var q=run.qs[run.qi]; q._answered=false;
+  $("docs").className="docs"+(q.multi?" multi":"");
+  $("docs").innerHTML=q.doc;
+  $("qPrompt").textContent=(run.qi+1)+". "+q.prompt;
+  var fb=$("feedback"); fb.className="feedback"; fb.innerHTML="";
+  var host=$("opts"); host.innerHTML="";
+  q.opts.forEach(function(text,i){
+    var btn=document.createElement("button");
+    btn.className="opt"; btn.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span>'+escapeHtml(text)+'</span>';
+    btn.addEventListener("click",function(){ answer(i); });
+    host.appendChild(btn);
+  });
+  renderPips();
+  // per-question timer for fast trials
+  clearTimer();
+  if(run.trial.perQ){
+    $("timerWrap").style.display="block";
+    var total=run.trial.perQ*1000, left=total, fill=$("timerFill"); fill.style.width="100%";
+    var t0=Date.now();
+    timerId=setInterval(function(){
+      left=total-(Date.now()-t0); var p=Math.max(0,left/total*100); fill.style.width=p+"%";
+      if(left<=0){ clearInterval(timerId); timerId=null; if(!q._answered) answer(-1,true); }
+    },60);
+  }
+  setTimeout(function(){ var f=host.querySelector(".opt"); if(f) f.focus(); },80);
+}
+
+function answer(i, timeout){
+  var q=run.qs[run.qi]; if(q._answered) return; q._answered=true;
+  if(timerId){ clearInterval(timerId); timerId=null; }
+  var correct = (i===q.answer);
+  q._ok=correct;
+  var btns=$("opts").querySelectorAll(".opt");
+  btns.forEach(function(b,idx){ b.disabled=true; if(idx===q.answer) b.classList.add("correct"); else if(idx===i) b.classList.add("wrong"); });
+  if(correct){ run.correct++; if(run.trial.type==="search"){ run.badger=Math.max(0,run.badger-18); updateBadger(); } }
+  else {
+    run.miss++;
+    if(run.trial.type==="search"){ run.badger=Math.min(100,run.badger+26); updateBadger(); }
+  }
+  var fb=$("feedback"); fb.className="feedback show "+(correct?"ok":"no");
+  var head = correct?"✓ Correct!":(timeout?"⌛ Time's up!":"✕ Not quite");
+  fb.innerHTML='<div class="fh">'+head+'</div>'+
+    (correct?"":'<div>Correct answer: <b>'+escapeHtml(q.opts[q.answer])+'</b></div>')+
+    '<div style="margin-top:6px;color:var(--ink-soft)">'+escapeHtml(q.exp)+'</div>'+
+    '<div class="next"><button class="btn green" id="nextBtn">'+(run.qi+1<run.qs.length?"Next ›":"Finish ›")+'</button></div>';
+  $("nextBtn").addEventListener("click",nextQ); $("nextBtn").focus();
+  announce(correct?"Correct.":"Incorrect. Answer: "+q.opts[q.answer]);
+  renderPips();
+  // badger caught you?
+  if(run.trial.type==="search" && run.badger>=100){ setTimeout(badgerCaught,700); return; }
+  // walnut bonus fail?
+  if(run.trial.type==="walnut" && run.miss>=BONUS.maxMiss){ setTimeout(bonusFail,700); return; }
+}
+function updateBadger(){ $("badger").style.left=(run.badger*0.82)+"%"; }
+
+function nextQ(){
+  run.qi++;
+  if(run.qi>=run.qs.length){ finishTrial(); return; }
+  renderQuestion();
+}
+
+function badgerCaught(){
+  // not a hard game-over (no frustration): bounce back to map with a note
+  clearTimer();
+  alert("🦡 The badger caught you! Take a breath and try the cave again.");
+  renderMap(); show("map");
+}
+
+function finishTrial(){
+  clearTimer();
+  if(run.trial.type==="walnut"){ // bonus success
+    state.bonusCleared=true; save(); confetti(20);
+    alert("🌰 Deliveries complete! The King is delighted. (+300 score)");
+    renderMap(); show("map"); return;
+  }
+  var total=run.qs.length, ratio=run.correct/total, elapsed=(Date.now()-run.start)/1000;
+  var pass = ratio>=0.6;
+  var perfect = run.correct===total;
+  var fast = elapsed <= run.trial.timeTarget;
+  var stars = !pass?0:(perfect?3:(fast?2:1));
+  var gained = run.correct*100 + stars*50;
+
+  if(!pass){
+    alert("The path stays blocked — you need at least "+Math.ceil(total*0.6)+"/"+total+". Try the trial again!");
+    renderMap(); show("map"); return;
+  }
+  var prev=state.trials[run.trial.key]||{stars:0,score:0,done:false};
+  state.trials[run.trial.key]={ stars:Math.max(prev.stars,stars), score:Math.max(prev.score,gained), done:true };
+  save();
+  if(run.trial.key==="palace"){ victory(); return; }
+  confetti(10);
+  var msg="Trial cleared! "+["","⭐","⭐⭐","⭐⭐⭐"][stars]+"  (+"+gained+" score)";
+  if(stars<3) msg+="\n\nTip: a perfect, quick run earns ⭐⭐⭐.";
+  alert(msg);
+  renderMap(); show("map");
+}
+
+/* ============================ VICTORY ============================ */
+function victory(){
+  confetti(80);
+  $("winStats").innerHTML=
+    '<div class="stat parch"><div class="v">'+totalStars()+'</div><div class="k">Stars (max 24)</div></div>'+
+    '<div class="stat parch"><div class="v">'+totalScore()+'</div><div class="k">Total score</div></div>'+
+    '<div class="stat parch"><div class="v">8/8</div><div class="k">Trials cleared</div></div>'+
+    '<div class="stat parch"><div class="v">'+(state.bonusCleared?"✓":"—")+'</div><div class="k">Walnut bonus</div></div>';
+  $("winTitle").textContent = (state.name? state.name+", ":"")+"you are crowned "+rankName()+"!";
+  show("victory");
+}
+
+/* ============================ BONUS FAIL ============================ */
+function bonusFail(){ clearTimer(); show("bonusfail"); }
+
+/* ============================ CONFETTI ============================ */
+function confetti(n){
+  var host=$("confetti"); var cols=["#d8b54a","#f0d27a","#6c4fa0","#9e2b2b","#4a7dc0","#3f7d46"];
+  for(var i=0;i<n;i++){ var c=document.createElement("i");
+    c.style.left=rnd(100)+"%"; c.style.background=pick(cols);
+    c.style.animationDuration=(1.8+Math.random()*2.2)+"s"; c.style.animationDelay=(Math.random()*0.6)+"s";
+    host.appendChild(c); (function(el){ setTimeout(function(){ el.remove(); }, 4600); })(c);
+  }
+}
+
+/* ============================ PASSPORT ============================ */
+function openPassport(){
+  $("ppName").textContent = state.name || "Traveller";
+  $("ppTrials").textContent = trialsDone()+" / 8";
+  $("ppStars").textContent = "★ "+totalStars();
+  $("ppScore").textContent = totalScore();
+  $("ppBonus").textContent = state.bonusCleared? "Cleared 🌰":"Not yet";
+  $("ppRank").textContent = rankName();
+  $("passModal").classList.add("show");
+}
+
+/* ============================ NAME / START ============================ */
+function beginQuest(){
+  if(!state.name){ $("nameInput").value=""; $("nameModal").classList.add("show"); setTimeout(function(){$("nameInput").focus();},60); return; }
+  goToFirstAvailable();
+}
+function goToFirstAvailable(){
+  // first not-done unlocked trial, else map
+  for(var i=0;i<TRIALS.length;i++){ if(isUnlocked(i) && !(state.trials[TRIALS[i].key]&&state.trials[TRIALS[i].key].done)){ startTrial(TRIALS[i]); return; } }
+  renderMap(); show("map");
+}
+$("nameOk").addEventListener("click",function(){
+  var v=$("nameInput").value.trim()||"Brave Knight"; state.name=v.slice(0,20); save();
+  $("nameModal").classList.remove("show"); goToFirstAvailable();
+});
+$("nameInput").addEventListener("keydown",function(e){ if(e.key==="Enter") $("nameOk").click(); });
+
+/* ============================ RESET ============================ */
+function resetProgress(){
+  if(!confirm("Reset ALL progress, stars, score and your name? This cannot be undone.")) return;
+  localStorage.removeItem(KEY); state=defaultState(); save(); reflectMusic(); renderMap(); announce("Progress reset."); show("menu");
+}
+
+/* ============================ EVENTS ============================ */
+document.addEventListener("click",function(e){
+  var act=e.target.closest&&e.target.closest("[data-act]");
+  if(act){ var a=act.getAttribute("data-act");
+    if(a==="start") beginQuest();
+    else if(a==="map"){ renderMap(); show("map"); }
+    else if(a==="how") show("how");
+    else if(a==="menu") show("menu");
+    else if(a==="passport") openPassport();
+    else if(a==="reset") resetProgress();
+    else if(a==="bonus") startTrial(BONUS);
+    return;
+  }
+  var tr=e.target.closest&&e.target.closest("[data-trial]");
+  if(tr){ var key=tr.getAttribute("data-trial"); var idx=trialIndexByKey(key); if(idx>=0 && isUnlocked(idx)) startTrial(TRIALS[idx]); return; }
+  if(e.target.closest&&e.target.closest("[data-bonus]")){ startTrial(BONUS); return; }
+  if(e.target.closest&&e.target.closest("[data-close]")){ $("passModal").classList.remove("show"); return; }
+});
+$("passBtn").addEventListener("click",openPassport);
+$("abandonBtn").addEventListener("click",function(){ if(confirm("Abandon this trial and return to the map?")){ clearTimer(); renderMap(); show("map"); } });
+// keyboard 1-4 in trial
+document.addEventListener("keydown",function(e){
+  if(!$("trial").classList.contains("active")) return;
+  if(["1","2","3","4"].indexOf(e.key)>=0){ var opts=$("opts").querySelectorAll(".opt"); var i=parseInt(e.key,10)-1; if(opts[i]&&!opts[i].disabled) opts[i].click(); }
+});
+
+/* ============================ HELPERS ============================ */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function announce(t){ var l=$("live"); if(l){ l.textContent=""; setTimeout(function(){ l.textContent=t; },50); } }
+
+/* ============================ BOOT ============================ */
+var loadMsgs=["Polishing the armour…","Unrolling the scrolls…","Feeding the royal badger…","Counting the walnuts…","Raising the banners…"];
+function boot(){
+  reflectMusic(); show("loading");
+  var pct=0,i=0; $("loadMsg").textContent=loadMsgs[0];
+  var t=setInterval(function(){ pct+=Math.random()*22+10; if(pct>100)pct=100; $("loadFill").style.width=pct+"%";
+    i=Math.min(loadMsgs.length-1,Math.floor(pct/20)); $("loadMsg").textContent=loadMsgs[i];
+    if(pct>=100){ clearInterval(t); setTimeout(function(){ show("menu"); },450); } },420);
+}
+boot();
+</script>
+</body>
+</html>
