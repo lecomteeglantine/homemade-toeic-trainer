@@ -488,6 +488,94 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
   </section>
 
   <!-- =================== NOS JEUX (regroupés) =================== -->
+  <style>
+  .ttt-card{ margin-top:18px; background:linear-gradient(180deg,#FFF6F2,var(--card,#fff)); border:1px solid var(--line,#ECE6DA); border-left:4px solid var(--coral,#FF7F6A); }
+  .ttt-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .ttt-date{ font-size:.72rem; color:var(--ink-soft,#5A6B82); white-space:nowrap; }
+  .ttt-word{ margin:10px 0 8px; font-size:1.15rem; color:var(--ink,#22324B); }
+  .ttt-line{ margin:4px 0; font-size:.95rem; line-height:1.35; }
+  .ttt-mk{ font-weight:800; margin-right:5px; }
+  .ttt-x{ color:var(--coral,#FF7F6A); }
+  .ttt-v{ color:var(--teal,#2EC4B6); }
+  .ttt-wrong span:last-child{ color:var(--ink-soft,#5A6B82); text-decoration:line-through; text-decoration-color:rgba(255,127,106,.55); }
+  .ttt-tip{ margin:10px 0 0; font-size:.85rem; color:var(--ink-soft,#5A6B82); border-top:1px dashed var(--line,#ECE6DA); padding-top:8px; }
+  .ttt-more{ margin-top:10px; background:transparent; border:0; color:var(--coral,#FF7F6A); font:inherit; font-weight:600; font-size:.85rem; cursor:pointer; padding:0; }
+  .ttt-more:hover{ text-decoration:underline; }
+  @media (min-width:1600px){
+    .ttt-card{ position:fixed; top:96px; right:18px; width:220px; z-index:55; margin-top:0; max-height:calc(100vh - 120px); overflow:auto; box-shadow:0 12px 34px rgba(34,50,75,.12); }
+  }
+  </style>
+  <aside id="tttWrap" class="ttt-card card" aria-labelledby="ttt-h" aria-live="polite">
+    <div class="ttt-head">
+      <span class="pill coral">Today's TOEIC Trap</span>
+      <span class="ttt-date" id="tttDate"></span>
+    </div>
+    <h3 id="ttt-h" class="ttt-word"><span id="tttCat" style="font-size:.7rem;color:var(--ink-soft,#5A6B82);font-weight:600;display:block;margin-bottom:2px"></span><span id="tttWord"></span></h3>
+    <p class="ttt-line ttt-wrong"><span class="ttt-mk ttt-x" aria-hidden="true">&#10007;</span><span id="tttWrong"></span></p>
+    <p class="ttt-line ttt-right"><span class="ttt-mk ttt-v" aria-hidden="true">&#10003;</span><span id="tttRight"></span></p>
+    <p class="ttt-tip" id="tttTip"></p>
+    <button type="button" class="ttt-more" id="tttMore">Un autre piège &rarr;</button>
+  </aside>
+  <script>
+  (function(){
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded",fn); } }
+    ready(function(){
+      var DEFAULT_TRAPS=[
+        {c:"Quantité",t:"much / many",w:"How many money do you need?",r:"How much money do you need?",tip:"much + indénombrable (money, time) ; many + dénombrable pluriel."},
+        {c:"Temps",t:"since / for",w:"I've worked here since three years.",r:"I've worked here for three years.",tip:"for + durée ; since + point de départ (since 2020)."},
+        {c:"Verbe",t:"make / do",w:"We need to do a decision.",r:"We need to make a decision.",tip:"make a decision / an offer ; do business / homework."},
+        {c:"Indénombrable",t:"advice",w:"He gave me some advices.",r:"He gave me some advice.",tip:"advice est indénombrable : jamais de -s."},
+        {c:"Indénombrable",t:"information",w:"I need some informations.",r:"I need some information.",tip:"information ne prend jamais de -s."},
+        {c:"Préposition",t:"look forward to",w:"I look forward to meet you.",r:"I look forward to meeting you.",tip:"ici « to » est une préposition -> verbe en -ing."},
+        {c:"Habitude",t:"be used to",w:"I'm used to work late.",r:"I'm used to working late.",tip:"be used to + -ing (habitué à) ; used to + base (autrefois)."},
+        {c:"Concession",t:"despite",w:"Despite of the rain, we left.",r:"Despite the rain, we left.",tip:"despite + nom, sans « of ». Le « of » va avec in spite of."},
+        {c:"Préposition",t:"arrive",w:"We arrived to the office.",r:"We arrived at the office.",tip:"arrive at (lieu précis) ; arrive in (ville/pays). Jamais « to »."},
+        {c:"Préposition",t:"depend",w:"It depends of the price.",r:"It depends on the price.",tip:"depend ON, toujours."},
+        {c:"Verbe transitif",t:"discuss",w:"Let's discuss about the plan.",r:"Let's discuss the plan.",tip:"discuss est transitif : pas de « about »."},
+        {c:"Structure",t:"explain",w:"Please explain me the report.",r:"Please explain the report to me.",tip:"explain something TO somebody."},
+        {c:"Structure",t:"suggest",w:"I suggest to leave early.",r:"I suggest leaving early.",tip:"suggest + -ing (ou « that »), jamais « to » + verbe."},
+        {c:"Structure",t:"recommend",w:"I recommend to book now.",r:"I recommend booking now.",tip:"recommend + -ing (ou « that »)."},
+        {c:"Structure",t:"avoid",w:"Avoid to make mistakes.",r:"Avoid making mistakes.",tip:"avoid + -ing."},
+        {c:"Accord",t:"each / every",w:"Every employees were present.",r:"Every employee was present.",tip:"each/every + nom singulier + verbe singulier."},
+        {c:"Quantité",t:"few / a few",w:"I have few friends here — great!",r:"I have a few friends here — great!",tip:"a few = quelques (positif) ; few = peu (négatif)."},
+        {c:"Échéance",t:"by / until",w:"Please finish it until Friday.",r:"Please finish it by Friday.",tip:"by = au plus tard (échéance) ; until = jusqu'à (action continue)."},
+        {c:"Préposition",t:"between / among",w:"Choose among the two options.",r:"Choose between the two options.",tip:"between = 2 ; among = 3 et plus."},
+        {c:"Verbe",t:"raise / rise",w:"Prices raised last year.",r:"Prices rose last year.",tip:"raise = augmenter qqch (transitif) ; rise = monter (intransitif)."},
+        {c:"Confusion",t:"affect / effect",w:"This will effect sales.",r:"This will affect sales.",tip:"affect = verbe (influencer) ; effect = nom (l'effet)."},
+        {c:"Orthographe",t:"its / it's",w:"The company lost it's contract.",r:"The company lost its contract.",tip:"its = possessif ; it's = it is / it has."},
+        {c:"Quantité",t:"fewer / less",w:"We had less complaints.",r:"We had fewer complaints.",tip:"fewer + dénombrable pluriel ; less + indénombrable."},
+        {c:"Confusion",t:"economic / economical",w:"An economical crisis hit us.",r:"An economic crisis hit us.",tip:"economic = lié à l'économie ; economical = économe."},
+        {c:"Faux ami",t:"sensible / sensitive",w:"She is very sensible to criticism.",r:"She is very sensitive to criticism.",tip:"sensitive = sensible (émotions) ; sensible = raisonnable."},
+        {c:"Temps",t:"on time / in time",w:"The train arrived in time.",r:"The train arrived on time.",tip:"on time = à l'heure pile ; in time = à temps (avant la limite)."},
+        {c:"Expression",t:"at the end / in the end",w:"In the end of the meeting...",r:"At the end of the meeting...",tip:"at the end of = à la fin de ; in the end = finalement."},
+        {c:"Verbe",t:"borrow / lend",w:"Can you borrow me your pen?",r:"Can you lend me your pen?",tip:"borrow = emprunter ; lend = prêter."},
+        {c:"Adverbe",t:"hard / hardly",w:"He works hardly every day.",r:"He works hard every day.",tip:"hard = dur ; hardly = à peine (presque pas)."},
+        {c:"Dénombrable",t:"job / work",w:"I have a good work.",r:"I have a good job.",tip:"job (dénombrable : a job) ; work (indénombrable : pas de « a »)."},
+        {c:"Structure",t:"married to",w:"She is married with a doctor.",r:"She is married to a doctor.",tip:"married TO somebody."},
+        {c:"Structure",t:"prefer ... to",w:"I prefer tea than coffee.",r:"I prefer tea to coffee.",tip:"prefer A to B."}
+      ];
+      var TRAPS = (window.TOEIC_BANK && window.TOEIC_BANK.TRAPS && window.TOEIC_BANK.TRAPS.length) ? window.TOEIC_BANK.TRAPS : DEFAULT_TRAPS;
+      var day = Math.floor(Date.now()/86400000);
+      var base = ((day % TRAPS.length) + TRAPS.length) % TRAPS.length;
+      var offset = 0;
+      function $(id){ return document.getElementById(id); }
+      function render(){
+        var t = TRAPS[((base + offset) % TRAPS.length + TRAPS.length) % TRAPS.length];
+        if(!t) return;
+        try{ $("tttDate").textContent = new Date().toLocaleDateString("fr-FR",{day:"numeric",month:"long"}); }catch(e){ $("tttDate").textContent=""; }
+        $("tttCat").textContent = t.c || "";
+        $("tttWord").textContent = t.t || "";
+        $("tttWrong").textContent = t.w || "";
+        $("tttRight").textContent = t.r || "";
+        $("tttTip").textContent = t.tip || "";
+      }
+      var more = $("tttMore");
+      if(more){ more.addEventListener("click", function(){ offset++; render(); }); }
+      render();
+    });
+  })();
+  </script>
+
   <section class="games-zone" aria-labelledby="games-h" style="margin-top:18px">
     <div style="background:linear-gradient(180deg,var(--coral-soft),var(--card) 72%);border:1px solid var(--line);border-radius:var(--r);padding:22px">
       <span class="pill coral">Apprendre en s'amusant</span>
