@@ -400,9 +400,9 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
 <!-- HOME -->
 <section class="view active" id="home" aria-labelledby="home-h">
   <style>
-  .hero-row{ display:flex; gap:20px; align-items:flex-start; }
-  .hero-main{ flex:1 1 auto; min-width:0; }
-  .hero-side{ flex:0 0 264px; margin-top:0; }
+  .hero-row{ display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:24px; align-items:start; }
+  .hero-main{ min-width:0; }
+  .hero-side{ margin-top:6px; }
   .ttt-card{ background:linear-gradient(180deg,#FFF6F2,var(--card,#fff)); border:1px solid var(--line,#ECE6DA); border-left:4px solid var(--coral,#FF7F6A); }
   .ttt-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .ttt-date{ font-size:.72rem; color:var(--ink-soft,#5A6B82); white-space:nowrap; }
@@ -415,7 +415,7 @@ html[data-focus="on"] .focus-hide{ display:none !important; }
   .ttt-tip{ margin:10px 0 0; font-size:.83rem; color:var(--ink-soft,#5A6B82); border-top:1px dashed var(--line,#ECE6DA); padding-top:8px; }
   .ttt-more{ margin-top:10px; background:transparent; border:0; color:var(--coral,#FF7F6A); font:inherit; font-weight:600; font-size:.83rem; cursor:pointer; padding:0; }
   .ttt-more:hover{ text-decoration:underline; }
-  @media (max-width:900px){ .hero-row{ flex-direction:column; } .hero-side{ flex:1 1 auto; width:100%; } }
+  @media (max-width:900px){ .hero-row{ grid-template-columns:1fr; } }
   </style>
   <div class="hero">
     <div class="hero-row">
