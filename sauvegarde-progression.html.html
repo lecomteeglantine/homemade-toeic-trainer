@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4F7CFF">
+  <title>Sauvegarde de progression — Homemade TOEIC Trainer</title>
+  <style>
+    :root{
+      --blue:#4F7CFF;
+      --blue-dark:#3A63DB;
+      --ink:#1F2A44;
+      --soft:#EEF2FF;
+      --soft-2:#F7F9FF;
+      --line:#D7DEFB;
+      --ok:#1E7A46;
+      --ok-soft:#EAF7F0;
+      --gold:#9C6B12;
+      --gold-soft:#FFF8E8;
+      --muted:#5B6478;
+      --white:#FFFFFF;
+      --danger:#A13C30;
+      --danger-soft:#FFF0ED;
+      --shadow:0 16px 38px rgba(31,42,68,.10);
+      --shadow-sm:0 5px 18px rgba(31,42,68,.08);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 88% 12%, rgba(79,124,255,.13), transparent 27rem),
+        linear-gradient(180deg,#FFFFFF 0%,#F8FAFF 58%,#F1F4FF 100%);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      line-height:1.55;
+    }
+
+    button,input{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    :focus-visible{
+      outline:3px solid var(--blue);
+      outline-offset:3px;
+      border-radius:10px;
+    }
+
+    .skip-link{
+      position:absolute;
+      left:-9999px;
+      top:8px;
+      z-index:999;
+      padding:.7rem 1rem;
+      border-radius:10px;
+      background:#fff;
+      color:var(--ink);
+      font-weight:800;
+      box-shadow:var(--shadow-sm);
+    }
+    .skip-link:focus{left:8px}
+
+    /* Header aligned with the Homemade TOEIC Trainer identity */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      border-bottom:1px solid rgba(215,222,251,.88);
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+    }
+    .topbar-inner{
+      width:min(1180px,calc(100% - 32px));
+      min-height:78px;
+      margin:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      text-decoration:none;
+    }
+    .brand-mark{
+      flex:0 0 auto;
+      width:48px;
+      height:48px;
+      display:grid;
+      place-items:center;
+      border-radius:15px;
+      background:linear-gradient(145deg,var(--blue),#7AA0FF);
+      color:#fff;
+      font-weight:900;
+      letter-spacing:-.04em;
+      box-shadow:0 8px 18px rgba(79,124,255,.30);
+    }
+    .brand-copy{min-width:0}
+    .brand-title{
+      display:block;
+      font-size:1rem;
+      font-weight:900;
+      line-height:1.12;
+      white-space:nowrap;
+    }
+    .brand-by{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.78rem;
+      white-space:nowrap;
+    }
+    .top-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .top-link,
+    .top-button{
+      min-height:40px;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:.5rem .82rem;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:var(--ink);
+      text-decoration:none;
+      font-weight:800;
+      font-size:.9rem;
+    }
+    .top-link:hover,
+    .top-button:hover{background:var(--soft)}
+    .top-button{border-color:transparent}
+
+    .accent-row{
+      width:min(1180px,calc(100% - 32px));
+      margin:auto;
+      padding:8px 0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    .accent-pills{
+      display:inline-flex;
+      gap:3px;
+      padding:3px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+    }
+    .accent-pill{
+      border:0;
+      background:transparent;
+      color:var(--muted);
+      padding:.28rem .62rem;
+      border-radius:999px;
+      font-weight:800;
+    }
+    .accent-pill.is-active{
+      color:#fff;
+      background:var(--ink);
+    }
+
+    main{
+      width:min(1120px,calc(100% - 32px));
+      margin:0 auto;
+      padding:58px 0 74px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);
+      gap:28px;
+      align-items:stretch;
+      margin-bottom:26px;
+    }
+    .hero-main,
+    .hero-side{
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:rgba(255,255,255,.92);
+      box-shadow:var(--shadow);
+    }
+    .hero-main{
+      padding:clamp(26px,4vw,48px);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-main::after{
+      content:"";
+      position:absolute;
+      right:-90px;
+      bottom:-120px;
+      width:310px;
+      height:310px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(79,124,255,.22),rgba(79,124,255,0) 68%);
+      pointer-events:none;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:.38rem .72rem;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--blue-dark);
+      font-size:.78rem;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    h1{
+      position:relative;
+      z-index:1;
+      max-width:760px;
+      margin:18px 0 14px;
+      font-size:clamp(2.25rem,5vw,4.35rem);
+      line-height:1.01;
+      letter-spacing:-.045em;
+    }
+    .blue-text{color:var(--blue)}
+    .lead{
+      position:relative;
+      z-index:1;
+      max-width:720px;
+      margin:0;
+      color:var(--muted);
+      font-size:clamp(1rem,1.8vw,1.18rem);
+    }
+    .hero-tags{
+      position:relative;
+      z-index:1;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+    .hero-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:.5rem .72rem;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      font-weight:800;
+      font-size:.88rem;
+      box-shadow:0 3px 10px rgba(31,42,68,.05);
+    }
+
+    .hero-side{
+      padding:26px;
+      background:
+        linear-gradient(160deg,var(--ink),#2C3B61);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .side-icon{
+      width:54px;
+      height:54px;
+      display:grid;
+      place-items:center;
+      border-radius:17px;
+      background:rgba(255,255,255,.12);
+      font-size:1.65rem;
+    }
+    .hero-side h2{
+      margin:0;
+      font-size:1.3rem;
+      line-height:1.18;
+    }
+    .hero-side p{
+      margin:8px 0 0;
+      color:rgba(255,255,255,.76);
+      font-size:.94rem;
+    }
+    .side-note{
+      padding:13px 14px;
+      border:1px solid rgba(255,255,255,.17);
+      border-radius:14px;
+      background:rgba(255,255,255,.07);
+      font-size:.85rem;
+      color:rgba(255,255,255,.82);
+    }
+
+    .steps{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:0 0 26px;
+      color:var(--muted);
+      font-size:.9rem;
+      font-weight:800;
+    }
+    .step{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:.48rem .72rem;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 3px 12px rgba(31,42,68,.04);
+    }
+    .step-num{
+      width:24px;
+      height:24px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      color:#fff;
+      background:var(--blue);
+      font-size:.78rem;
+    }
+    .step-arrow{color:#9AA3B6}
+
+    .action-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:20px;
+    }
+    .card{
+      position:relative;
+      padding:28px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+      box-shadow:var(--shadow-sm);
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto 0 0;
+      width:5px;
+      background:linear-gradient(180deg,var(--blue),#8EABFF);
+    }
+    .card.import::before{
+      background:linear-gradient(180deg,var(--gold),#E3B95B);
+    }
+    .card-head{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:12px;
+    }
+    .card-icon{
+      flex:0 0 auto;
+      width:48px;
+      height:48px;
+      display:grid;
+      place-items:center;
+      border-radius:15px;
+      background:var(--soft);
+      color:var(--blue-dark);
+      font-size:1.4rem;
+      font-weight:900;
+    }
+    .import .card-icon{
+      background:var(--gold-soft);
+      color:var(--gold);
+    }
+    .card-kicker{
+      margin:0 0 3px;
+      color:var(--blue-dark);
+      font-size:.75rem;
+      font-weight:900;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .import .card-kicker{color:var(--gold)}
+    .card h2{
+      margin:0;
+      font-size:1.42rem;
+      line-height:1.16;
+    }
+    .card-copy{
+      margin:0 0 16px;
+      color:var(--muted);
+    }
+
+    .status{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:48px;
+      margin-top:15px;
+      padding:11px 13px;
+      border:1px solid var(--line);
+      border-radius:13px;
+      background:var(--soft-2);
+      color:var(--muted);
+      font-size:.91rem;
+    }
+    .status-dot{
+      width:10px;
+      height:10px;
+      flex:0 0 auto;
+      border-radius:50%;
+      background:var(--blue);
+      box-shadow:0 0 0 5px rgba(79,124,255,.10);
+    }
+    .status strong{color:var(--ink)}
+
+    .btn{
+      width:100%;
+      min-height:52px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      margin-top:15px;
+      padding:.75rem 1rem;
+      border:1px solid transparent;
+      border-radius:13px;
+      background:var(--blue);
+      color:#fff;
+      font-weight:900;
+      box-shadow:0 8px 18px rgba(79,124,255,.22);
+      transition:transform .16s ease,background .16s ease,box-shadow .16s ease;
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+      background:var(--blue-dark);
+      box-shadow:0 10px 22px rgba(79,124,255,.28);
+    }
+    .btn.import-btn{
+      background:var(--ink);
+      box-shadow:0 8px 18px rgba(31,42,68,.20);
+    }
+    .btn.import-btn:hover{background:#121C31}
+    .btn:disabled{
+      cursor:not-allowed;
+      opacity:.45;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .file-label{
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      padding:.75rem 1rem;
+      border:2px dashed var(--line);
+      border-radius:13px;
+      background:var(--soft-2);
+      color:var(--ink);
+      font-weight:900;
+      text-align:center;
+      cursor:pointer;
+    }
+    .file-label:hover{
+      border-color:var(--blue);
+      background:var(--soft);
+    }
+    input[type=file]{
+      position:absolute;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .preview{
+      display:none;
+      margin-top:14px;
+      padding:13px 14px;
+      border:1px solid var(--line);
+      border-radius:13px;
+      background:var(--soft-2);
+      color:var(--muted);
+      font-size:.9rem;
+    }
+    .preview.show{display:block}
+    .preview strong{color:var(--ok)}
+
+    .message{
+      display:none;
+      margin-top:20px;
+      padding:15px 17px;
+      border-radius:14px;
+      font-weight:800;
+    }
+    .message.show{display:block}
+    .message.ok{
+      color:#245A38;
+      border:1px solid #A9D8BB;
+      background:var(--ok-soft);
+    }
+    .message.error{
+      color:var(--danger);
+      border:1px solid #E4A194;
+      background:var(--danger-soft);
+    }
+
+    .info-strip{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:14px;
+      align-items:start;
+      margin-top:22px;
+      padding:18px 20px;
+      border:1px solid var(--line);
+      border-radius:17px;
+      background:linear-gradient(135deg,var(--soft),#fff);
+    }
+    .info-strip-icon{
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:13px;
+      background:#fff;
+      color:var(--blue-dark);
+      box-shadow:0 4px 12px rgba(31,42,68,.08);
+    }
+    .info-strip h3{
+      margin:0 0 4px;
+      font-size:1rem;
+    }
+    .info-strip p{
+      margin:0;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    details.help{
+      margin-top:22px;
+      border:1px solid var(--line);
+      border-radius:17px;
+      background:#fff;
+      box-shadow:0 5px 18px rgba(31,42,68,.05);
+    }
+    details.help summary{
+      cursor:pointer;
+      list-style:none;
+      padding:18px 20px;
+      font-weight:900;
+    }
+    details.help summary::-webkit-details-marker{display:none}
+    details.help summary::after{
+      content:"+";
+      float:right;
+      color:var(--blue);
+      font-size:1.2rem;
+    }
+    details.help[open] summary::after{content:"−"}
+    .help-body{
+      padding:0 20px 20px;
+      color:var(--muted);
+    }
+    .help-body ol{
+      margin:0;
+      padding-left:1.25rem;
+    }
+    .help-body li+li{margin-top:7px}
+
+    footer{
+      padding:24px 20px 34px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    /* Accessibility */
+    .access-panel{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      background:rgba(20,28,49,.46);
+      padding:20px;
+    }
+    .access-panel.open{
+      display:grid;
+      place-items:center;
+    }
+    .access-box{
+      width:min(520px,100%);
+      max-height:90vh;
+      overflow:auto;
+      padding:24px;
+      border-radius:22px;
+      background:#fff;
+      box-shadow:0 28px 70px rgba(31,42,68,.28);
+    }
+    .access-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .access-head h2{margin:0}
+    .close-panel{
+      width:40px;
+      height:40px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:var(--ink);
+      font-weight:900;
+    }
+    .access-option{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+      border-top:1px solid var(--line);
+    }
+    .access-option:first-of-type{border-top:0}
+    .access-option strong{display:block}
+    .access-option small{color:var(--muted)}
+    .access-toggle{
+      min-width:74px;
+      padding:.5rem .7rem;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      color:var(--ink);
+      font-weight:800;
+    }
+    .access-toggle.on{
+      color:#fff;
+      background:var(--blue);
+      border-color:var(--blue);
+    }
+
+    body.large-text{font-size:18px}
+    body.high-contrast{
+      --ink:#000;
+      --muted:#252525;
+      --line:#64748B;
+      --soft:#E8EDFF;
+      --soft-2:#F3F5FF;
+    }
+    body.dyslexia{
+      font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;
+      letter-spacing:.02em;
+      line-height:1.72;
+    }
+
+    @media(max-width:850px){
+      .hero{grid-template-columns:1fr}
+      .action-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:690px){
+      .topbar-inner{
+        align-items:flex-start;
+        padding:13px 0;
+      }
+      .top-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .accent-row{
+        justify-content:flex-start;
+      }
+      .brand-title{white-space:normal}
+      main{padding-top:34px}
+      .hero-main,.hero-side{border-radius:22px}
+      .card{padding:22px}
+      .steps{justify-content:flex-start}
+      .step-arrow{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *{scroll-behavior:auto!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html" aria-label="Retour à Homemade TOEIC Trainer">
+      <span class="brand-mark" aria-hidden="true">HT</span>
+      <span class="brand-copy">
+        <span class="brand-title">Homemade TOEIC Trainer</span>
+        <span class="brand-by">Créé par Eglantine Lecomte</span>
+      </span>
+    </a>
+
+    <div class="top-actions">
+      <button class="top-button" id="openAccessibility" type="button">⚙ Accessibilité</button>
+      <a class="top-link" href="index.html#about">ⓘ À propos</a>
+      <a class="top-link" href="index.html">← Accueil</a>
+    </div>
+  </div>
+
+  <div class="accent-row" aria-label="Accent sélectionné">
+    <span>Accent :</span>
+    <span class="accent-pills">
+      <button class="accent-pill is-active" type="button" aria-pressed="true">US</button>
+      <button class="accent-pill" type="button" aria-pressed="false">UK</button>
+      <button class="accent-pill" type="button" aria-pressed="false">AU</button>
+      <button class="accent-pill" type="button" aria-pressed="false">CA</button>
+    </span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="hero-main">
+      <span class="eyebrow">📊 Ta progression</span>
+      <h1>Change d’appareil.<br><span class="blue-text">Pas de progression.</span></h1>
+      <p class="lead">
+        Exporte les données enregistrées dans ton navigateur, puis réimporte-les sur ton nouvel ordinateur,
+        ta tablette ou ton téléphone.
+      </p>
+      <div class="hero-tags" aria-label="Avantages">
+        <span class="hero-tag">🔒 Aucune donnée envoyée</span>
+        <span class="hero-tag">⚡ Transfert rapide</span>
+        <span class="hero-tag">📁 Un seul fichier JSON</span>
+      </div>
+    </div>
+
+    <aside class="hero-side">
+      <div>
+        <div class="side-icon" aria-hidden="true">💾</div>
+        <h2>Une sauvegarde locale, comme ta progression.</h2>
+        <p>Le fichier reste sous ton contrôle : tu le télécharges, tu le conserves et tu choisis quand l’importer.</p>
+      </div>
+      <div class="side-note">
+        Le score estimé reste une estimation pédagogique et non un score officiel du TOEIC.
+      </div>
+    </aside>
+  </section>
+
+  <div class="steps" aria-label="Étapes du transfert">
+    <span class="step"><span class="step-num">1</span>Exporter</span>
+    <span class="step-arrow">→</span>
+    <span class="step"><span class="step-num">2</span>Conserver le fichier</span>
+    <span class="step-arrow">→</span>
+    <span class="step"><span class="step-num">3</span>Importer</span>
+    <span class="step-arrow">→</span>
+    <span class="step"><span class="step-num">4</span>Actualiser le site</span>
+  </div>
+
+  <section class="action-grid" aria-label="Exporter ou importer sa progression">
+    <article class="card">
+      <div class="card-head">
+        <div class="card-icon" aria-hidden="true">⇩</div>
+        <div>
+          <p class="card-kicker">Ancien appareil</p>
+          <h2>Exporter ma progression</h2>
+        </div>
+      </div>
+      <p class="card-copy">
+        Utilise ce bouton sur l’appareil qui contient actuellement tes résultats, tes mots et tes statistiques.
+      </p>
+      <div class="status" id="exportStatus" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Analyse des données locales…</span>
+      </div>
+      <button class="btn" id="exportBtn" type="button">⇩ Télécharger ma sauvegarde</button>
+    </article>
+
+    <article class="card import">
+      <div class="card-head">
+        <div class="card-icon" aria-hidden="true">⇧</div>
+        <div>
+          <p class="card-kicker">Nouvel appareil</p>
+          <h2>Importer ma progression</h2>
+        </div>
+      </div>
+      <p class="card-copy">
+        Sélectionne le fichier JSON créé sur l’ancien appareil. Vérifie son contenu, puis confirme l’import.
+      </p>
+      <label class="file-label" for="importFile">📁 Choisir mon fichier de sauvegarde</label>
+      <input id="importFile" type="file" accept=".json,application/json">
+      <div class="preview" id="preview" aria-live="polite"></div>
+      <button class="btn import-btn" id="importBtn" type="button" disabled>⇧ Importer cette sauvegarde</button>
+    </article>
+  </section>
+
+  <div class="message" id="message" role="status" aria-live="polite"></div>
+
+  <section class="info-strip">
+    <div class="info-strip-icon" aria-hidden="true">ⓘ</div>
+    <div>
+      <h3>Bon à savoir</h3>
+      <p>
+        Les sites hébergés sous <strong>lecomteeglantine.github.io</strong> utilisent le même stockage de navigateur.
+        La sauvegarde inclut donc toutes les données locales enregistrées sous ce domaine afin d’éviter d’en oublier.
+      </p>
+    </div>
+  </section>
+
+  <details class="help">
+    <summary>Comment transférer ma progression ?</summary>
+    <div class="help-body">
+      <ol>
+        <li>Sur l’ancien appareil, clique sur <strong>Télécharger ma sauvegarde</strong>.</li>
+        <li>Envoie-toi le fichier JSON ou conserve-le sur une clé USB ou un espace cloud.</li>
+        <li>Sur le nouvel appareil, reviens sur cette page et sélectionne le fichier.</li>
+        <li>Après l’import, retourne à l’accueil et actualise la page.</li>
+      </ol>
+    </div>
+  </details>
+</main>
+
+<footer>
+  Homemade TOEIC Trainer · Conçu et développé par Eglantine Lecomte · Site pédagogique indépendant, non affilié à ETS Global.
+</footer>
+
+<div class="access-panel" id="accessPanel" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
+  <div class="access-box">
+    <div class="access-head">
+      <div>
+        <h2 id="accessTitle">Réglages d’accessibilité</h2>
+        <small>Tes réglages restent sur cet appareil.</small>
+      </div>
+      <button class="close-panel" id="closeAccessibility" type="button" aria-label="Fermer">×</button>
+    </div>
+
+    <div class="access-option">
+      <div><strong>Grand texte</strong><small>Augmente la taille générale.</small></div>
+      <button class="access-toggle" data-setting="large-text" type="button">Non</button>
+    </div>
+    <div class="access-option">
+      <div><strong>Contraste élevé</strong><small>Renforce les couleurs et les bordures.</small></div>
+      <button class="access-toggle" data-setting="high-contrast" type="button">Non</button>
+    </div>
+    <div class="access-option">
+      <div><strong>Police adaptée</strong><small>Interlignes et espacement plus confortables.</small></div>
+      <button class="access-toggle" data-setting="dyslexia" type="button">Non</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const FORMAT = "eglantine-local-progress-backup";
+  const VERSION = 1;
+  const MAX_FILE_SIZE = 8 * 1024 * 1024;
+
+  const exportStatus = document.getElementById("exportStatus");
+  const exportBtn = document.getElementById("exportBtn");
+  const importFile = document.getElementById("importFile");
+  const importBtn = document.getElementById("importBtn");
+  const preview = document.getElementById("preview");
+  const message = document.getElementById("message");
+  let pendingBackup = null;
+
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "message show " + type;
+    message.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+
+  function storageSnapshot() {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (key !== null) data[key] = localStorage.getItem(key);
+    }
+    return data;
+  }
+
+  function updateStatus() {
+    const count = localStorage.length;
+    exportStatus.innerHTML =
+      '<span class="status-dot" aria-hidden="true"></span>' +
+      '<span><strong>' + count + '</strong> ' +
+      (count === 1 ? 'donnée enregistrée trouvée dans ce navigateur.' : 'données enregistrées trouvées dans ce navigateur.') +
+      '</span>';
+    exportBtn.disabled = count === 0;
+  }
+
+  function formatDate(iso) {
+    try {
+      return new Intl.DateTimeFormat("fr-FR",{dateStyle:"medium",timeStyle:"short"}).format(new Date(iso));
+    } catch (_) {
+      return iso;
+    }
+  }
+
+  exportBtn.addEventListener("click", () => {
+    try {
+      const backup = {
+        format: FORMAT,
+        version: VERSION,
+        origin: location.origin,
+        exportedAt: new Date().toISOString(),
+        sourcePath: location.pathname,
+        storageType: "localStorage",
+        data: storageSnapshot()
+      };
+
+      const blob = new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "sauvegarde-progression-toeic-" + new Date().toISOString().slice(0,10) + ".json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      showMessage(
+        "Sauvegarde téléchargée : " + Object.keys(backup.data).length + " données enregistrées.",
+        "ok"
+      );
+    } catch (error) {
+      console.error(error);
+      showMessage("La sauvegarde n’a pas pu être créée. Réessaie.", "error");
+    }
+  });
+
+  importFile.addEventListener("change", async () => {
+    pendingBackup = null;
+    importBtn.disabled = true;
+    preview.className = "preview";
+
+    const file = importFile.files && importFile.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      showMessage("Ce fichier est trop volumineux pour être une sauvegarde valide.", "error");
+      importFile.value = "";
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(await file.text());
+
+      if (
+        !parsed ||
+        parsed.format !== FORMAT ||
+        parsed.version !== VERSION ||
+        typeof parsed.data !== "object" ||
+        Array.isArray(parsed.data)
+      ) {
+        throw new Error("invalid");
+      }
+
+      if (parsed.origin && parsed.origin !== location.origin) {
+        throw new Error("origin");
+      }
+
+      for (const [key,value] of Object.entries(parsed.data)) {
+        if (typeof key !== "string" || (value !== null && typeof value !== "string")) {
+          throw new Error("invalid");
+        }
+      }
+
+      pendingBackup = parsed;
+      const count = Object.keys(parsed.data).length;
+      preview.innerHTML =
+        "<strong>✓ Fichier de sauvegarde valide</strong><br>" +
+        "Date : " + formatDate(parsed.exportedAt) + "<br>" +
+        count + " données seront importées.";
+      preview.className = "preview show";
+      importBtn.disabled = false;
+      message.className = "message";
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        error.message === "origin"
+          ? "Cette sauvegarde a été créée pour un autre site."
+          : "Ce fichier n’est pas une sauvegarde de progression valide.",
+        "error"
+      );
+      importFile.value = "";
+    }
+  });
+
+  importBtn.addEventListener("click", () => {
+    if (!pendingBackup) return;
+
+    let imported = 0;
+    const failed = [];
+
+    for (const [key,value] of Object.entries(pendingBackup.data)) {
+      try {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key,value);
+        imported += 1;
+      } catch (error) {
+        console.error("Import impossible pour",key,error);
+        failed.push(key);
+      }
+    }
+
+    updateStatus();
+
+    if (failed.length) {
+      showMessage(
+        "Import partiel : " + imported + " données restaurées ; " + failed.length + " n’ont pas pu être importées.",
+        "error"
+      );
+    } else {
+      showMessage(
+        "Import terminé : " + imported + " données restaurées. Retourne à l’accueil et actualise la page.",
+        "ok"
+      );
+    }
+  });
+
+  /* Accent selector — visual consistency with the main site */
+  document.querySelectorAll(".accent-pill").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".accent-pill").forEach((item) => {
+        item.classList.remove("is-active");
+        item.setAttribute("aria-pressed","false");
+      });
+      button.classList.add("is-active");
+      button.setAttribute("aria-pressed","true");
+    });
+  });
+
+  /* Accessibility panel */
+  const accessPanel = document.getElementById("accessPanel");
+  const openAccessibility = document.getElementById("openAccessibility");
+  const closeAccessibility = document.getElementById("closeAccessibility");
+
+  openAccessibility.addEventListener("click", () => {
+    accessPanel.classList.add("open");
+    closeAccessibility.focus();
+  });
+  closeAccessibility.addEventListener("click", () => {
+    accessPanel.classList.remove("open");
+    openAccessibility.focus();
+  });
+  accessPanel.addEventListener("click", (event) => {
+    if (event.target === accessPanel) closeAccessibility.click();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && accessPanel.classList.contains("open")) {
+      closeAccessibility.click();
+    }
+  });
+
+  document.querySelectorAll(".access-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      const setting = button.dataset.setting;
+      const active = document.body.classList.toggle(setting);
+      button.classList.toggle("on",active);
+      button.textContent = active ? "Oui" : "Non";
+      button.setAttribute("aria-pressed",String(active));
+    });
+  });
+
+  updateStatus();
+})();
+</script>
+</body>
+</html>
