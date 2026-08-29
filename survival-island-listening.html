@@ -3,1304 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="TOEIC Survival Island — a listening adventure training TOEIC auditory traps: numbers, minimal pairs, word stress, final sounds, business confusions, connected speech and details.">
+<meta name="description" content="TOEIC Survival Island — a listening adventure training numbers, minimal pairs, word stress, final sounds, business vocabulary, connected speech and listening for detail.">
 <title>TOEIC Survival Island — Listening Adventure</title>
 <style>
 :root{
-  --parch:#efe3c6; --parch-2:#e6d5ad; --parch-edge:#c9b079;
-  --ink:#2b2013; --ink-soft:#5c4a31;
-  --wood:#5b3d22; --wood-d:#3a2614; --wood-dd:#241608;
-  --water:#2f7d8c; --water-l:#57b3c4;
-  --food:#c4622d; --energy:#d8a93a; --shelter:#7a5bc4; --signal:#3f9b46;
-  --danger:#b5402f; --danger-d:#7d2417;
-  --gold:#d8a93a; --gold-d:#a8801f;
-  --good:#2f6b35;
-  --shadow:0 10px 30px rgba(0,0,0,.45);
-  --disp:'Arial Narrow','Helvetica Neue Condensed',system-ui,sans-serif;
-  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --hand:Georgia,'Times New Roman',serif;
+  --parch:#efe3c6;--parch2:#e6d5ad;--edge:#c9b079;--ink:#2b2013;--soft:#5c4a31;
+  --wood:#5b3d22;--woodd:#3a2614;--danger:#b5402f;--good:#2f6b35;--gold:#d8a93a;
+  --shadow:0 10px 30px rgba(0,0,0,.45);--disp:'Arial Narrow','Helvetica Neue Condensed',system-ui,sans-serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--hand:Georgia,'Times New Roman',serif;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;height:100%;}
-body{
-  font-family:var(--body); color:var(--ink); background:#0d1410;
-  -webkit-font-smoothing:antialiased; overflow:hidden;
-}
-button{font-family:inherit;cursor:pointer;}
-img{display:block;}
-
-/* ---------- screens ---------- */
-.screen{position:fixed;inset:0;display:none;background-size:cover;background-position:center;}
-.screen.active{display:block;}
-.scrim{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 30%,rgba(8,14,10,.25),rgba(8,14,10,.78));}
-.wrap{position:relative;height:100%;width:100%;overflow-y:auto;}
-
-/* ---------- wood / parchment chrome ---------- */
-.wood{
-  background:linear-gradient(180deg,#6b4a2b,#4a3019 60%,#3a2513);
-  border:2px solid #241608; border-radius:14px;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), inset 0 -6px 14px rgba(0,0,0,.45), var(--shadow);
-}
-.parch{
-  background:
-    radial-gradient(140% 120% at 20% 0%, #f6ecd2, var(--parch) 55%, var(--parch-2));
-  border:2px solid var(--parch-edge); border-radius:12px;
-  box-shadow:inset 0 0 40px rgba(150,120,70,.25), var(--shadow);
-  color:var(--ink);
-}
-.label{font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-weight:800;}
-
-/* ---------- main menu ---------- */
-#menu .wrap{display:flex;align-items:center;justify-content:center;padding:24px;}
-.menu-card{width:min(440px,94vw);padding:26px;text-align:center;}
-.menu-title{
-  font-family:var(--disp);font-weight:800;text-transform:uppercase;
-  font-size:clamp(34px,7vw,58px);line-height:.92;letter-spacing:.03em;
-  color:#fff;margin:0 0 4px;text-shadow:0 3px 0 #241608,0 6px 14px rgba(0,0,0,.6);
-}
-.menu-sub{font-family:var(--hand);font-style:italic;color:#f4e6c0;margin:0 0 20px;font-size:clamp(14px,2.4vw,18px);text-shadow:0 2px 6px rgba(0,0,0,.7);}
-.menu-btns{display:flex;flex-direction:column;gap:10px;}
-.btn{
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;font-weight:800;
-  font-size:16px;color:#f7eccf;padding:13px 16px;border-radius:11px;border:2px solid #241608;
-  background:linear-gradient(180deg,#6e4a28,#4a3018 65%,#371f0f);
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.1),inset 0 -6px 12px rgba(0,0,0,.4);
-  transition:transform .08s ease,filter .15s ease;
-}
-.btn:hover{filter:brightness(1.12);}
-.btn:active{transform:translateY(2px);}
-.btn.gold{background:linear-gradient(180deg,#e7c35c,#c79a2c 60%,#9c7716);color:#231703;text-shadow:0 1px 0 rgba(255,255,255,.3);}
-.btn.green{background:linear-gradient(180deg,#3f9b46,#2c6e32 65%,#1f4e25);}
-.btn.danger{background:linear-gradient(180deg,#c04a37,#8d2c1d 65%,#6a1d11);}
-.btn:focus-visible{outline:3px solid #ffe07a;outline-offset:2px;}
-.btn[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.4);}
-
-/* music pill (always visible) */
-#musicBtn{
-  position:fixed;top:14px;right:14px;z-index:50;
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.05em;font-weight:800;font-size:13px;
-  color:#f7eccf;padding:9px 14px;border-radius:30px;border:2px solid #241608;
-  background:linear-gradient(180deg,#6e4a28,#3a2513);box-shadow:var(--shadow);
-}
-#musicBtn .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#4be07a;margin-right:7px;box-shadow:0 0 8px #4be07a;vertical-align:middle;}
-#musicBtn.off .dot{background:#7a6a55;box-shadow:none;}
-#musicBtn:focus-visible{outline:3px solid #ffe07a;outline-offset:2px;}
-
-/* accent toggle */
-.accent-toggle{display:inline-flex;border:2px solid #241608;border-radius:30px;overflow:hidden;box-shadow:var(--shadow);}
-.accent-toggle button{
-  font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:13px;
-  color:#f0e2c0;padding:8px 14px;border:none;background:#4a3018;
-}
-.accent-toggle button.on{background:linear-gradient(180deg,#e7c35c,#a8801f);color:#231703;}
-
-/* ---------- generic panels list ---------- */
-.section-title{font-family:var(--disp);text-transform:uppercase;font-weight:800;letter-spacing:.05em;font-size:clamp(22px,4vw,34px);color:#fff;text-shadow:0 2px 0 #241608,0 5px 12px rgba(0,0,0,.6);margin:0 0 14px;}
-.panel-pad{padding:22px;}
-.center-col{max-width:760px;margin:0 auto;padding:26px 18px 60px;}
-.back-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
-
-/* ---------- island map ---------- */
-.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
-.node{padding:14px;text-align:left;border-radius:12px;position:relative;}
-.node .num{font-family:var(--disp);font-weight:800;font-size:26px;line-height:1;}
-.node h3{margin:6px 0 4px;font-family:var(--disp);text-transform:uppercase;letter-spacing:.03em;font-size:16px;}
-.node p{margin:0;font-size:12.5px;color:var(--ink-soft);}
-.node .state{position:absolute;top:10px;right:12px;font-size:18px;}
-.node.locked{filter:grayscale(.5);opacity:.72;}
-.node.done{box-shadow:inset 0 0 0 3px var(--good),var(--shadow);}
-.node button.play{margin-top:10px;width:100%;}
-
-/* ---------- mission HUD ---------- */
-#mission .wrap{display:block;}
-.hud-top{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:10px;pointer-events:none;z-index:5;flex-wrap:wrap;}
-.status{width:min(260px,46vw);padding:10px 12px;pointer-events:auto;}
-.status .st-h{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:#f0e2c0;margin-bottom:8px;}
-.bar-row{display:flex;align-items:center;gap:8px;margin:5px 0;color:#f3e8cd;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
-.bar-row .ic{width:16px;text-align:center;}
-.bar-row .nm{width:54px;}
-.bar{flex:1;height:9px;background:rgba(0,0,0,.45);border-radius:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.5);}
-.bar i{display:block;height:100%;width:0;border-radius:6px;transition:width .4s ease;}
-.bar-row .pct{width:34px;text-align:right;}
-.b-water i{background:linear-gradient(90deg,#2f7d8c,#57b3c4);}
-.b-food i{background:linear-gradient(90deg,#9c3f17,#e07b3a);}
-.b-energy i{background:linear-gradient(90deg,#b6861f,#f2cf52);}
-.b-shelter i{background:linear-gradient(90deg,#5a3fa0,#9b7ce0);}
-.b-signal i{background:linear-gradient(90deg,#1f6b2a,#5fd068);}
-
-.progress-nodes{display:flex;align-items:center;gap:4px;pointer-events:auto;padding:8px 12px;}
-.pnode{width:26px;height:26px;border-radius:50%;border:2px solid #241608;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:13px;color:#f0e2c0;background:#3a2513;}
-.pnode.cur{background:linear-gradient(180deg,#3f9b46,#2c6e32);box-shadow:0 0 0 2px #ffe07a;}
-.pnode.done{background:linear-gradient(180deg,#3f9b46,#2c6e32);}
-.pnode .lk{font-size:11px;}
-.mtag{padding:8px 12px;font-family:var(--disp);font-weight:800;text-transform:uppercase;color:#f0e2c0;font-size:12px;text-align:center;}
-
-/* question card on right */
-.qcard{
-  position:absolute;top:62px;right:12px;bottom:78px;width:min(460px,92vw);
-  display:flex;flex-direction:column;overflow:hidden;z-index:4;
-}
-.qcard .q-h{padding:12px 16px;color:#fff;font-family:var(--disp);text-transform:uppercase;font-weight:800;letter-spacing:.03em;}
-.qcard .q-h .big{font-size:clamp(20px,3.4vw,28px);line-height:1;}
-.qcard .q-h .sub{font-size:12px;opacity:.92;font-weight:600;letter-spacing:.04em;margin-top:3px;}
-.q-body{flex:1;overflow-y:auto;padding:14px 16px 16px;}
-.q-instr{font-size:13.5px;color:var(--ink-soft);line-height:1.45;margin:0 0 12px;}
-.q-instr b{color:var(--ink);}
-.audio-row{display:flex;align-items:center;gap:12px;background:rgba(180,150,90,.18);border:1px solid var(--parch-edge);border-radius:12px;padding:10px 12px;margin-bottom:14px;}
-.play-big{width:54px;height:54px;border-radius:50%;border:3px solid #241608;color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:var(--shadow);}
-.wave{flex:1;height:26px;background:
-  repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 5px);
-  -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-  mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-  opacity:.35;color:var(--ink-soft);border-radius:4px;}
-.wave.playing{animation:wv .9s steps(4) infinite;opacity:.7;}
-@keyframes wv{50%{transform:scaleY(.55);}}
-.q-prompt{font-weight:800;font-size:15px;margin:2px 0 10px;color:var(--ink);}
-.opts{display:flex;flex-direction:column;gap:9px;}
-.opt{
-  display:flex;align-items:center;gap:11px;text-align:left;width:100%;
-  background:linear-gradient(180deg,#6b4a2b,#4a3018);border:2px solid #241608;border-radius:10px;
-  padding:11px 12px;color:#f4e8cd;font-size:15px;font-weight:600;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.08);transition:filter .12s,transform .06s;
-}
-.opt:hover:not(:disabled){filter:brightness(1.12);}
-.opt:active:not(:disabled){transform:translateY(1px);}
-.opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:#241608;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;}
-.opt.correct{background:linear-gradient(180deg,#3f9b46,#2c6e32);border-color:#173f1c;}
-.opt.wrong{background:linear-gradient(180deg,#c04a37,#7d2417);border-color:#4a120a;}
-.opt:disabled{cursor:default;}
-.opt:focus-visible{outline:3px solid #ffe07a;outline-offset:2px;}
-
-.feedback{margin-top:14px;padding:12px 13px;border-radius:11px;font-size:13.5px;line-height:1.5;display:none;}
-.feedback.show{display:block;}
-.feedback.ok{background:rgba(47,107,53,.16);border:1px solid #2f6b35;}
-.feedback.no{background:rgba(181,64,47,.16);border:1px solid #b5402f;}
-.feedback .fb-h{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:14px;margin-bottom:5px;}
-.feedback .tip{margin-top:7px;font-family:var(--hand);font-style:italic;color:var(--ink-soft);}
-.feedback .next{margin-top:11px;}
-
-/* bottom toolbar */
-.toolbar{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:6;display:flex;gap:0;padding:6px 8px;}
-.tool{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:#f3e8cd;padding:6px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;position:relative;}
-.tool .ti{font-size:20px;}
-.tool:not(:last-child){border-right:1px solid rgba(255,255,255,.12);}
-.tool:hover{color:#ffe07a;}
-.tool:focus-visible{outline:3px solid #ffe07a;outline-offset:2px;border-radius:8px;}
-.tool .badge{position:absolute;top:0;right:6px;background:#3f9b46;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;}
-
-.end-mission{position:absolute;right:12px;bottom:12px;z-index:6;}
-
-/* hint / help bubbles */
-.bubble{position:absolute;left:50%;transform:translateX(-50%);bottom:120px;z-index:9;width:min(420px,90vw);padding:14px 16px;font-size:14px;line-height:1.5;display:none;}
-.bubble.show{display:block;}
-.bubble .bx{position:absolute;top:8px;right:10px;background:none;border:none;font-size:18px;color:var(--ink-soft);}
-
-/* ---------- logbook / victory / gameover stats ---------- */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px;}
-.stat{padding:14px;text-align:center;}
-.stat .v{font-family:var(--disp);font-weight:800;font-size:30px;line-height:1;color:var(--ink);}
-.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-top:5px;}
-.list-line{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px dashed var(--parch-edge);font-size:14px;}
-.list-line:last-child{border-bottom:none;}
-
-.big-banner{font-family:var(--disp);text-transform:uppercase;font-weight:800;text-align:center;font-size:clamp(34px,8vw,64px);line-height:.95;margin:0 0 6px;}
-.win .big-banner{color:#ffe07a;text-shadow:0 3px 0 #5a3a00,0 7px 16px rgba(0,0,0,.6);}
-.lose .big-banner{color:#ff8d77;text-shadow:0 3px 0 #4a120a,0 7px 16px rgba(0,0,0,.6);}
-
-/* review */
-.review-item{padding:13px;margin-bottom:10px;}
-.review-item .rq{font-weight:700;margin-bottom:6px;}
-.review-item .ra{font-size:13.5px;}
-.review-item .ra .you{color:var(--danger-d);font-weight:700;}
-.review-item .ra .ans{color:var(--good);font-weight:700;}
-.review-item .rx{margin-top:6px;font-family:var(--hand);font-style:italic;color:var(--ink-soft);font-size:13px;}
-
-/* loading */
-#loading .wrap{display:flex;align-items:center;justify-content:center;}
-.load-card{width:min(420px,92vw);padding:26px;text-align:center;}
-.load-title{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:30px;color:#fff;text-shadow:0 2px 0 #241608;}
-.load-bar{height:14px;background:rgba(0,0,0,.5);border:2px solid #241608;border-radius:10px;overflow:hidden;margin:16px 0 12px;}
-.load-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3f9b46,#5fd068);transition:width .25s ease;}
-.load-msg{font-family:var(--hand);font-style:italic;color:#f4e6c0;font-size:15px;min-height:22px;}
-
-/* how to play */
-.how p{line-height:1.6;font-size:15px;margin:0 0 12px;}
-.how ul{line-height:1.6;font-size:14.5px;padding-left:20px;}
-.how .kbd{font-family:var(--disp);font-weight:800;background:var(--wood-d);color:#f0e2c0;border-radius:6px;padding:1px 7px;font-size:12px;}
-
-/* small screens: stack mission HUD */
-@media (max-width:780px){
-  .qcard{position:static;width:auto;margin:120px 10px 86px;height:auto;max-height:none;}
-  .hud-top{position:static;flex-direction:column;padding:10px;}
-  .status{width:auto;}
-  #mission .wrap{padding-bottom:20px;}
-  .progress-nodes{flex-wrap:wrap;}
-}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{font-family:var(--body);color:var(--ink);background:#0d1410;overflow:hidden}
+button,input{font:inherit}button{cursor:pointer}a{color:inherit}.screen{position:fixed;inset:0;display:none;background-size:cover;background-position:center}.screen.active{display:block}
+.scrim{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 30%,rgba(8,14,10,.24),rgba(8,14,10,.79))}.wrap{position:relative;width:100%;height:100%;overflow-y:auto}
+.wood{background:linear-gradient(180deg,#6b4a2b,#4a3019 60%,#3a2513);border:2px solid #241608;border-radius:14px;box-shadow:inset 0 2px 0 rgba(255,255,255,.08),inset 0 -6px 14px rgba(0,0,0,.45),var(--shadow)}
+.parch{background:radial-gradient(140% 120% at 20% 0%,#f6ecd2,var(--parch) 55%,var(--parch2));border:2px solid var(--edge);border-radius:12px;box-shadow:inset 0 0 40px rgba(150,120,70,.25),var(--shadow);color:var(--ink)}
+.btn{font-family:var(--disp);text-transform:uppercase;letter-spacing:.055em;font-weight:800;font-size:15px;color:#f7eccf;padding:12px 16px;border-radius:11px;border:2px solid #241608;background:linear-gradient(180deg,#6e4a28,#4a3018 65%,#371f0f);box-shadow:inset 0 2px 0 rgba(255,255,255,.1),inset 0 -6px 12px rgba(0,0,0,.4)}
+.btn:hover:not(:disabled){filter:brightness(1.12)}.btn:active:not(:disabled){transform:translateY(1px)}.btn:focus-visible,.tool:focus-visible,.opt:focus-visible,#musicBtn:focus-visible,.accent-toggle button:focus-visible{outline:3px solid #ffe07a;outline-offset:2px}.btn:disabled,.opt:disabled{opacity:.52;cursor:not-allowed}
+.btn.gold{background:linear-gradient(180deg,#e7c35c,#c79a2c 60%,#9c7716);color:#231703}.btn.green{background:linear-gradient(180deg,#3f9b46,#2c6e32 65%,#1f4e25)}.btn.danger{background:linear-gradient(180deg,#c04a37,#8d2c1d 65%,#6a1d11)}
+#musicBtn{position:fixed;top:14px;right:14px;z-index:60;font-family:var(--disp);text-transform:uppercase;letter-spacing:.05em;font-weight:800;font-size:13px;color:#f7eccf;padding:9px 14px;border-radius:30px;border:2px solid #241608;background:linear-gradient(180deg,#6e4a28,#3a2513);box-shadow:var(--shadow)}
+#musicBtn .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#4be07a;margin-right:7px;box-shadow:0 0 8px #4be07a;vertical-align:middle}#musicBtn.off .dot{background:#7a6a55;box-shadow:none}
+#menu .wrap,#loading .wrap{display:flex;align-items:center;justify-content:center;padding:24px}.menu-card,.load-card{width:min(455px,94vw);padding:26px;text-align:center}.menu-title{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:clamp(34px,7vw,58px);line-height:.92;letter-spacing:.03em;color:#fff;margin:0 0 6px;text-shadow:0 3px 0 #241608,0 6px 14px rgba(0,0,0,.6)}.menu-sub{font-family:var(--hand);font-style:italic;color:#f4e6c0;margin:0 0 20px}.menu-btns{display:flex;flex-direction:column;gap:10px}
+.load-title,.section-title,.big-banner{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.load-title{font-size:30px;color:#fff;text-shadow:0 2px 0 #241608}.load-bar{height:14px;background:rgba(0,0,0,.5);border:2px solid #241608;border-radius:10px;overflow:hidden;margin:16px 0 12px}.load-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3f9b46,#5fd068);transition:width .25s ease}.load-msg{font-family:var(--hand);font-style:italic;color:#f4e6c0;min-height:22px}
+.center-col{max-width:780px;margin:0 auto;padding:26px 18px 60px}.section-title{font-size:clamp(22px,4vw,34px);color:#fff;text-shadow:0 2px 0 #241608,0 5px 12px rgba(0,0,0,.6);margin:0 0 14px}.panel-pad{padding:22px}.back-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}.node{padding:14px;position:relative}.node.locked{filter:grayscale(.55);opacity:.7}.node.done{box-shadow:inset 0 0 0 3px var(--good),var(--shadow)}.node .num{font-family:var(--disp);font-size:27px;font-weight:800}.node h3{font-family:var(--disp);text-transform:uppercase;font-size:16px;margin:5px 0}.node p{font-size:12.5px;color:var(--soft);margin:0}.node .state{position:absolute;right:12px;top:10px;font-size:18px}.node .play{width:100%;margin-top:10px}
+.how p,.how li{line-height:1.6}.kbd{font-family:var(--disp);font-weight:800;background:var(--woodd);color:#f0e2c0;border-radius:6px;padding:1px 7px;font-size:12px}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.stat{padding:14px;text-align:center}.stat .v{font-family:var(--disp);font-weight:800;font-size:28px}.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}.list-line{display:flex;justify-content:space-between;gap:14px;padding:8px 4px;border-bottom:1px dashed var(--edge);font-size:14px}.review-item{padding:13px;margin-bottom:10px}.review-item .rq{font-weight:750}.review-item .ra,.review-item .rx{font-size:13.5px;margin-top:6px}.you{color:#7d2417;font-weight:750}.ans{color:var(--good);font-weight:750}.rx{font-family:var(--hand);font-style:italic;color:var(--soft)}
+#mission .wrap{display:block}.hud-top{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:10px;z-index:5;pointer-events:none;flex-wrap:wrap}.status{width:min(265px,46vw);padding:10px 12px;pointer-events:auto}.status .st-h{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:#f0e2c0;margin-bottom:8px}.bar-row{display:flex;align-items:center;gap:8px;margin:5px 0;color:#f3e8cd;font-size:11px;font-weight:700;text-transform:uppercase}.bar-row .ic{width:16px}.bar-row .nm{width:54px}.bar{flex:1;height:9px;background:rgba(0,0,0,.45);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;transition:width .35s ease}.bar-row .pct{width:34px;text-align:right}.b-water i{background:#57b3c4}.b-food i{background:#e07b3a}.b-energy i{background:#f2cf52}.b-shelter i{background:#9b7ce0}.b-signal i{background:#5fd068}.progress-nodes{display:flex;align-items:center;gap:4px;padding:8px 12px;pointer-events:auto}.pnode{width:26px;height:26px;border-radius:50%;border:2px solid #241608;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:13px;color:#f0e2c0;background:#3a2513}.pnode.cur,.pnode.done{background:#2c6e32}.pnode.cur{box-shadow:0 0 0 2px #ffe07a}.mtag{padding:8px 12px;font-family:var(--disp);font-weight:800;text-transform:uppercase;color:#f0e2c0;font-size:12px;text-align:center}
+.qcard{position:absolute;top:62px;right:12px;bottom:78px;width:min(465px,92vw);display:flex;flex-direction:column;overflow:hidden;z-index:4}.q-h{padding:12px 16px;color:#fff;font-family:var(--disp);text-transform:uppercase;font-weight:800}.q-h .big{font-size:clamp(20px,3.4vw,28px)}.q-h .sub{font-size:12px;margin-top:3px}.q-body{flex:1;overflow-y:auto;padding:14px 16px 16px}.q-instr{font-size:13.5px;color:var(--soft);line-height:1.45;margin:0 0 12px}.audio-row{display:flex;align-items:center;gap:12px;background:rgba(180,150,90,.18);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;margin-bottom:8px}.play-big{width:54px;height:54px;border-radius:50%;border:3px solid #241608;color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}.wave{flex:1;height:26px;background:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 5px);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);opacity:.35;color:var(--soft)}.wave.playing{animation:wv .9s steps(4) infinite;opacity:.7}@keyframes wv{50%{transform:scaleY(.55)}}.audio-status{min-height:20px;font-size:12px;color:var(--soft);margin:0 2px 9px}.q-prompt{font-weight:800;font-size:15px;margin:2px 0 10px}.opts{display:flex;flex-direction:column;gap:9px}.opt{display:flex;align-items:center;gap:11px;text-align:left;width:100%;background:linear-gradient(180deg,#6b4a2b,#4a3018);border:2px solid #241608;border-radius:10px;padding:11px 12px;color:#f4e8cd;font-size:15px;font-weight:600}.opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:#241608;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800}.opt.correct{background:linear-gradient(180deg,#3f9b46,#2c6e32)}.opt.wrong{background:linear-gradient(180deg,#c04a37,#7d2417)}.feedback{margin-top:14px;padding:12px 13px;border-radius:11px;font-size:13.5px;line-height:1.5;display:none}.feedback.show{display:block}.feedback.ok{background:rgba(47,107,53,.16);border:1px solid #2f6b35}.feedback.no{background:rgba(181,64,47,.16);border:1px solid #b5402f}.fb-h{font-family:var(--disp);font-weight:800;text-transform:uppercase}.tip{margin-top:7px;font-family:var(--hand);font-style:italic;color:var(--soft)}.next{margin-top:11px}
+.toolbar{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:6;display:flex;padding:6px 8px}.tool{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:#f3e8cd;padding:6px 14px;font-size:11px;font-weight:700;text-transform:uppercase;position:relative}.tool:not(:last-child){border-right:1px solid rgba(255,255,255,.12)}.tool .ti{font-size:20px}.badge{position:absolute;top:0;right:6px;background:#3f9b46;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center}.end-mission{position:absolute;right:12px;bottom:12px;z-index:6}.bubble{position:absolute;left:50%;transform:translateX(-50%);bottom:120px;z-index:20;width:min(430px,90vw);padding:14px 16px;font-size:14px;line-height:1.5;display:none}.bubble.show{display:block}.bubble .bx{position:absolute;top:7px;right:9px;background:none;border:none;font-size:19px;color:var(--soft)}.accent-toggle{display:inline-flex;border:2px solid #241608;border-radius:30px;overflow:hidden}.accent-toggle button{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:13px;color:#f0e2c0;padding:8px 14px;border:0;background:#4a3018}.accent-toggle button.on{background:linear-gradient(180deg,#e7c35c,#a8801f);color:#231703}
+.big-banner{text-align:center;font-size:clamp(34px,8vw,64px);line-height:.95;margin:0 0 6px;color:#ffe07a;text-shadow:0 3px 0 #5a3a00,0 7px 16px rgba(0,0,0,.6)}.lose .big-banner{color:#ff8d77;text-shadow:0 3px 0 #4a120a,0 7px 16px rgba(0,0,0,.6)}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media(max-width:780px){.qcard{position:static;width:auto;margin:8px 10px 90px;height:auto;max-height:none}.hud-top{position:static;flex-direction:column;padding:10px}.status{width:auto}.progress-nodes{flex-wrap:wrap}#mission .wrap{padding-bottom:20px}.toolbar{position:fixed}.end-mission{position:fixed}}
+@media(max-width:480px){#musicBtn{top:8px;right:8px;padding:8px 10px}.tool{padding:6px 10px}.center-col{padding-top:56px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-
-<!-- persistent music button -->
 <button id="musicBtn" class="off" aria-pressed="false" title="Music on/off"><span class="dot"></span><span id="musicLabel">Music off</span></button>
-<audio id="bgm" loop preload="auto" src="audio/theme_survival_island_listening.mp3"></audio>
+<audio id="bgm" loop preload="none" src="audio/theme_survival_island_listening.mp3"></audio>
 <div id="live" aria-live="polite" class="sr-only"></div>
 
-<!-- ===================== LOADING ===================== -->
-<section id="loading" class="screen" style="background-image:url('images/loading_tropical_path.png')">
-  <div class="scrim"></div>
-  <div class="wrap">
-    <div class="load-card parch">
-      <div class="load-title">Loading…</div>
-      <div class="load-bar"><i id="loadFill"></i></div>
-      <div class="load-msg" id="loadMsg">Exploring the island…</div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== MENU ===================== -->
-<section id="menu" class="screen" style="background-image:url('images/survival_island_map.png')">
-  <div class="scrim"></div>
-  <div class="wrap">
-    <div class="menu-card wood">
-      <h1 class="menu-title">TOEIC<br>Survival Island</h1>
-      <p class="menu-sub">Listen. Survive. Get rescued.</p>
-      <div class="menu-btns">
-        <button class="btn gold" data-act="start">▶ Start Adventure</button>
-        <button class="btn" data-act="continue" id="continueBtn">⮕ Continue</button>
-        <button class="btn" data-act="map">🗺 Island Map</button>
-        <button class="btn" data-act="logbook">📖 Survival Logbook</button>
-        <button class="btn" data-act="how">❓ How to Play</button>
-        <button class="btn danger" data-act="reset">↺ Reset Progress</button>
-        <a class="btn green" href="index.html" style="text-decoration:none;display:block">🏝 Back to TOEIC Trainer</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== ISLAND MAP ===================== -->
-<section id="map" class="screen" style="background-image:url('images/survival_island_map.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="section-title">Island Map</h2>
-    <div class="parch panel-pad">
-      <p style="margin:0 0 14px;font-size:14px;color:var(--ink-soft)">Complete each listening mission to push your rescue signal toward 100%. Missions unlock in order.</p>
-      <div class="map-grid" id="mapGrid"></div>
-    </div>
-    <div class="back-row">
-      <button class="btn" data-act="menu">‹ Back to Menu</button>
-    </div>
-  </div></div>
-</section>
-
-<!-- ===================== HOW TO PLAY ===================== -->
-<section id="how" class="screen" style="background-image:url('images/loading_tropical_path.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="section-title">How to Play</h2>
-    <div class="parch panel-pad how">
-      <p>You survived a shipwreck. To be rescued, complete <b>8 listening missions</b>. Each mission trains a specific TOEIC listening trap your ear has to learn to catch.</p>
-      <ul>
-        <li>Press <b>▶ Play</b> to hear the audio. Use <b>Replay</b> as often as you need.</li>
-        <li>Choose the word, number or sentence you hear.</li>
-        <li><b>Correct</b> answers restore resources and raise your <b>signal</b>.</li>
-        <li><b>Wrong</b> answers cost resources. If Water, Food <i>or</i> Energy hits 0%, you don't survive.</li>
-        <li>Finish all 8 missions to send the rescue signal and win.</li>
-      </ul>
-      <p><b>Audio &amp; accent.</b> Speech is generated on your device. Switch between 🇺🇸 US and 🇬🇧 UK accents any time.</p>
-      <p><b>Music.</b> The button (top-right) toggles the theme and is remembered. Music automatically drops to 10% while a question plays so you can focus on the listening.</p>
-      <p><b>Keyboard.</b> <span class="kbd">Tab</span> to move, <span class="kbd">Enter</span>/<span class="kbd">Space</span> to activate, <span class="kbd">1–4</span> to pick an answer, <span class="kbd">P</span> to play audio, <span class="kbd">R</span> to replay.</p>
-      <div class="back-row"><button class="btn" data-act="menu">‹ Back to Menu</button></div>
-    </div>
-  </div></div>
-</section>
-
-<!-- ===================== LOGBOOK ===================== -->
-<section id="logbook" class="screen" style="background-image:url('images/survival_logbook.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="section-title">Survival Logbook</h2>
-    <div class="parch panel-pad">
-      <div class="stat-grid" id="logStats"></div>
-      <h3 class="label" style="margin:20px 0 8px;color:var(--ink)">Listening categories</h3>
-      <div id="logCats"></div>
-      <h3 class="label" style="margin:20px 0 8px;color:var(--ink)">Most common mistakes</h3>
-      <div id="logMistakes"></div>
-    </div>
-    <div class="back-row">
-      <button class="btn" data-act="menu">‹ Back to Menu</button>
-      <button class="btn" data-act="review">🔍 Review Mistakes</button>
-    </div>
-  </div></div>
-</section>
-
-<!-- ===================== REVIEW MISTAKES ===================== -->
-<section id="review" class="screen" style="background-image:url('images/survival_logbook.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="section-title">Review Mistakes</h2>
-    <div id="reviewList"></div>
-    <div class="back-row"><button class="btn" data-act="logbook">‹ Back to Logbook</button><button class="btn" data-act="menu">Menu</button></div>
-  </div></div>
-</section>
-
-<!-- ===================== MISSION (gameplay) ===================== -->
-<section id="mission" class="screen">
-  <div class="scrim"></div>
-  <div class="wrap">
-    <div class="hud-top">
-      <div class="status wood">
-        <div class="st-h">Survival Status</div>
-        <div class="bar-row b-water"><span class="ic">💧</span><span class="nm">Water</span><span class="bar"><i id="barWater"></i></span><span class="pct" id="pctWater">100%</span></div>
-        <div class="bar-row b-food"><span class="ic">🍖</span><span class="nm">Food</span><span class="bar"><i id="barFood"></i></span><span class="pct" id="pctFood">100%</span></div>
-        <div class="bar-row b-energy"><span class="ic">⚡</span><span class="nm">Energy</span><span class="bar"><i id="barEnergy"></i></span><span class="pct" id="pctEnergy">100%</span></div>
-        <div class="bar-row b-shelter"><span class="ic">🏠</span><span class="nm">Shelter</span><span class="bar"><i id="barShelter"></i></span><span class="pct" id="pctShelter">100%</span></div>
-        <div class="bar-row b-signal"><span class="ic">📡</span><span class="nm">Signal</span><span class="bar"><i id="barSignal"></i></span><span class="pct" id="pctSignal">0%</span></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:flex-start;pointer-events:auto">
-        <div class="progress-nodes wood" id="progNodes"></div>
-        <div class="mtag wood" id="missionTag">Mission<br>1/8</div>
-      </div>
-    </div>
-
-    <div class="qcard parch">
-      <div class="q-h" id="qHead" style="background:linear-gradient(180deg,#3f6f8c,#2c5470)">
-        <div class="big" id="qTitle">Waterfall Camp</div>
-        <div class="sub" id="qSub">Listening Mission 1 of 8</div>
-      </div>
-      <div class="q-body">
-        <p class="q-instr" id="qIntro"></p>
-        <div class="audio-row">
-          <button class="play-big" id="playBtn" style="background:linear-gradient(180deg,#3f6f8c,#234255)" title="Play audio (P)">▶</button>
-          <span class="wave" id="wave"></span>
-        </div>
-        <p class="q-prompt" id="qPrompt">1. What do you hear?</p>
-        <div class="opts" id="opts"></div>
-        <div class="feedback" id="feedback" aria-live="polite"></div>
-      </div>
-    </div>
-
-    <div class="toolbar wood">
-      <button class="tool" id="hintTool"><span class="ti">💡</span>Hint<span class="badge" id="hintBadge">3</span></button>
-      <button class="tool" id="replayTool"><span class="ti">↻</span>Replay</button>
-      <button class="tool" id="notesTool"><span class="ti">📒</span>Notes</button>
-      <button class="tool" id="helpTool"><span class="ti">?</span>Help</button>
-    </div>
-
-    <button class="btn danger end-mission" id="abandonBtn">✕ Abandon</button>
-
-    <div class="bubble parch" id="hintBubble"><button class="bx" data-close="hintBubble">✕</button><div id="hintText"></div></div>
-    <div class="bubble parch" id="notesBubble"><button class="bx" data-close="notesBubble">✕</button><div id="notesText"></div></div>
-    <div class="bubble parch" id="helpBubble"><button class="bx" data-close="helpBubble">✕</button>
-      <b>Listen carefully.</b> Play the audio, pick the option you hear. Correct answers raise your signal; wrong answers cost survival resources. Use the accent toggle if a voice is unclear.
-      <div style="margin-top:10px"><span class="accent-toggle" id="accentHelp"></span></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== VICTORY ===================== -->
-<section id="victory" class="screen win" style="background-image:url('images/victory_rescue_signal.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="big-banner">Rescue Successful</h2>
-    <p style="text-align:center;font-family:var(--hand);font-style:italic;color:#f4e6c0;margin:0 0 18px;text-shadow:0 2px 6px rgba(0,0,0,.7)">You listened carefully. You made the right choices. You survived.</p>
-    <div class="parch panel-pad">
-      <div class="stat-grid" id="winStats"></div>
-      <h3 class="label" style="margin:18px 0 8px;color:var(--ink)">Achievements</h3>
-      <div id="winAch"></div>
-    </div>
-    <div class="back-row">
-      <button class="btn gold" data-act="start">▶ Play Again</button>
-      <button class="btn" data-act="review">🔍 Review Mistakes</button>
-      <button class="btn" data-act="menu">Return to Menu</button>
-    </div>
-  </div></div>
-</section>
-
-<!-- ===================== GAME OVER ===================== -->
-<section id="gameover" class="screen lose" style="background-image:url('images/game_over_storm_island.png')">
-  <div class="scrim"></div>
-  <div class="wrap"><div class="center-col">
-    <h2 class="big-banner">Survival Failed</h2>
-    <p style="text-align:center;font-family:var(--hand);font-style:italic;color:#f4c9be;margin:0 0 18px;text-shadow:0 2px 6px rgba(0,0,0,.7)" id="goReason">The storm destroyed your camp.</p>
-    <div class="parch panel-pad">
-      <div class="stat-grid" id="loseStats"></div>
-      <div class="list-line" style="margin-top:14px"><span>Weakest listening category</span><b id="loseWeak">—</b></div>
-    </div>
-    <div class="back-row">
-      <button class="btn danger" data-act="start">↺ Try Again</button>
-      <button class="btn" data-act="review">🔍 Review Mistakes</button>
-      <button class="btn" data-act="menu">Return to Menu</button>
-    </div>
-  </div></div>
-</section>
+<section id="loading" class="screen" style="background-image:url('images/loading_tropical_path.png')"><div class="scrim"></div><div class="wrap"><div class="load-card parch"><div class="load-title">Loading…</div><div class="load-bar"><i id="loadFill"></i></div><div class="load-msg" id="loadMsg">Exploring the island…</div></div></div></section>
+<section id="menu" class="screen" style="background-image:url('images/survival_island_map.png')"><div class="scrim"></div><div class="wrap"><div class="menu-card wood"><h1 class="menu-title">TOEIC<br>Survival Island</h1><p class="menu-sub">Listen. Survive. Get rescued.</p><div class="menu-btns"><button class="btn gold" data-act="start">▶ Start Adventure</button><button class="btn" data-act="continue" id="continueBtn">⮕ Continue</button><button class="btn" data-act="map">🗺 Island Map</button><button class="btn" data-act="logbook">📖 Survival Logbook</button><button class="btn" data-act="how">❓ How to Play</button><button class="btn danger" data-act="reset">↺ Reset Progress</button><a class="btn green" href="index.html" style="text-decoration:none;display:block">🏝 Back to TOEIC Trainer</a></div></div></div></section>
+<section id="map" class="screen" style="background-image:url('images/survival_island_map.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="section-title">Island Map</h2><div class="parch panel-pad"><p style="margin-top:0;color:var(--soft)">Complete each listening mission to push your rescue signal toward 100%. Missions unlock in order. Replaying a completed mission is practice only and cannot restore resources or inflate your signal.</p><div class="map-grid" id="mapGrid"></div></div><div class="back-row"><button class="btn" data-act="menu">‹ Back to Menu</button></div></div></div></section>
+<section id="how" class="screen" style="background-image:url('images/loading_tropical_path.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="section-title">How to Play</h2><div class="parch panel-pad how"><p>You survived a shipwreck. To be rescued, complete <b>8 listening missions</b>.</p><ul><li>Listen to the full audio before answering; choices unlock when playback finishes.</li><li>Correct answers restore resources and raise your signal.</li><li>Wrong answers cost resources. If Water, Food or Energy reaches 0%, the adventure ends.</li><li>Mission 8 contains one question from every previous listening category.</li><li>Replays are for practice and do not change survival resources.</li></ul><p><b>Audio & accent.</b> Speech is generated on your device. Switch between 🇺🇸 US and 🇬🇧 UK. If your browser has no suitable speech engine, the game tells you instead of silently failing.</p><p><b>Music.</b> The theme loads only when you turn it on. It automatically ducks while speech is playing.</p><p><b>Keyboard.</b> <span class="kbd">1–4</span> answer, <span class="kbd">P</span>/<span class="kbd">R</span> play/replay, <span class="kbd">H</span> hint, <span class="kbd">Esc</span> closes help.</p><div class="back-row"><button class="btn" data-act="menu">‹ Back to Menu</button></div></div></div></div></section>
+<section id="logbook" class="screen" style="background-image:url('images/survival_logbook.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="section-title">Survival Logbook</h2><div class="parch panel-pad"><div class="stat-grid" id="logStats"></div><h3>Listening categories</h3><div id="logCats"></div><h3>Most common mistakes</h3><div id="logMistakes"></div></div><div class="back-row"><button class="btn" data-act="menu">‹ Back to Menu</button><button class="btn" data-act="review">🔍 Review Mistakes</button></div></div></div></section>
+<section id="review" class="screen" style="background-image:url('images/survival_logbook.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="section-title">Review Mistakes</h2><div id="reviewList"></div><div class="back-row"><button class="btn" data-act="logbook">‹ Back to Logbook</button><button class="btn" data-act="menu">Menu</button></div></div></div></section>
+<section id="mission" class="screen"><div class="scrim"></div><div class="wrap"><div class="hud-top"><div class="status wood"><div class="st-h">Survival Status</div><div class="bar-row b-water"><span class="ic">💧</span><span class="nm">Water</span><span class="bar"><i id="barWater"></i></span><span class="pct" id="pctWater">100%</span></div><div class="bar-row b-food"><span class="ic">🍖</span><span class="nm">Food</span><span class="bar"><i id="barFood"></i></span><span class="pct" id="pctFood">100%</span></div><div class="bar-row b-energy"><span class="ic">⚡</span><span class="nm">Energy</span><span class="bar"><i id="barEnergy"></i></span><span class="pct" id="pctEnergy">100%</span></div><div class="bar-row b-shelter"><span class="ic">🏠</span><span class="nm">Shelter</span><span class="bar"><i id="barShelter"></i></span><span class="pct" id="pctShelter">100%</span></div><div class="bar-row b-signal"><span class="ic">📡</span><span class="nm">Signal</span><span class="bar"><i id="barSignal"></i></span><span class="pct" id="pctSignal">0%</span></div></div><div style="display:flex;gap:8px;align-items:flex-start;pointer-events:auto"><div class="progress-nodes wood" id="progNodes"></div><div class="mtag wood" id="missionTag"></div></div></div>
+<div class="qcard parch"><div class="q-h" id="qHead"><div class="big" id="qTitle"></div><div class="sub" id="qSub"></div></div><div class="q-body"><p class="q-instr" id="qIntro"></p><div class="audio-row"><button class="play-big" id="playBtn" aria-label="Play listening audio">▶</button><span class="wave" id="wave"></span></div><div class="audio-status" id="audioStatus" aria-live="polite"></div><p class="q-prompt" id="qPrompt"></p><div class="opts" id="opts"></div><div class="feedback" id="feedback" aria-live="polite"></div></div></div>
+<div class="toolbar wood"><button class="tool" id="hintTool"><span class="ti">💡</span>Hint<span class="badge" id="hintBadge">3</span></button><button class="tool" id="replayTool"><span class="ti">↻</span>Replay</button><button class="tool" id="notesTool"><span class="ti">📒</span>Notes</button><button class="tool" id="helpTool"><span class="ti">?</span>Help</button></div><button class="btn danger end-mission" id="abandonBtn">✕ Abandon</button>
+<div class="bubble parch" id="hintBubble" role="dialog" aria-label="Hint"><button class="bx" data-close="hintBubble" aria-label="Close hint">✕</button><div id="hintText"></div></div><div class="bubble parch" id="notesBubble" role="dialog" aria-label="Listening notes"><button class="bx" data-close="notesBubble" aria-label="Close notes">✕</button><div id="notesText"></div></div><div class="bubble parch" id="helpBubble" role="dialog" aria-label="Help"><button class="bx" data-close="helpBubble" aria-label="Close help">✕</button><b>Listen carefully.</b> Play the audio and wait until it finishes; then choose an answer.<div style="margin-top:10px"><span class="accent-toggle" id="accentHelp"></span></div></div></div></section>
+<section id="victory" class="screen win" style="background-image:url('images/victory_rescue_signal.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="big-banner">Rescue Successful</h2><p style="text-align:center;font-family:var(--hand);font-style:italic;color:#f4e6c0">You listened carefully. You sent the signal. You survived.</p><div class="parch panel-pad"><div class="stat-grid" id="winStats"></div><h3>Achievements</h3><div id="winAch"></div></div><div class="back-row"><button class="btn gold" data-act="restart">▶ Play Again</button><button class="btn" data-act="review">🔍 Review Mistakes</button><button class="btn" data-act="menu">Return to Menu</button></div></div></div></section>
+<section id="gameover" class="screen lose" style="background-image:url('images/game_over_storm_island.png')"><div class="scrim"></div><div class="wrap"><div class="center-col"><h2 class="big-banner">Survival Failed</h2><p id="goReason" style="text-align:center;font-family:var(--hand);font-style:italic;color:#f4c9be"></p><div class="parch panel-pad"><div class="stat-grid" id="loseStats"></div><div class="list-line"><span>Weakest listening category</span><b id="loseWeak">—</b></div></div><div class="back-row"><button class="btn danger" data-act="restart">↺ Try Again</button><button class="btn" data-act="review">🔍 Review Mistakes</button><button class="btn" data-act="menu">Return to Menu</button></div></div></div></section>
 
 <script>
 "use strict";
-/* =========================================================================
-   TOEIC SURVIVAL ISLAND — single-file listening game
-   ========================================================================= */
-var $ = function(id){ return document.getElementById(id); };
-var KEY = "HT_SURVIVAL_ISLAND_V1";
-
-/* ---------- mission metadata ---------- */
-var MISSIONS = [
-  {id:1, name:"Waterfall Camp", img:"waterfall_camp.png", color:"#3f6f8c", res:"water",
-   focus:"Numbers", cat:"Numbers (teens vs tens)",
-   intro:"You will hear a number. Choose the number you hear. <b>Be careful — some numbers sound very similar.</b>"},
-  {id:2, name:"Shelter Beach", img:"shelter_beach.png", color:"#3f6f8c", res:"shelter",
-   focus:"Minimal pairs", cat:"Minimal pairs",
-   intro:"You will hear a word or short sentence. Choose what you hear. <b>Watch words that sound similar.</b>"},
-  {id:3, name:"Fruit Jungle", img:"fruit_jungle.png", color:"#2f6b35", res:"food",
-   focus:"Word stress", cat:"Word stress (noun vs verb)",
-   intro:"You will hear a sentence. Choose the word you hear. <b>Pay attention to which syllable is stressed.</b>"},
-  {id:4, name:"Fire Camp", img:"fire_camp.png", color:"#9c3f17", res:"energy",
-   focus:"Final sounds", cat:"Final sounds",
-   intro:"You will hear a word. Choose what you hear. <b>Listen carefully to the final sound.</b>"},
-  {id:5, name:"Tool Cave", img:"tool_cave.png", color:"#2f6b35", res:"food",
-   focus:"Business confusions", cat:"Business vocabulary confusions",
-   intro:"You will hear a word or sentence. Choose what you hear. <b>These business words are easy to confuse.</b>"},
-  {id:6, name:"Lagoon Path", img:"lagoon_path.png", color:"#2f7d8c", res:"water",
-   focus:"Connected speech", cat:"Connected speech",
-   intro:"You will hear a sentence. Choose the sentence you hear. <b>Pay attention to connected speech.</b>"},
-  {id:7, name:"Mountain Lookout", img:"mountain_lookout.png", color:"#3f6f8c", res:"energy",
-   focus:"Details", cat:"Names, dates, times, prices",
-   intro:"You will hear information. <b>Pay attention to names, dates, times, prices and numbers.</b> Choose the correct answer."},
-  {id:8, name:"Signal Cliff", img:"signal_cliff.png", color:"#7a5bc4", res:"signal",
-   focus:"Ultimate mix", cat:"Ultimate TOEIC mix",
-   intro:"The final challenge mixes every trap from the island. <b>Listen very carefully to similar-sounding words.</b>"}
+var $=function(id){return document.getElementById(id)};
+var KEY="HT_SURVIVAL_ISLAND_V1", VERSION=2;
+var MISSIONS=[
+{id:1,name:"Waterfall Camp",img:"waterfall_camp.png",color:"#3f6f8c",res:"water",cat:"Numbers",intro:"You will hear a number or a short sentence. <b>Distinguish -teen from -ty.</b>"},
+{id:2,name:"Shelter Beach",img:"shelter_beach.png",color:"#3f6f8c",res:"shelter",cat:"Minimal pairs",intro:"You will hear a word. <b>Focus on the vowel contrast.</b>"},
+{id:3,name:"Fruit Jungle",img:"fruit_jungle.png",color:"#2f6b35",res:"food",cat:"Word stress",intro:"You will hear a sentence containing a noun/verb stress pair. <b>Use stress and context together.</b>"},
+{id:4,name:"Fire Camp",img:"fire_camp.png",color:"#9c3f17",res:"energy",cat:"Final sounds",intro:"You will hear a word. <b>Listen to the final consonant.</b>"},
+{id:5,name:"Tool Cave",img:"tool_cave.png",color:"#2f6b35",res:"food",cat:"Business confusions",intro:"You will hear a business-context sentence. <b>Choose the word that fits what you heard.</b>"},
+{id:6,name:"Lagoon Path",img:"lagoon_path.png",color:"#2f7d8c",res:"water",cat:"Connected speech",intro:"You will hear a reduced spoken form. <b>Choose its full standard-English meaning.</b>"},
+{id:7,name:"Mountain Lookout",img:"mountain_lookout.png",color:"#3f6f8c",res:"energy",cat:"Details",intro:"Listen for one key detail: <b>name, date, time, price or number.</b>"},
+{id:8,name:"Signal Cliff",img:"signal_cliff.png",color:"#7a5bc4",res:"signal",cat:"Ultimate mix",intro:"Final challenge: <b>one question from every listening category.</b>"}
 ];
-
-/* =========================================================================
-   QUESTION BANK  — generators build 25+ questions per mission
-   ========================================================================= */
-function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
-function pick(arr,n){ return shuffle(arr).slice(0,n); }
-function fourOpts(answer, pool){
-  // build 4 options containing answer + 3 distractors from pool
-  var d = shuffle(pool.filter(function(x){return x!==answer;})).slice(0,3);
-  var opts = shuffle([answer].concat(d));
-  return {opts:opts, idx:opts.indexOf(answer)};
-}
-
-var QBANK = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
-
-/* ---- MISSION 1: numbers (teens vs tens) ---- */
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function clamp(n){return Math.max(0,Math.min(100,n))}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function q(spoken,prompt,answer,distractors,cat,tip,hint,family){return{spoken:spoken,prompt:prompt,answerText:answer,distractors:distractors,cat:cat,tip:tip,hint:hint,family:family||answer}}
+var QBANK={1:[],2:[],3:[],4:[],5:[],6:[],7:[]};
 (function(){
-  var pairs = [
-    ["fifteen","fifty",15,50],["thirteen","thirty",13,30],["fourteen","forty",14,40],
-    ["sixteen","sixty",16,60],["seventeen","seventy",17,70],["eighteen","eighty",18,80],
-    ["nineteen","ninety",19,90]
-  ];
-  var allWords = ["thirteen","thirty","fourteen","forty","fifteen","fifty","sixteen","sixty","seventeen","seventy","eighteen","eighty","nineteen","ninety"];
-  pairs.forEach(function(p){
-    var teen=p[0], ty=p[1];
-    [teen,ty].forEach(function(say){
-      var o=fourOpts(say, allWords);
-      QBANK[1].push({
-        spoken:say, prompt:"What number do you hear?", opts:o.opts, answer:o.idx, cat:"Numbers",
-        explanation:'The number is "'+say+'".',
-        tip:'"'+teen+'" stresses the END (-teen); "'+ty+'" stresses the FRONT. Listen for the stress and the final /n/ in -teen.',
-        hint:"Teens (-teen) stress the second syllable and end in an /n/ sound."
-      });
-    });
-    // sentence form
-    var s1 = "We will arrive at "+teen+".";
-    var s2 = "We will arrive at "+ty+".";
-    var oA=fourOpts(s1,[s1,s2,"We will arrive at five.","We will arrive at "+p[2]+"-five."]);
-    QBANK[1].push({spoken:s1,prompt:"Which sentence do you hear?",opts:oA.opts,answer:oA.idx,cat:"Numbers",
-      explanation:'You heard "'+s1+'".',
-      tip:'Numbers in a sentence are still distinguished by stress: '+teen+' vs '+ty+'.',
-      hint:"Focus only on the number word and its stress."});
-  });
-  // price / quantity variety
-  var extra=[
-    {spoken:"It costs thirteen dollars.",prompt:"How much does it cost?",opts:["$13","$30","$13.50","$3"],answer:0,tip:"thirteen ends in -teen and is stressed on the second syllable."},
-    {spoken:"It costs thirty dollars.",prompt:"How much does it cost?",opts:["$13","$30","$3","$33"],answer:1,tip:"thirty is stressed on the first syllable."},
-    {spoken:"There are sixteen people.",prompt:"How many people?",opts:["16","60","6","66"],answer:0,tip:"sixteen = 16 (stress on -teen)."},
-    {spoken:"There are sixty people.",prompt:"How many people?",opts:["16","60","6","16.5"],answer:1,tip:"sixty = 60 (stress on six-)."},
-    {spoken:"The flight is at nineteen hundred.",prompt:"What time is the flight?",opts:["19:00","9:00","90:00","1:90"],answer:0,tip:"nineteen hundred = 19:00 in 24-hour time."}
-  ];
-  extra.forEach(function(e){ e.cat="Numbers"; e.explanation='You heard "'+e.spoken+'".'; e.hint="Listen for teen vs ty stress."; QBANK[1].push(e); });
+ var pairs=[['fifteen','fifty','15','50'],['thirteen','thirty','13','30'],['fourteen','forty','14','40'],['sixteen','sixty','16','60'],['seventeen','seventy','17','70'],['eighteen','eighty','18','80'],['nineteen','ninety','19','90']];
+ pairs.forEach(function(p){var teen=p[0],ty=p[1],tn=p[2],tens=p[3],fam=teen+'/'+ty;
+  QBANK[1].push(q(teen,'What number do you hear?',teen,[ty,'twelve','twenty'],'Numbers','-teen normally carries stress near the end; -ty stresses the first syllable.','Listen for the stressed syllable and the final /n/.',fam));
+  QBANK[1].push(q(ty,'What number do you hear?',ty,[teen,'twelve','twenty'],'Numbers','-teen normally carries stress near the end; -ty stresses the first syllable.','Listen for the stressed syllable and the final /n/.',fam));
+  QBANK[1].push(q('The order contains '+teen+' items.','How many items are in the order?',tn,[tens,'5','55'],'Numbers','You heard '+teen+' = '+tn+'.','Focus on the number only.',fam));
+ })
 })();
-
-/* ---- MISSION 2: minimal pairs ---- */
 (function(){
-  var pairs=[
-    ["ship","sheep"],["live","leave"],["sit","seat"],["fill","feel"],["full","fool"],
-    ["work","walk"],["bit","beat"],["pull","pool"],["chip","cheap"],["hit","heat"],
-    ["slip","sleep"],["grin","green"],["pitch","peach"],["wrist","wreast?"]
-  ];
-  // clean up the deliberately odd one
-  pairs = pairs.filter(function(p){return p[1].indexOf("?")<0;});
-  pairs=pairs.concat([["this","these"],["miss","niece?"]].filter(function(p){return p[1].indexOf("?")<0;}));
-  var all=[];
-  pairs.forEach(function(p){ all.push(p[0]); all.push(p[1]); });
-  pairs.forEach(function(p){
-    p.forEach(function(say,k){
-      var partner = p[1-k];
-      var o=fourOpts(say, all.concat([partner]));
-      // make sure partner is present
-      if(o.opts.indexOf(partner)<0){ o.opts[(o.idx+1)%4]=partner; }
-      o.idx=o.opts.indexOf(say);
-      QBANK[2].push({
-        spoken:say,prompt:"What do you hear?",opts:o.opts,answer:o.idx,cat:"Minimal pairs",
-        explanation:'The word is "'+say+'".',
-        tip:'"'+p[0]+'" has a short vowel; "'+p[1]+'" has a long vowel. The vowel LENGTH is the clue.',
-        hint:"Compare the vowel length — short vs long."
-      });
-    });
-  });
-  // sentence minimal pairs
-  var sents=[
-    ["Can you see the ship?","Can you see the sheep?"],
-    ["I want to live here.","I want to leave here."],
-    ["Please take a seat.","Please take a sit?"]
-  ];
-  sents.filter(function(s){return s[1].indexOf("?")<0;}).forEach(function(s){
-    var o=fourOpts(s[0],[s[0],s[1]]);
-    QBANK[2].push({spoken:s[0],prompt:"Which sentence do you hear?",opts:o.opts.length<2?[s[0],s[1]]:o.opts,answer:o.opts.indexOf(s[0]),cat:"Minimal pairs",
-      explanation:'You heard "'+s[0]+'".',tip:"Short vs long vowel changes the whole meaning.",hint:"Listen to the key vowel."});
-  });
+ var pairs=[['ship','sheep'],['live','leave'],['sit','seat'],['fill','feel'],['full','fool'],['bit','beat'],['pull','pool'],['chip','cheap'],['hit','heat'],['slip','sleep'],['grin','green'],['pitch','peach']];
+ var all=[];pairs.forEach(function(p){all=all.concat(p)});
+ pairs.forEach(function(p){p.forEach(function(word,k){var partner=p[1-k],ds=[partner].concat(shuffle(all.filter(function(x){return x!==word&&x!==partner})).slice(0,2));QBANK[2].push(q(word,'What do you hear?',word,ds,'Minimal pairs','The word is “'+word+'”.','Compare the key vowel, not the spelling.',p.join('/')))})})
 })();
-
-/* ---- MISSION 3: word stress (noun vs verb) ---- */
 (function(){
-  var words=[
-    ["record","I'd like to record this meeting.","verb","We broke the sales record.","noun"],
-    ["present","Let me present the results.","verb","She gave me a present.","noun"],
-    ["increase","Prices will increase next month.","verb","There was a big increase in sales.","noun"],
-    ["contract","The metal will contract when cold.","verb","Please sign the contract.","noun"],
-    ["object","Some staff object to the plan.","verb","Pick up that object.","noun"],
-    ["project","Sales will project upward.","verb","We finished the project.","noun"],
-    ["permit","They permit visitors here.","verb","You need a parking permit.","noun"],
-    ["export","We export to Asia.","verb","Coffee is a key export.","noun"],
-    ["produce","They produce cars here.","verb","Buy fresh produce.","noun"],
-    ["address","Please address the issue.","verb","What is your address?","noun"],
-    ["conduct","She will conduct the survey.","verb","His conduct was professional.","noun"],
-    ["refund","We will refund your money.","verb","I received a refund.","noun"],
-    ["decrease","Sales may decrease slightly.","verb","We saw a decrease in costs.","noun"],
-    ["transfer","Please transfer the funds.","verb","I requested a transfer.","noun"],
-    ["survey","We will survey our clients.","verb","Please complete the survey.","noun"],
-    ["suspect","The police suspect fraud.","verb","He is the main suspect.","noun"],
-    ["subject","Don't subject staff to that.","verb","Let's change the subject.","noun"],
-    ["convert","We will convert the file.","verb","She is a recent convert.","noun"]
-  ];
-  words.forEach(function(w){
-    var word=w[0];
-    var opts=[word+" (noun)",word+" (verb)"];
-    // pick noun or verb usage
-    [["verb",w[1]],["noun",w[3]]].forEach(function(u){
-      var role=u[0], sent=u[1];
-      var ans = word+" ("+role+")";
-      var distractA = (role==="verb"?word+" (noun)":word+" (verb)");
-      var others = words.filter(function(x){return x[0]!==word;});
-      var d2 = others[Math.floor(Math.random()*others.length)][0]+" (noun)";
-      var d3 = others[Math.floor(Math.random()*others.length)][0]+" (verb)";
-      var four=shuffle([ans,distractA,d2,d3]);
-      QBANK[3].push({
-        spoken:sent,prompt:'Which word do you hear?',opts:four,answer:four.indexOf(ans),cat:"Word stress",
-        explanation:'You heard "'+word+'" used as a '+role+' ("'+sent+'").',
-        tip: role==="verb"
-          ? 'As a VERB, "'+word+'" stresses the SECOND syllable (e.g. re-CORD).'
-          : 'As a NOUN, "'+word+'" stresses the FIRST syllable (e.g. RE-cord).',
-        hint:"Nouns usually stress the first syllable; verbs the second."
-      });
-    });
-  });
+ var items=[
+ ['record','I need to record the interview.','We broke the sales record.'],['present','She will present the results.','He received a present.'],['increase','Costs may increase next year.','There was an increase in demand.'],['contract','Metals contract when they cool.','Please sign the contract.'],['object','Several staff object to the change.','Move that object carefully.'],['project','Analysts project higher sales next year.','The project ends in June.'],['permit','They permit visitors after nine.','You need a parking permit.'],['export','We export equipment to Canada.','Coffee is a major export.'],['produce','They produce medical devices.','The shop sells fresh produce.'],['conduct','We will conduct the survey tomorrow.','His conduct was professional.'],['refund','We will refund the delivery fee.','I received a full refund.'],['decrease','Costs should decrease soon.','We saw a decrease in complaints.'],['survey','We survey clients every quarter.','Please complete the survey.'],['suspect','Auditors suspect an accounting error.','The police questioned the suspect.'],['subject','Do not subject staff to unnecessary risk.','Let us change the subject.'],['convert','We can convert the file to PDF.','He became a recent convert.']];
+ var labels=items.map(function(x){return x[0]});
+ items.forEach(function(x){var w=x[0],fam=w,other=shuffle(labels.filter(function(z){return z!==w}));
+  QBANK[3].push(q(x[1],'How is “'+w+'” used in the sentence?',w+' — verb',[w+' — noun',other[0]+' — noun',other[1]+' — verb'],'Word stress','In this common noun/verb pattern, the verb has later stress.','Listen for stress, then confirm with the sentence meaning.',fam));
+  QBANK[3].push(q(x[2],'How is “'+w+'” used in the sentence?',w+' — noun',[w+' — verb',other[0]+' — noun',other[1]+' — verb'],'Word stress','In this common noun/verb pattern, the noun has earlier stress.','Listen for stress, then confirm with the sentence meaning.',fam));
+ })
 })();
-
-/* ---- MISSION 4: final sounds ---- */
 (function(){
-  var pairs=[
-    ["cap","cab"],["back","bag"],["seat","seed"],["bet","bed"],["rice","rise"],
-    ["cup","cub"],["lock","log"],["write","ride"],["leaf","leave"],["safe","save"],
-    ["pick","pig"],["rope","robe"],["coat","code"],["heart","hard"],["lap","lab"]
-  ];
-  var all=[]; pairs.forEach(function(p){all.push(p[0]);all.push(p[1]);});
-  pairs.forEach(function(p){
-    p.forEach(function(say,k){
-      var partner=p[1-k];
-      var o=fourOpts(say, all);
-      if(o.opts.indexOf(partner)<0){ o.opts[(o.idx+1)%4]=partner; }
-      o.idx=o.opts.indexOf(say);
-      QBANK[4].push({
-        spoken:say,prompt:"Which word do you hear?",opts:o.opts,answer:o.idx,cat:"Final sounds",
-        explanation:'The word is "'+say+'".',
-        tip:'The final sound is the clue: "'+p[0]+'" ends in a voiceless sound, "'+p[1]+'" in a voiced one. Voiced endings make the vowel a little longer.',
-        hint:"Listen to the very end of the word — voiced or voiceless?"
-      });
-    });
-  });
+ var pairs=[['cap','cab'],['back','bag'],['seat','seed'],['bet','bed'],['rice','rise'],['cup','cub'],['lock','log'],['write','ride'],['leaf','leave'],['safe','save'],['pick','pig'],['rope','robe'],['coat','code'],['heart','hard'],['lap','lab']];var all=[];pairs.forEach(function(p){all=all.concat(p)});
+ pairs.forEach(function(p){p.forEach(function(word,k){var partner=p[1-k],ds=[partner].concat(shuffle(all.filter(function(x){return x!==word&&x!==partner})).slice(0,2));QBANK[4].push(q(word,'Which word do you hear?',word,ds,'Final sounds','The final sound distinguishes “'+p[0]+'” from “'+p[1]+'”.','Listen right to the end of the word.',p.join('/')))})})
 })();
-
-/* ---- MISSION 5: business confusions ---- */
 (function(){
-  var sets=[
-    ["staff","stuff"],["price","prize"],["form","firm"],["accept","except"],
-    ["quite","quiet"],["affect","effect"],["personal","personnel"],
-    ["complement","compliment"],["principal","principle"],["assure","ensure"],
-    ["cite","site"],["loose","lose"],["desert","dessert"],["advice","advise"]
-  ];
-  var all=[]; sets.forEach(function(p){all.push(p[0]);all.push(p[1]);});
-  sets.forEach(function(p){
-    p.forEach(function(say,k){
-      var partner=p[1-k];
-      var o=fourOpts(say, all);
-      if(o.opts.indexOf(partner)<0){ o.opts[(o.idx+1)%4]=partner; }
-      o.idx=o.opts.indexOf(say);
-      QBANK[5].push({
-        spoken:say,prompt:"Which word do you hear?",opts:o.opts,answer:o.idx,cat:"Business confusions",
-        explanation:'The word is "'+say+'".',
-        tip: tipFor(p[0],p[1]),
-        hint:"These two are easy to mix up — listen for the small sound difference."
-      });
-    });
-  });
-  function tipFor(a,b){
-    var t={
-      "staff":"staff = employees; stuff = things/material.",
-      "price":"price = cost; prize = award you win.",
-      "form":"form = a document/shape; firm = a company / solid.",
-      "accept":"accept = receive; except = apart from.",
-      "quite":"quite = fairly; quiet = silent.",
-      "affect":"affect (verb) = to influence; effect (noun) = a result.",
-      "personal":"personal = private; personnel = staff (stress on -NEL).",
-      "complement":"complement = completes; compliment = praise.",
-      "principal":"principal = main/head person; principle = a rule.",
-      "assure":"assure = reassure someone; ensure = make sure.",
-      "cite":"cite = quote a source; site = a location.",
-      "loose":"loose = not tight; lose = to misplace.",
-      "desert":"desert = dry land (DE-sert); dessert = sweet course (de-SSERT).",
-      "advice":"advice (noun, /s/); advise (verb, /z/)."
-    };
-    return t[a] || (a+" vs "+b+" — listen carefully.");
-  }
+ var sets=[
+ ['staff','stuff','Our staff will attend the training.','Please move this stuff to storage.','staff = employees; stuff = things'],
+ ['price','prize','The price includes delivery.','She won first prize at the trade fair.','price = cost; prize = award'],
+ ['form','firm','Please complete this form.','The firm opened a new branch.','form = document; firm = company'],
+ ['accept','except','We accept card payments.','Everyone attended except Mr Lee.','accept = receive; except = excluding'],
+ ['quite','quiet','The presentation was quite short.','Please keep the meeting room quiet.','quite = fairly; quiet = silent'],
+ ['affect','effect','The delay may affect deliveries.','The new policy had an immediate effect.','affect = influence; effect = result'],
+ ['personal','personnel','Do not share personal information.','Personnel records are confidential.','personal = private; personnel = staff'],
+ ['complement','compliment','The new service will complement our existing offer.','The client gave the team a compliment.','complement = complete; compliment = praise'],
+ ['principal','principle','The principal reason is cost.','Safety is our guiding principle.','principal = main; principle = rule'],
+ ['assure','ensure','I can assure you that the order was sent.','Please ensure the door is locked.','assure = reassure a person; ensure = make certain'],
+ ['cite','site','Please cite the source in your report.','The new warehouse site is near the airport.','cite = quote a source; site = location'],
+ ['loose','lose','One cable is loose.','Do not lose the receipt.','loose = not tight; lose = misplace'],
+ ['desert','dessert','The route crosses the desert.','Dessert is included in the set menu.','desert = dry region; dessert = sweet course'],
+ ['advice','advise','Thank you for your advice.','I advise you to confirm the booking.','advice = noun; advise = verb']];
+ var all=[];sets.forEach(function(s){all.push(s[0],s[1])});
+ sets.forEach(function(s){var fam=s[0]+'/'+s[1];[[s[0],s[2]],[s[1],s[3]]].forEach(function(z){var word=z[0],partner=word===s[0]?s[1]:s[0],extra=shuffle(all.filter(function(x){return x!==word&&x!==partner})).slice(0,2);QBANK[5].push(q(z[1],'Which word fits the sentence you hear?',word,[partner].concat(extra),'Business confusions',s[4]+'.','Use the sentence meaning as well as the sound.',fam))})})
 })();
-
-/* ---- MISSION 6: connected speech ---- */
 (function(){
-  var items=[
-    ["I want to go now.",["I want to go now.","I wanna go now.","I went to go now.","I want a go now."],0,"want to"],
-    ["I'm going to leave.",["I'm going to leave.","I'm gonna leave.","I'm going leave.","I'm go to leave."],0,"going to"],
-    ["You have to sign here.",["You have to sign here.","You hafta sign here.","You had to sign here.","You have a sign here."],0,"have to"],
-    ["Did you call him?",["Did you call him?","Didja call him?","Did he call him?","Do you call him?"],0,"did you"],
-    ["Would you help me?",["Would you help me?","Wouldja help me?","Will you help me?","Should you help me?"],0,"would you"],
-    ["It's kind of late.",["It's kind of late.","It's kinda late.","It's kind a late.","It's find of late."],0,"kind of"],
-    ["I sort of agree.",["I sort of agree.","I sorta agree.","I sought to agree.","I sort a agree."],0,"sort of"],
-    ["We've got to hurry.",["We've got to hurry.","We've gotta hurry.","We've got a hurry.","We got to hurry."],0,"got to"],
-    ["She ran out of time.",["She ran out of time.","She ran outta time.","She ran out a time.","She run out of time."],0,"out of"],
-    ["There's a lot of work.",["There's a lot of work.","There's a lotta work.","There's a lot a work.","There's allot of work."],0,"a lot of"],
-    ["What do you want?",["What do you want?","Whaddya want?","What you want?","What did you want?"],0,"what do you"],
-    ["I'll give you a call.",["I'll give you a call.","I'll give ya a call.","I'll give you call.","I gave you a call."],0,"give you"],
-    ["He used to work here.",["He used to work here.","He use to work here.","He used two work here.","He uses to work here."],0,"used to"],
-    ["Could you repeat that?",["Could you repeat that?","Couldja repeat that?","Could you repeat that.","Should you repeat that?"],0,"could you"],
-    ["I'm going to call later.",["I'm going to call later.","I'm gonna call later.","I'm going to call ladder.","I'm go to call later."],0,"going to"],
-    ["What are you doing?",["What are you doing?","Whatcha doing?","What you are doing?","What were you doing?"],0,"what are you"],
-    ["I want a coffee.",["I want a coffee.","I wanna coffee.","I want to coffee.","I went a coffee."],0,"want a vs want to"],
-    ["We ought to start.",["We ought to start.","We oughta start.","We ought two start.","We out to start."],0,"ought to"],
-    ["Give me a minute.",["Give me a minute.","Gimme a minute.","Give my a minute.","Gave me a minute."],0,"give me"],
-    ["It's next to the bank.",["It's next to the bank.","It's nexta the bank.","It's next two the bank.","It's next of the bank."],0,"next to"],
-    ["Lots of people came.",["Lots of people came.","Lotsa people came.","Lots of people come.","A lot of people came."],0,"lots of"],
-    ["I'll let you know.",["I'll let you know.","I'll letcha know.","I'll let you no.","I let you know."],0,"let you"],
-    ["Let's get together soon.",["Let's get together soon.","Let's git together soon.","Let's get to gather soon.","Let's got together soon."],0,"get together"],
-    ["We're supposed to meet.",["We're supposed to meet.","We're sposta meet.","We're supposed to meat.","We supposed to meet."],0,"supposed to"],
-    ["Can I get you anything?",["Can I get you anything?","Can I getcha anything?","Can I get your anything?","Can I got you anything?"],0,"get you"]
-  ];
-  items.forEach(function(it){
-    QBANK[6].push({
-      spoken:it[0],prompt:"Which sentence do you hear?",opts:shuffleKeep(it[1],it[2]),answerWord:it[1][it[2]],cat:"Connected speech",
-      explanation:'You heard "'+it[0]+'".',
-      tip:'In fast speech, "'+it[3]+'" blends together. Learn the full form so you recognise the reduced one.',
-      hint:"Small linking words ('to', 'of', 'you') often disappear in fast speech."
-    });
-  });
-  // resolve answer index after shuffle
-  QBANK[6].forEach(function(q){ q.answer=q.opts.indexOf(q.answerWord); });
-  function shuffleKeep(opts,correctIdx){ var c=opts[correctIdx]; var s=shuffle(opts); return s; }
+ var items=[
+ ['I wanna go now.','I want to go now.',['I went to go now.','I want a coffee now.','I will not go now.'],'want to → wanna'],
+ ["I'm gonna leave.","I'm going to leave.",["I'm going to live.","I have gone to leave.","I am leaving yesterday."],'going to → gonna'],
+ ["You've gotta sign here.","You have got to sign here.",["You have got a sign here.","You had to sign here.","You should sign there."],'got to → gotta'],
+ ["It's kinda late.","It's kind of late.",["It is a kind late.","It is quite late.","It was late yesterday."],'kind of → kinda'],
+ ['I sorta agree.','I sort of agree.',['I sought to agree.','I strongly disagree.','I already agreed.'],'sort of → sorta'],
+ ['She ran outta time.','She ran out of time.',['She ran out at ten.','She runs out on time.','She has plenty of time.'],'out of → outta'],
+ ["There's a lotta work.","There is a lot of work.",["There is a lot at work.","There was little work.","There are lots to work."],'a lot of → lotta'],
+ ['Gimme a minute.','Give me a minute.',['Give him a minute.','Give me the minutes.','I gave you a minute.'],'give me → gimme'],
+ ['We oughta start.','We ought to start.',['We are out to start.','We started already.','We ought to stop.'],'ought to → oughta'],
+ ['Lemme check the schedule.','Let me check the schedule.',['Let him check the schedule.','Let me change the schedule.','I checked the schedule.'],'let me → lemme'],
+ ["We're gonna meet at noon.","We are going to meet at noon.",["We met at noon yesterday.","We are going to eat at noon.","We are meeting at night."],'going to → gonna'],
+ ['I hafta finish this today.','I have to finish this today.',['I finished this yesterday.','I have finished this today.','I have to send this today.'],'have to → hafta'],
+ ["The train's gonna be late.","The train is going to be late.",["The train was late.","The train is going to Gate Eight.","The train is early."],'going to → gonna']];
+ items.forEach(function(it,i){QBANK[6].push(q(it[0],'Which full sentence matches what you hear?',it[1],it[2],'Connected speech','In fast speech, '+it[3]+'.','Recognise the reduced form, then choose the standard full sentence.',it[3]+'-'+i))})
 })();
-
-/* ---- MISSION 7: details (names/dates/times/prices/etc.) ---- */
 (function(){
-  var items=[
-    ["The meeting starts at nine fifteen.","What time does the meeting start?",["8:15 a.m.","8:50 a.m.","9:15 a.m.","10:15 a.m."],2,"Listen for fifteen (9:15), not fifty."],
-    ["The total is forty-five dollars.","How much is the total?",["$14.50","$40.05","$45.00","$54.00"],2,"forty-five = 45; don't confuse with fourteen-fifty."],
-    ["Flight BA two oh seven departs at noon.","What is the flight number?",["BA 270","BA 207","BA 217","BA 027"],1,"'two oh seven' = 2-0-7 = 207."],
-    ["The address is fifty Maple Street.","What is the address?",["15 Maple Street","50 Maple Street","55 Maple Street","50 Mable Street"],1,"fifty (50), stressed on the first syllable."],
-    ["Mr. Sanders will arrive on the thirteenth.","When will Mr. Sanders arrive?",["The 3rd","The 13th","The 30th","The 23rd"],1,"thirteenth ends in -teenth."],
-    ["The discount is thirty percent.","What is the discount?",["13%","30%","33%","3%"],1,"thirty = 30 (front stress)."],
-    ["Room four-one-six is ready.","Which room is ready?",["Room 460","Room 416","Room 461","Room 406"],1,"four-one-six = 4-1-6."],
-    ["The deadline is Tuesday the twenty-second.","What is the deadline date?",["Tue 12th","Tue 20th","Tue 22nd","Thu 22nd"],2,"twenty-second = 22nd."],
-    ["It departs at a quarter to eight.","What time does it depart?",["7:15","7:45","8:15","8:45"],1,"'a quarter to eight' = 7:45."],
-    ["Ms. Park's number is five five five, oh one nine oh.","What is the phone number?",["555-0190","555-0119","555-1090","555-9010"],0,"oh one nine oh = 0-1-9-0."],
-    ["The booth costs ninety euros.","How much is the booth?",["19 euros","90 euros","99 euros","9 euros"],1,"ninety = 90 (front stress)."],
-    ["The shipment arrives on March third.","When does the shipment arrive?",["March 3rd","March 13th","March 23rd","May 3rd"],0,"third = 3rd (not thirteenth)."],
-    ["The seminar is on the fifteenth.","What date is the seminar?",["The 5th","The 15th","The 50th","The 13th"],1,"fifteenth ends in -teenth = 15th."],
-    ["The fee is fifty dollars.","What is the fee?",["$15","$50","$55","$5"],1,"fifty = 50 (front stress)."],
-    ["The train leaves at six forty.","When does the train leave?",["6:14","6:40","6:04","7:40"],1,"forty = 40 → 6:40."],
-    ["Please call extension three nineteen.","Which extension should you call?",["Ext. 309","Ext. 319","Ext. 390","Ext. 391"],1,"three nineteen = 319."],
-    ["The invoice number is A two oh four.","What is the invoice number?",["A-240","A-204","A-024","A-220"],1,"two oh four = 204."],
-    ["Gate twenty-two is now boarding.","Which gate is boarding?",["Gate 2","Gate 12","Gate 22","Gate 20"],2,"twenty-two = 22."],
-    ["Ms. Wright will lead the session.","Who will lead the session?",["Ms. White","Ms. Wright","Ms. Bright","Ms. Knight"],1,"'Wright' sounds like 'right'."],
-    ["The rent is nine hundred a month.","What is the monthly rent?",["$90","$900","$9,000","$190"],1,"nine hundred = 900."],
-    ["We open at half past ten.","What time do you open?",["10:15","10:30","10:45","9:30"],1,"half past ten = 10:30."],
-    ["The package weighs fourteen kilos.","How heavy is the package?",["4 kg","14 kg","40 kg","44 kg"],1,"fourteen = 14."],
-    ["His office is on the eighteenth floor.","Which floor is the office on?",["8th","18th","80th","28th"],1,"eighteenth = 18th."],
-    ["The order total comes to sixteen fifty.","What is the order total?",["$16.50","$60.50","$6.15","$16.15"],0,"sixteen fifty = $16.50."],
-    ["Please dial nine for an outside line.","What number gives an outside line?",["5","9","19","90"],1,"nine = 9."]
-  ];
-  items.forEach(function(it){
-    var four=shuffle(it[2]); var ans=it[2][it[3]];
-    QBANK[7].push({
-      spoken:it[0],prompt:it[1],opts:four,answer:four.indexOf(ans),cat:"Details",
-      explanation:'You heard: "'+it[0]+'"',
-      tip:it[4],
-      hint:"Catch the one key detail — the number, time, date or name."
-    });
-  });
+ var items=[
+ ['The meeting starts at nine fifteen.','What time does the meeting start?','9:15 a.m.',['8:15 a.m.','8:50 a.m.','10:15 a.m.'],'nine fifteen = 9:15'],
+ ['The total is forty-five dollars.','How much is the total?','$45.00',['$14.50','$40.05','$54.00'],'forty-five = 45'],
+ ['Flight BA two oh seven departs at noon.','What is the flight number?','BA 207',['BA 270','BA 217','BA 027'],'two oh seven = 207'],
+ ['The address is fifty Maple Street.','What is the address?','50 Maple Street',['15 Maple Street','55 Maple Street','50 Mable Street'],'fifty = 50'],
+ ['Mr Sanders will arrive on the thirteenth.','When will Mr Sanders arrive?','The 13th',['The 3rd','The 30th','The 23rd'],'thirteenth = 13th'],
+ ['The discount is thirty percent.','What is the discount?','30%',['13%','33%','3%'],'thirty = 30'],
+ ['Room four-one-six is ready.','Which room is ready?','Room 416',['Room 460','Room 461','Room 406'],'four-one-six = 416'],
+ ['The deadline is Tuesday the twenty-second.','What is the deadline?','Tuesday the 22nd',['Tuesday the 12th','Tuesday the 20th','Thursday the 22nd'],'twenty-second = 22nd'],
+ ['It departs at a quarter to eight.','What time does it depart?','7:45',['7:15','8:15','8:45'],'a quarter to eight = 7:45'],
+ ["Ms Park's number is five five five, oh one nine oh.",'What is the phone number?','555-0190',['555-0119','555-1090','555-9010'],'oh one nine oh = 0190'],
+ ['The booth costs ninety euros.','How much is the booth?','90 euros',['19 euros','99 euros','9 euros'],'ninety = 90'],
+ ['The shipment arrives on March third.','When does the shipment arrive?','March 3rd',['March 13th','March 23rd','May 3rd'],'third = 3rd'],
+ ['The seminar is on the fifteenth.','What date is the seminar?','The 15th',['The 5th','The 50th','The 13th'],'fifteenth = 15th'],
+ ['The fee is fifty dollars.','What is the fee?','$50',['$15','$55','$5'],'fifty = 50'],
+ ['The train leaves at six forty.','When does the train leave?','6:40',['6:14','6:04','7:40'],'six forty = 6:40'],
+ ['Please call extension three nineteen.','Which extension should you call?','Ext. 319',['Ext. 309','Ext. 390','Ext. 391'],'three nineteen = 319'],
+ ['The invoice number is A two oh four.','What is the invoice number?','A-204',['A-240','A-024','A-220'],'two oh four = 204'],
+ ['Gate twenty-two is now boarding.','Which gate is boarding?','Gate 22',['Gate 2','Gate 12','Gate 20'],'twenty-two = 22'],
+ ['Ms Wright will lead the session.','Who will lead the session?','Ms Wright',['Ms White','Ms Bright','Ms Knight'],"Wright sounds like 'right'"],
+ ['The rent is nine hundred a month.','What is the monthly rent?','$900',['$90','$9,000','$190'],'nine hundred = 900'],
+ ['We open at half past ten.','What time do we open?','10:30',['10:15','10:45','9:30'],'half past ten = 10:30'],
+ ['The package weighs fourteen kilos.','How heavy is the package?','14 kg',['4 kg','40 kg','44 kg'],'fourteen = 14'],
+ ['His office is on the eighteenth floor.','Which floor is the office on?','18th',['8th','80th','28th'],'eighteenth = 18th'],
+ ['The order total comes to sixteen fifty.','What is the order total?','$16.50',['$60.50','$6.15','$16.15'],'sixteen fifty = 16.50'],
+ ['Please dial nine for an outside line.','What number gives an outside line?','9',['5','19','90'],'nine = 9']];
+ items.forEach(function(it,i){QBANK[7].push(q(it[0],it[1],it[2],it[3],'Details',it[4]+'.','Catch the one key detail.',String(i)))})
 })();
-
-/* ---- MISSION 8: ultimate mix (pull from all categories) ---- */
-function buildMission8(){
-  QBANK[8]=[];
-  var sources=[1,2,3,4,5,6,7];
-  sources.forEach(function(m){
-    pick(QBANK[m], 4).forEach(function(q){
-      var c=JSON.parse(JSON.stringify(q));
-      c.cat=q.cat; // keep original category for stats
-      QBANK[8].push(c);
-    });
-  });
-  QBANK[8]=shuffle(QBANK[8]);
-}
-
-/* =========================================================================
-   STATE + STORAGE
-   ========================================================================= */
-var defaultState = function(){
-  return {
-    resources:{water:100,food:100,energy:100,shelter:100,signal:0},
-    unlocked:1,            // highest mission unlocked
-    completed:[],          // mission ids completed
-    stats:{answered:0, correct:0, byCat:{}}, // byCat[cat]={c:..,t:..}
-    mistakes:[],           // {q, cat, you, ans, exp}
-    settings:{ music:false, accent:"US" }
-  };
-};
-var state = load();
-
-function load(){
-  try{
-    var raw=localStorage.getItem(KEY);
-    if(raw){ var s=JSON.parse(raw); var d=defaultState();
-      // shallow-merge to be safe across versions
-      s.resources=Object.assign(d.resources,s.resources||{});
-      s.stats=Object.assign(d.stats,s.stats||{}); s.stats.byCat=s.stats.byCat||{};
-      s.settings=Object.assign(d.settings,s.settings||{});
-      s.completed=s.completed||[]; s.mistakes=s.mistakes||[]; s.unlocked=s.unlocked||1;
-      return s;
-    }
-  }catch(e){}
-  return defaultState();
-}
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
-
-/* runtime session vars */
-var run = null; // {missionIdx, queue, qi, hints}
-
-/* =========================================================================
-   SPEECH (Web Speech API) with music ducking
-   ========================================================================= */
-var synth = window.speechSynthesis;
-var voices = [];
-function loadVoices(){ voices = synth ? synth.getVoices() : []; }
-if(synth){ loadVoices(); if(typeof synth.onvoiceschanged!=="undefined"){ synth.onvoiceschanged=loadVoices; } }
-
-function pickVoice(){
-  var want = state.settings.accent==="UK" ? "en-GB" : "en-US";
-  var v = voices.filter(function(x){return x.lang && x.lang.replace("_","-").toLowerCase()===want.toLowerCase();});
-  if(v.length) return v[0];
-  v = voices.filter(function(x){return x.lang && x.lang.toLowerCase().indexOf("en")===0;});
-  return v[0] || null;
-}
-
-var speaking=false;
-function speak(text){
-  if(!synth){ return; }
-  synth.cancel();
-  var u = new SpeechSynthesisUtterance(text);
-  var v = pickVoice(); if(v) u.voice=v;
-  u.lang = state.settings.accent==="UK" ? "en-GB":"en-US";
-  u.rate = 0.92; u.pitch=1;
-  u.onstart=function(){ speaking=true; setWave(true); duckMusic(true); };
-  u.onend=function(){ speaking=false; setWave(false); duckMusic(false); };
-  u.onerror=function(){ speaking=false; setWave(false); duckMusic(false); };
-  synth.speak(u);
-}
-function setWave(on){ var w=$("wave"); if(w){ w.classList.toggle("playing",on); } }
-
-/* =========================================================================
-   MUSIC
-   ========================================================================= */
-var bgm = $("bgm");
-var BASE_VOL = 0.45;
-bgm.volume = BASE_VOL;
-var musicStarted=false;
-
-function reflectMusicBtn(){
-  var b=$("musicBtn"), l=$("musicLabel");
-  if(state.settings.music){ b.classList.remove("off"); b.setAttribute("aria-pressed","true"); l.textContent="Music on"; }
-  else{ b.classList.add("off"); b.setAttribute("aria-pressed","false"); l.textContent="Music off"; }
-}
-function startMusicIfWanted(){
-  if(state.settings.music && bgm.paused){
-    bgm.volume = speaking ? BASE_VOL*0.1 : BASE_VOL;
-    var p=bgm.play(); if(p&&p.catch){ p.catch(function(){}); }
-  }
-}
-function toggleMusic(){
-  state.settings.music = !state.settings.music; save(); reflectMusicBtn();
-  if(state.settings.music){ startMusicIfWanted(); }
-  else{ bgm.pause(); }
-}
-function duckMusic(on){
-  if(!state.settings.music) return;
-  bgm.volume = on ? BASE_VOL*0.1 : BASE_VOL;
-}
-$("musicBtn").addEventListener("click", toggleMusic);
-// start on first user interaction (autoplay policy)
-function firstGesture(){ musicStarted=true; startMusicIfWanted(); document.removeEventListener("pointerdown",firstGesture); document.removeEventListener("keydown",firstGesture); }
-document.addEventListener("pointerdown",firstGesture);
-document.addEventListener("keydown",firstGesture);
-
-/* =========================================================================
-   SCREEN ROUTER
-   ========================================================================= */
-var SCREENS=["loading","menu","map","how","logbook","review","mission","victory","gameover"];
-function show(id){
-  SCREENS.forEach(function(s){ var el=$(s); if(el) el.classList.toggle("active", s===id); });
-  // stop speaking when leaving mission
-  if(id!=="mission" && synth){ synth.cancel(); setWave(false); duckMusic(false); }
-  window.scrollTo(0,0);
-}
-
-/* =========================================================================
-   RESOURCES / HUD
-   ========================================================================= */
-function clamp(n){ return Math.max(0,Math.min(100,n)); }
-function renderHUD(){
-  var r=state.resources;
-  ["water","food","energy","shelter","signal"].forEach(function(k){
-    var cap=k.charAt(0).toUpperCase()+k.slice(1);
-    var bar=$("bar"+cap), pct=$("pct"+cap);
-    if(bar) bar.style.width=r[k]+"%";
-    if(pct) pct.textContent=Math.round(r[k])+"%";
-  });
-}
-function renderProgressNodes(curIdx){
-  var host=$("progNodes"); host.innerHTML="";
-  for(var i=0;i<8;i++){
-    var d=document.createElement("div"); d.className="pnode";
-    var mid=MISSIONS[i].id;
-    if(state.completed.indexOf(mid)>=0){ d.classList.add("done"); d.textContent="✓"; }
-    else if(i===curIdx){ d.classList.add("cur"); d.textContent=String(i+1); }
-    else if(mid<=state.unlocked){ d.textContent=String(i+1); }
-    else { d.innerHTML='<span class="lk">🔒</span>'; }
-    host.appendChild(d);
-  }
-}
-
-/* =========================================================================
-   MISSION FLOW
-   ========================================================================= */
-var QPER = 6; // questions presented per mission
-
-function startMission(idx){
-  var m=MISSIONS[idx];
-  if(m.id===8){ buildMission8(); }
-  run = { idx:idx, m:m, queue:pick(QBANK[m.id], Math.min(QPER, QBANK[m.id].length)), qi:0, hints:3, missedThisMission:0 };
-  // theme the mission screen
-  var sec=$("mission");
-  sec.style.backgroundImage="url('images/"+m.img+"')";
-  $("qHead").style.background="linear-gradient(180deg,"+m.color+","+shade(m.color,-28)+")";
-  $("playBtn").style.background="linear-gradient(180deg,"+m.color+","+shade(m.color,-28)+")";
-  $("qTitle").textContent=m.name;
-  $("qSub").textContent="Listening Mission "+m.id+" of 8";
-  $("missionTag").innerHTML="Mission<br>"+m.id+"/8";
-  $("hintBadge").textContent=run.hints;
-  renderHUD(); renderProgressNodes(idx);
-  show("mission");
-  renderQuestion();
-}
-
-function renderQuestion(){
-  closeBubbles();
-  var q = run.queue[run.qi];
-  q._answered = false; // questions are shared bank refs; always start answerable
-  $("qIntro").innerHTML = run.m.intro;
-  $("qPrompt").textContent = (run.qi+1)+". "+q.prompt;
-  var fb=$("feedback"); fb.className="feedback"; fb.innerHTML="";
-  var host=$("opts"); host.innerHTML="";
-  q.opts.forEach(function(text,i){
-    var b=document.createElement("button");
-    b.className="opt"; b.setAttribute("data-i",i);
-    b.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span>'+escapeHtml(text)+'</span>';
-    b.addEventListener("click",function(){ answer(i); });
-    host.appendChild(b);
-  });
-  // auto play after a short beat
-  setTimeout(function(){ speak(q.spoken); }, 350);
-  // focus first option for keyboard users
-  setTimeout(function(){ var f=host.querySelector(".opt"); if(f) f.focus(); }, 120);
-  $("hintBadge").textContent=run.hints;
-}
-
-function answer(i){
-  var q=run.queue[run.qi];
-  if(q._answered) return;
-  q._answered=true;
-  var correct = (i===q.answer);
-  // mark options
-  var btns=$("opts").querySelectorAll(".opt");
-  btns.forEach(function(b,idx){
-    b.disabled=true;
-    if(idx===q.answer) b.classList.add("correct");
-    else if(idx===i) b.classList.add("wrong");
-  });
-  // stats
-  state.stats.answered++;
-  var cat=q.cat||run.m.cat;
-  if(!state.stats.byCat[cat]) state.stats.byCat[cat]={c:0,t:0};
-  state.stats.byCat[cat].t++;
-  if(correct){ state.stats.correct++; state.stats.byCat[cat].c++; }
-
-  // resources
-  applyResources(correct);
-
-  // feedback
-  var fb=$("feedback");
-  fb.className="feedback show "+(correct?"ok":"no");
-  fb.innerHTML =
-    '<div class="fb-h">'+(correct?"✓ Correct":"✕ Not quite")+'</div>'+
-    '<div>'+escapeHtml(q.explanation)+'</div>'+
-    (correct?'':'<div style="margin-top:5px">Correct answer: <b>'+escapeHtml(q.opts[q.answer])+'</b></div>')+
-    '<div class="tip">💡 '+escapeHtml(q.tip)+'</div>'+
-    '<div class="next"><button class="btn green" id="nextBtn">'+(run.qi+1<run.queue.length?"Next ›":"Finish Mission ›")+'</button></div>';
-  $("nextBtn").addEventListener("click", nextQuestion);
-  $("nextBtn").focus();
-  announce(correct?"Correct.":"Incorrect. The answer is "+q.opts[q.answer]+".");
-
-  if(!correct){
-    run.missedThisMission++;
-    state.mistakes.unshift({ q:q.prompt+' (heard: "'+q.spoken+'")', cat:cat, you:q.opts[i], ans:q.opts[q.answer], exp:q.tip });
-    if(state.mistakes.length>60) state.mistakes.pop();
-  }
-  renderHUD(); save();
-
-  // game over check
-  var r=state.resources;
-  if(r.water<=0 || r.food<=0 || r.energy<=0){
-    setTimeout(function(){ gameOver(); }, 900);
-  }
-}
-
-function applyResources(correct){
-  var r=state.resources;
-  var themed=run.m.res;
-  if(correct){
-    r.signal = clamp(r.signal + 4);
-    r.energy = clamp(r.energy + 3);
-    if(themed!=="signal") r[themed]=clamp(r[themed]+5);
-    // gentle bump to lowest resource
-    var lows=["water","food","energy","shelter"].sort(function(a,b){return r[a]-r[b];});
-    r[lows[0]]=clamp(r[lows[0]]+2);
-  }else{
-    if(themed==="signal") themed="shelter";
-    r[themed]=clamp(r[themed]-10);
-    r.energy=clamp(r.energy-6);
-  }
-}
-
-function nextQuestion(){
-  run.qi++;
-  if(run.qi>=run.queue.length){ endMission(); return; }
-  renderQuestion();
-}
-
-function endMission(){
-  var m=run.m;
-  if(state.completed.indexOf(m.id)<0) state.completed.push(m.id);
-  if(m.id===state.unlocked && state.unlocked<8) state.unlocked=m.id+1;
-  // signal boost for completing
-  state.resources.signal=clamp(state.resources.signal + (m.id===8?20:6));
-  save();
-  if(state.completed.indexOf(8)>=0){ victory(); return; }
-  // back to map with next mission highlighted
-  renderMap();
-  show("map");
-  announce("Mission complete. "+(m.id<8?"Next mission unlocked.":""));
-}
-
-/* =========================================================================
-   VICTORY / GAME OVER
-   ========================================================================= */
-function accuracy(){ return state.stats.answered? Math.round(100*state.stats.correct/state.stats.answered):0; }
-function bestWorstCat(){
-  var best=null,worst=null;
-  Object.keys(state.stats.byCat).forEach(function(k){
-    var o=state.stats.byCat[k]; if(o.t<1) return;
-    var acc=o.c/o.t;
-    if(!best || acc>best.acc) best={k:k,acc:acc};
-    if(!worst || acc<worst.acc) worst={k:k,acc:acc};
-  });
-  return {best:best?best.k:"—", worst:worst?worst.k:"—"};
-}
-
-function victory(){
-  var r=state.resources;
-  $("winStats").innerHTML =
-    statBox(accuracy()+"%","Accuracy")+
-    statBox(state.stats.correct,"Correct answers")+
-    statBox(Math.round(r.signal)+"%","Signal")+
-    statBox(bestWorstCat().best,"Best category");
-  var ach=[
-    ["Survived", true],
-    ["Found shelter", r.shelter>0],
-    ["Found food", r.food>0],
-    ["Stayed safe", r.energy>30],
-    ["Sent the signal", r.signal>=80],
-    ["Sharp ears (80%+)", accuracy()>=80]
-  ];
-  $("winAch").innerHTML = ach.map(function(a){
-    return '<div class="list-line"><span>'+a[0]+'</span><b>'+(a[1]?"✓":"—")+'</b></div>';
-  }).join("");
-  save();
-  show("victory");
-}
-
-function gameOver(){
-  var r=state.resources;
-  $("loseStats").innerHTML =
-    statBox(Math.round(r.water)+"%","Water")+
-    statBox(Math.round(r.food)+"%","Food")+
-    statBox(Math.round(r.energy)+"%","Energy")+
-    statBox(Math.round(r.signal)+"%","Signal");
-  var cause = r.water<=0?"You ran out of water.":r.food<=0?"You ran out of food.":"You ran out of energy.";
-  $("goReason").textContent = cause+" No one heard your signal. Better luck next time.";
-  $("loseWeak").textContent = bestWorstCat().worst;
-  // reset run resources for a fresh attempt next time, keep stats/mistakes
-  save();
-  show("gameover");
-}
-function statBox(v,k){ return '<div class="stat parch"><div class="v">'+v+'</div><div class="k">'+k+'</div></div>'; }
-
-/* =========================================================================
-   MAP / LOGBOOK / REVIEW
-   ========================================================================= */
-function renderMap(){
-  var host=$("mapGrid"); host.innerHTML="";
-  MISSIONS.forEach(function(m,idx){
-    var unlocked = m.id<=state.unlocked;
-    var done = state.completed.indexOf(m.id)>=0;
-    var div=document.createElement("div");
-    div.className="node parch"+(unlocked?"":" locked")+(done?" done":"");
-    div.innerHTML=
-      '<div class="state">'+(done?"✓":unlocked?"":"🔒")+'</div>'+
-      '<div class="num" style="color:'+m.color+'">'+m.id+'</div>'+
-      '<h3>'+m.name+'</h3>'+
-      '<p>'+m.cat+'</p>';
-    if(unlocked){
-      var b=document.createElement("button");
-      b.className="btn green play";
-      b.textContent = done? "Replay ▶" : "Play ▶";
-      b.addEventListener("click",function(){ startMission(idx); });
-      div.appendChild(b);
-    }
-    host.appendChild(div);
-  });
-}
-
-function renderLogbook(){
-  var bw=bestWorstCat();
-  $("logStats").innerHTML =
-    statBox(state.completed.length+"/8","Missions completed")+
-    statBox(accuracy()+"%","Accuracy")+
-    statBox(state.stats.answered,"Questions answered")+
-    statBox(Math.round(state.resources.signal)+"%","Best signal");
-  var cats=Object.keys(state.stats.byCat);
-  $("logCats").innerHTML = cats.length? cats.map(function(k){
-    var o=state.stats.byCat[k]; var acc=o.t?Math.round(100*o.c/o.t):0;
-    return '<div class="list-line"><span>'+k+'</span><b>'+acc+'% ('+o.c+'/'+o.t+')</b></div>';
-  }).join("") : '<p style="color:var(--ink-soft);font-size:14px">No data yet — play a mission to fill your logbook.</p>';
-  $("logCats").innerHTML += '<div class="list-line" style="margin-top:8px"><span>Strongest</span><b>'+bw.best+'</b></div>'+
-                            '<div class="list-line"><span>Weakest</span><b>'+bw.worst+'</b></div>';
-  // common mistakes (group by category)
-  var byCat={};
-  state.mistakes.forEach(function(m){ byCat[m.cat]=(byCat[m.cat]||0)+1; });
-  var keys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
-  $("logMistakes").innerHTML = keys.length? keys.map(function(k){
-    return '<div class="list-line"><span>'+k+'</span><b>'+byCat[k]+' missed</b></div>';
-  }).join("") : '<p style="color:var(--ink-soft);font-size:14px">No mistakes recorded yet. Keep it up!</p>';
-}
-
-function renderReview(){
-  var host=$("reviewList");
-  if(!state.mistakes.length){ host.innerHTML='<div class="parch panel-pad">No mistakes recorded. Your ear is sharp! 🎧</div>'; return; }
-  host.innerHTML = state.mistakes.map(function(m){
-    return '<div class="review-item parch">'+
-      '<div class="rq">'+escapeHtml(m.q)+' <span style="color:var(--ink-soft);font-weight:600">· '+escapeHtml(m.cat)+'</span></div>'+
-      '<div class="ra">Your answer: <span class="you">'+escapeHtml(m.you)+'</span> &nbsp;·&nbsp; Correct: <span class="ans">'+escapeHtml(m.ans)+'</span></div>'+
-      '<div class="rx">💡 '+escapeHtml(m.exp||"")+'</div>'+
-    '</div>';
-  }).join("");
-}
-
-/* =========================================================================
-   HINTS / NOTES / HELP / TOOLBAR
-   ========================================================================= */
-function closeBubbles(){ ["hintBubble","notesBubble","helpBubble"].forEach(function(id){ $(id).classList.remove("show"); }); }
-function useHint(){
-  if(!run) return;
-  if(run.hints<=0){ flashBubble("hintBubble","<b>No hints left.</b> Trust your ears — replay the audio and focus on the key sound."); return; }
-  run.hints--; $("hintBadge").textContent=run.hints;
-  var q=run.queue[run.qi];
-  flashBubble("hintBubble","<b>Hint</b><br>"+escapeHtml(q.hint));
-}
-function showNotes(){
-  if(!run) return;
-  flashBubble("notesBubble","<b>Listening notes — "+escapeHtml(run.m.name)+"</b><br><span style=\"font-family:var(--hand);font-style:italic\">Focus: "+escapeHtml(run.m.cat)+". "+escapeHtml(run.m.intro.replace(/<[^>]+>/g,""))+"</span>");
-}
-function flashBubble(id,html){
-  closeBubbles();
-  var textEl = $(id.replace("Bubble","Text"));
-  if(textEl) textEl.innerHTML = html;
-  $(id).classList.add("show");
-}
-function openBubble(id){ closeBubbles(); $(id).classList.add("show"); }
-
-/* =========================================================================
-   ACCENT TOGGLE (rendered into help bubble)
-   ========================================================================= */
-function renderAccent(){
-  var host=$("accentHelp"); host.innerHTML="";
-  [["US","🇺🇸 US"],["UK","🇬🇧 UK"]].forEach(function(a){
-    var b=document.createElement("button");
-    b.textContent=a[1]; b.className=(state.settings.accent===a[0]?"on":"");
-    b.addEventListener("click",function(){ state.settings.accent=a[0]; save(); renderAccent();
-      // re-speak current question with new accent
-      if(run && run.queue[run.qi]) speak(run.queue[run.qi].spoken);
-    });
-    host.appendChild(b);
-  });
-}
-
-/* =========================================================================
-   HELPERS
-   ========================================================================= */
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
-function announce(t){ var l=$("live"); if(l){ l.textContent=""; setTimeout(function(){ l.textContent=t; },50); } }
-function shade(hex,amt){ // lighten/darken hex by amt (-/+)
-  var c=hex.replace("#",""); if(c.length===3) c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
-  var n=parseInt(c,16); var r=(n>>16)+amt, g=((n>>8)&255)+amt, b=(n&255)+amt;
-  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
-  return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
-}
-
-/* =========================================================================
-   NEW GAME / CONTINUE / RESET
-   ========================================================================= */
-function newAdventure(){
-  // fresh resources + run, keep long-term stats? -> reset session resources & mission progress, keep mistakes/stats history
-  state.resources={water:100,food:100,energy:100,shelter:100,signal:0};
-  state.unlocked=1; state.completed=[];
-  save();
-  startMission(0);
-}
-function continueAdventure(){
-  // resume at first not-completed unlocked mission
-  var idx=0;
-  for(var i=0;i<MISSIONS.length;i++){
-    if(state.completed.indexOf(MISSIONS[i].id)<0){ idx=i; break; }
-    idx=i;
-  }
-  if(MISSIONS[idx].id>state.unlocked) idx=state.unlocked-1;
-  startMission(idx);
-}
-function resetProgress(){
-  if(!confirm("Reset ALL progress, stats and mistakes? This cannot be undone.")) return;
-  localStorage.removeItem(KEY); state=defaultState(); save();
-  reflectMusicBtn(); renderMap(); announce("Progress reset.");
-  show("menu");
-}
-function updateContinueBtn(){
-  $("continueBtn").disabled = (state.completed.length===0 && state.unlocked===1 && state.resources.signal===0) ? false : false;
-  // always enabled (acts as resume / start)
-}
-
-/* =========================================================================
-   EVENTS
-   ========================================================================= */
-document.addEventListener("click", function(e){
-  var act = e.target.closest && e.target.closest("[data-act]");
-  if(act){
-    var a=act.getAttribute("data-act");
-    if(a==="start"){ newAdventure(); }
-    else if(a==="continue"){ continueAdventure(); }
-    else if(a==="map"){ renderMap(); show("map"); }
-    else if(a==="logbook"){ renderLogbook(); show("logbook"); }
-    else if(a==="review"){ renderReview(); show("review"); }
-    else if(a==="how"){ show("how"); }
-    else if(a==="menu"){ show("menu"); }
-    else if(a==="reset"){ resetProgress(); }
-    return;
-  }
-  var cl = e.target.closest && e.target.closest("[data-close]");
-  if(cl){ $(cl.getAttribute("data-close")).classList.remove("show"); }
-});
-
-$("playBtn").addEventListener("click", function(){ if(run) speak(run.queue[run.qi].spoken); });
-$("replayTool").addEventListener("click", function(){ if(run) speak(run.queue[run.qi].spoken); });
-$("hintTool").addEventListener("click", useHint);
-$("notesTool").addEventListener("click", showNotes);
-$("helpTool").addEventListener("click", function(){ renderAccent(); openBubble("helpBubble"); });
-$("abandonBtn").addEventListener("click", function(){
-  if(confirm("Abandon this mission and return to the map?")){ if(synth) synth.cancel(); renderMap(); show("map"); }
-});
-
-/* keyboard shortcuts during mission */
-document.addEventListener("keydown", function(e){
-  if(!$("mission").classList.contains("active")) return;
-  var k=e.key.toLowerCase();
-  if(k==="p"){ if(run) speak(run.queue[run.qi].spoken); }
-  else if(k==="r"){ if(run) speak(run.queue[run.qi].spoken); }
-  else if(k==="h"){ useHint(); }
-  else if(["1","2","3","4"].indexOf(k)>=0){
-    var opts=$("opts").querySelectorAll(".opt"); var i=parseInt(k,10)-1;
-    if(opts[i] && !opts[i].disabled){ opts[i].click(); }
-  } else if(k==="enter"){
-    var nb=$("nextBtn"); if(nb && document.activeElement!==nb && $("feedback").classList.contains("show")){ /* let focus handle */ }
-  }
-});
-
-/* =========================================================================
-   BOOT — loading sequence then menu
-   ========================================================================= */
-var loadMsgs=["Exploring the island…","Searching for water…","Building shelter…","Following the jungle trail…","Preparing the rescue signal…"];
-function boot(){
-  reflectMusicBtn(); updateContinueBtn();
-  show("loading");
-  var i=0, pct=0;
-  $("loadMsg").textContent=loadMsgs[0];
-  var t=setInterval(function(){
-    pct+=Math.random()*22+10; if(pct>100)pct=100;
-    $("loadFill").style.width=pct+"%";
-    i=Math.min(loadMsgs.length-1, Math.floor(pct/20));
-    $("loadMsg").textContent=loadMsgs[i];
-    if(pct>=100){ clearInterval(t); setTimeout(function(){ show("menu"); }, 450); }
-  }, 420);
-}
-// warm up voices
-if(synth){ setTimeout(loadVoices, 200); }
+function balancedTargets(n){var base=Math.floor(n/4),rem=n%4,counts=[base,base,base,base],order=shuffle([0,1,2,3]);for(var i=0;i<rem;i++)counts[order[i]]++;var out=[];counts.forEach(function(c,pos){for(var j=0;j<c;j++)out.push(pos)});return shuffle(out)}
+function prepare(raw,target){var ds=[];shuffle(raw.distractors).forEach(function(x){if(x!==raw.answerText&&ds.indexOf(x)<0&&ds.length<3)ds.push(x)});while(ds.length<3)ds.push('—');var opts=[null,null,null,null],d=0;opts[target]=raw.answerText;for(var i=0;i<4;i++)if(i!==target)opts[i]=ds[d++];return Object.assign({},raw,{opts:opts,answer:target,_answered:false})}
+function selectDiverse(bank,n){var s=shuffle(bank),out=[],seen={};s.forEach(function(x){if(out.length<n&&!seen[x.family]){seen[x.family]=1;out.push(x)}});if(out.length<n)s.forEach(function(x){if(out.length<n&&out.indexOf(x)<0)out.push(x)});return out}
+function buildQueue(mid){var raw;if(mid===8){raw=[];for(var m=1;m<=7;m++)raw.push(selectDiverse(QBANK[m],1)[0])}else raw=selectDiverse(QBANK[mid],6);var targets=balancedTargets(raw.length);return raw.map(function(x,i){return prepare(x,targets[i])})}
+function defaults(){return{version:VERSION,resources:{water:100,food:100,energy:100,shelter:100,signal:0},unlocked:1,completed:[],stats:{answered:0,correct:0,byCat:{},bestSignal:0},mistakes:[],settings:{music:false,accent:'US'},adventure:{active:false,answered:0,correct:0,byCat:{}}}}
+var state=load(),run=null;
+function load(){var d=defaults();try{var raw=localStorage.getItem(KEY);if(!raw)return d;var s=JSON.parse(raw)||{};s.resources=Object.assign({},d.resources,s.resources||{});s.stats=Object.assign({},d.stats,s.stats||{});s.stats.byCat=s.stats.byCat||{};s.stats.bestSignal=Math.max(s.stats.bestSignal||0,s.resources.signal||0);s.settings=Object.assign({},d.settings,s.settings||{});s.completed=Array.isArray(s.completed)?s.completed:[];s.mistakes=Array.isArray(s.mistakes)?s.mistakes:[];s.unlocked=Math.max(1,Math.min(8,s.unlocked||1));s.adventure=Object.assign({},d.adventure,s.adventure||{});s.adventure.byCat=s.adventure.byCat||{};if(!('active' in (s.adventure||{})))s.adventure.active=false;if(s.version!==VERSION&& !s.adventure.answered){s.adventure.active=(s.completed.indexOf(8)<0 && s.resources.water>0&&s.resources.food>0&&s.resources.energy>0&&(s.unlocked>1||s.resources.signal>0))}s.version=VERSION;return s}catch(e){return d}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function announce(t){$('live').textContent='';setTimeout(function(){$('live').textContent=t},30)}
+var synth=window.speechSynthesis||null,voices=[],speechToken=0,speechTimer=null,speaking=false;
+function loadVoices(){voices=synth?synth.getVoices():[]}if(synth){loadVoices();synth.onvoiceschanged=loadVoices}
+function voiceInfo(){var want=state.settings.accent==='UK'?'en-GB':'en-US',exact=voices.filter(function(v){return(v.lang||'').replace('_','-').toLowerCase()===want.toLowerCase()});if(exact.length)return{voice:exact[0],exact:true};var en=voices.filter(function(v){return(v.lang||'').toLowerCase().indexOf('en')===0});return{voice:en[0]||null,exact:false}}
+function cancelSpeech(){speechToken++;if(speechTimer){clearTimeout(speechTimer);speechTimer=null}if(synth)synth.cancel();speaking=false;setWave(false);duckMusic(false)}
+function setWave(on){$('wave').classList.toggle('playing',!!on)}
+function setOptionLock(locked){Array.prototype.forEach.call($('opts').querySelectorAll('.opt'),function(b){if(!b.classList.contains('correct')&&!b.classList.contains('wrong'))b.disabled=locked})}
+function speakCurrent(){if(!run||run.locked)return;var qn=run.queue[run.qi];run.audioPlayed=false;setOptionLock(true);if(!synth||typeof SpeechSynthesisUtterance==='undefined'){$('audioStatus').textContent='Audio unavailable in this browser. Try Chrome, Edge or another device.';announce('Audio unavailable.');return}var my=++speechToken;synth.cancel();var info=voiceInfo(),u=new SpeechSynthesisUtterance(qn.spoken);if(info.voice)u.voice=info.voice;u.lang=state.settings.accent==='UK'?'en-GB':'en-US';u.rate=.94;u.pitch=1;$('audioStatus').textContent=info.exact?'Preparing '+state.settings.accent+' voice…':'Exact '+state.settings.accent+' voice unavailable — using the closest English voice.';u.onstart=function(){if(my!==speechToken)return;speaking=true;setWave(true);duckMusic(true);$('audioStatus').textContent='Listening…'};u.onend=function(){if(my!==speechToken)return;speaking=false;setWave(false);duckMusic(false);run.audioPlayed=true;if(!qn._answered&&!run.locked)setOptionLock(false);$('audioStatus').textContent='Choose your answer.';announce('Audio finished. Choose your answer.')};u.onerror=function(){if(my!==speechToken)return;speaking=false;setWave(false);duckMusic(false);$('audioStatus').textContent='Audio could not play. Try Replay, another accent or another browser.';announce('Audio could not play.')};synth.speak(u)}
+var bgm=$('bgm'),BASE=.42;bgm.volume=BASE;
+function reflectMusic(){var on=!!state.settings.music;$('musicBtn').classList.toggle('off',!on);$('musicBtn').setAttribute('aria-pressed',String(on));$('musicLabel').textContent=on?'Music on':'Music off'}
+function startMusic(){if(!state.settings.music)return;bgm.volume=speaking?BASE*.1:BASE;var p=bgm.play();if(p&&p.catch)p.catch(function(){state.settings.music=false;save();reflectMusic();announce('Music could not be loaded.')})}
+function toggleMusic(){state.settings.music=!state.settings.music;save();reflectMusic();if(state.settings.music)startMusic();else bgm.pause()}
+function duckMusic(on){if(state.settings.music)bgm.volume=on?BASE*.1:BASE}
+$('musicBtn').addEventListener('click',toggleMusic);
+function show(id){cancelSpeech();['loading','menu','map','how','logbook','review','mission','victory','gameover'].forEach(function(s){$(s).classList.toggle('active',s===id)});var w=$(id).querySelector('.wrap');if(w)w.scrollTop=0;if(id==='menu')updateContinue()}
+function renderHUD(){var r=state.resources;['water','food','energy','shelter','signal'].forEach(function(k){var cap=k.charAt(0).toUpperCase()+k.slice(1);$('bar'+cap).style.width=r[k]+'%';$('pct'+cap).textContent=Math.round(r[k])+'%'})}
+function renderProgress(cur){$('progNodes').innerHTML='';MISSIONS.forEach(function(m,i){var d=document.createElement('div');d.className='pnode';if(state.completed.indexOf(m.id)>=0){d.classList.add('done');d.textContent='✓'}else if(i===cur){d.classList.add('cur');d.textContent=m.id}else if(m.id<=state.unlocked)d.textContent=m.id;else d.textContent='🔒';$('progNodes').appendChild(d)})}
+function startMission(idx){var m=MISSIONS[idx],practice=state.completed.indexOf(m.id)>=0;run={idx:idx,m:m,queue:buildQueue(m.id),qi:0,hints:3,practice:practice,locked:false,audioPlayed:false};$('mission').style.backgroundImage="url('images/"+m.img+"')";$('qHead').style.background='linear-gradient(180deg,'+m.color+','+shade(m.color,-28)+')';$('playBtn').style.background='linear-gradient(180deg,'+m.color+','+shade(m.color,-28)+')';$('qTitle').textContent=m.name+(practice?' — Practice':'');$('qSub').textContent='Listening Mission '+m.id+' of 8';$('missionTag').innerHTML='Mission<br>'+m.id+'/8';renderHUD();renderProgress(idx);show('mission');renderQuestion()}
+function renderQuestion(){closeBubbles();var z=run.queue[run.qi];z._answered=false;run.audioPlayed=false;$('qIntro').innerHTML=run.m.intro+(run.practice?' <b>This replay is practice only.</b>':'');$('qPrompt').textContent=(run.qi+1)+'. '+z.prompt;$('feedback').className='feedback';$('feedback').innerHTML='';$('audioStatus').textContent='Audio will play automatically…';var host=$('opts');host.innerHTML='';z.opts.forEach(function(text,i){var b=document.createElement('button');b.className='opt';b.disabled=true;b.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span>'+esc(text)+'</span>';b.addEventListener('click',function(){answer(i)});host.appendChild(b)});$('hintBadge').textContent=run.hints;speechTimer=setTimeout(speakCurrent,420)}
+function addCat(obj,cat,correct){if(!obj[cat])obj[cat]={c:0,t:0};obj[cat].t++;if(correct)obj[cat].c++}
+function applyResources(correct){if(run.practice)return;var r=state.resources,themed=run.m.res;if(correct){r.signal=clamp(r.signal+4);r.energy=clamp(r.energy+3);if(themed!=='signal')r[themed]=clamp(r[themed]+5);var lows=['water','food','energy','shelter'].sort(function(a,b){return r[a]-r[b]});r[lows[0]]=clamp(r[lows[0]]+2)}else{if(themed==='signal')themed='shelter';r[themed]=clamp(r[themed]-10);r.energy=clamp(r.energy-6)}state.stats.bestSignal=Math.max(state.stats.bestSignal||0,r.signal)}
+function answer(i){if(!run||run.locked)return;var z=run.queue[run.qi];if(z._answered||!run.audioPlayed)return;z._answered=true;cancelSpeech();var correct=i===z.answer,btns=$('opts').querySelectorAll('.opt');btns.forEach(function(b,k){b.disabled=true;if(k===z.answer)b.classList.add('correct');else if(k===i)b.classList.add('wrong')});state.stats.answered++;if(correct)state.stats.correct++;addCat(state.stats.byCat,z.cat,correct);if(!run.practice){state.adventure.answered++;if(correct)state.adventure.correct++;addCat(state.adventure.byCat,z.cat,correct)}applyResources(correct);if(!correct){state.mistakes.unshift({q:z.prompt+' (heard: “'+z.spoken+'”)',cat:z.cat,you:z.opts[i],ans:z.opts[z.answer],exp:z.tip});if(state.mistakes.length>80)state.mistakes.pop()}renderHUD();var dead=!run.practice&&(state.resources.water<=0||state.resources.food<=0||state.resources.energy<=0);var fb=$('feedback');fb.className='feedback show '+(correct?'ok':'no');var html='<div class="fb-h">'+(correct?'✓ Correct':'✕ Not quite')+'</div><div>'+esc(z.tip)+'</div>';if(!correct)html+='<div style="margin-top:5px">Correct answer: <b>'+esc(z.opts[z.answer])+'</b></div>';if(dead){run.locked=true;html+='<div class="tip">Your survival resources have reached zero.</div>'}else html+='<div class="next"><button class="btn green" id="nextBtn">'+(run.qi+1<run.queue.length?'Next ›':'Finish Mission ›')+'</button></div>';fb.innerHTML=html;if(!dead){$('nextBtn').addEventListener('click',nextQuestion);$('nextBtn').focus()}save();announce(correct?'Correct.':'Incorrect. The correct answer is '+z.opts[z.answer]+'.');if(dead)setTimeout(gameOver,550)}
+function nextQuestion(){if(!run||run.locked)return;run.qi++;if(run.qi>=run.queue.length){endMission();return}renderQuestion()}
+function endMission(){if(run.practice){renderMap();show('map');announce('Practice replay complete.');run=null;return}var m=run.m;if(state.completed.indexOf(m.id)<0)state.completed.push(m.id);if(m.id===state.unlocked&&state.unlocked<8)state.unlocked=m.id+1;if(m.id===8){state.resources.signal=100;state.stats.bestSignal=100;save();victory();return}state.resources.signal=clamp(state.resources.signal+6);state.stats.bestSignal=Math.max(state.stats.bestSignal,state.resources.signal);save();renderMap();show('map');announce('Mission complete. Next mission unlocked.');run=null}
+function acc(a){return a.answered?Math.round(100*a.correct/a.answered):0}
+function bestWorst(by){var best=null,worst=null;Object.keys(by||{}).forEach(function(k){var o=by[k];if(!o.t)return;var x=o.c/o.t;if(!best||x>best.x)best={k:k,x:x};if(!worst||x<worst.x)worst={k:k,x:x}});return{best:best?best.k:'—',worst:worst?worst.k:'—'}}
+function statBox(v,k){return'<div class="stat parch"><div class="v">'+esc(v)+'</div><div class="k">'+esc(k)+'</div></div>'}
+function victory(){state.adventure.active=false;var a=state.adventure,r=state.resources,bw=bestWorst(a.byCat);$('winStats').innerHTML=statBox(acc(a)+'%','Adventure accuracy')+statBox(a.correct,'Correct answers')+statBox('100%','Signal')+statBox(bw.best,'Best category');var ach=[['Survived',true],['Found shelter',r.shelter>0],['Found food',r.food>0],['Stayed energised',r.energy>30],['Sent the signal',true],['Sharp ears (80%+)',acc(a)>=80]];$('winAch').innerHTML=ach.map(function(x){return'<div class="list-line"><span>'+x[0]+'</span><b>'+(x[1]?'✓':'—')+'</b></div>'}).join('');save();show('victory')}
+function gameOver(){if(!state.adventure.active&&$('gameover').classList.contains('active'))return;state.adventure.active=false;var r=state.resources,a=state.adventure;$('loseStats').innerHTML=statBox(Math.round(r.water)+'%','Water')+statBox(Math.round(r.food)+'%','Food')+statBox(Math.round(r.energy)+'%','Energy')+statBox(acc(a)+'%','Adventure accuracy');var cause=r.water<=0?'You ran out of water.':r.food<=0?'You ran out of food.':'You ran out of energy.';$('goReason').textContent=cause+' Better luck next time.';$('loseWeak').textContent=bestWorst(a.byCat).worst;save();show('gameover');run=null}
+function renderMap(){var h=$('mapGrid');h.innerHTML='';MISSIONS.forEach(function(m,idx){var unlocked=m.id<=state.unlocked,done=state.completed.indexOf(m.id)>=0,d=document.createElement('div');d.className='node parch'+(unlocked?'':' locked')+(done?' done':'');d.innerHTML='<div class="state">'+(done?'✓':unlocked?'':'🔒')+'</div><div class="num" style="color:'+m.color+'">'+m.id+'</div><h3>'+esc(m.name)+'</h3><p>'+esc(m.cat)+'</p>';if(unlocked){var b=document.createElement('button');b.className='btn green play';b.textContent=done?'Practice replay ▶':'Play ▶';b.addEventListener('click',function(){startMission(idx)});d.appendChild(b)}h.appendChild(d)})}
+function renderLogbook(){var bw=bestWorst(state.stats.byCat);$('logStats').innerHTML=statBox(state.completed.length+'/8','Current missions')+statBox(acc(state.stats)+'%','Lifetime accuracy')+statBox(state.stats.answered,'Questions answered')+statBox(Math.round(state.stats.bestSignal||0)+'%','Best signal');var cats=Object.keys(state.stats.byCat);$('logCats').innerHTML=cats.length?cats.map(function(k){var o=state.stats.byCat[k];return'<div class="list-line"><span>'+esc(k)+'</span><b>'+Math.round(100*o.c/o.t)+'% ('+o.c+'/'+o.t+')</b></div>'}).join(''):'<p>No data yet.</p>';$('logCats').innerHTML+='<div class="list-line"><span>Strongest</span><b>'+esc(bw.best)+'</b></div><div class="list-line"><span>Weakest</span><b>'+esc(bw.worst)+'</b></div>';var c={};state.mistakes.forEach(function(m){c[m.cat]=(c[m.cat]||0)+1});var keys=Object.keys(c).sort(function(a,b){return c[b]-c[a]});$('logMistakes').innerHTML=keys.length?keys.map(function(k){return'<div class="list-line"><span>'+esc(k)+'</span><b>'+c[k]+' missed</b></div>'}).join(''):'<p>No mistakes recorded yet.</p>'}
+function renderReview(){var h=$('reviewList');if(!state.mistakes.length){h.innerHTML='<div class="parch panel-pad">No mistakes recorded. Your ear is sharp! 🎧</div>';return}h.innerHTML=state.mistakes.map(function(m){return'<div class="review-item parch"><div class="rq">'+esc(m.q)+' · '+esc(m.cat)+'</div><div class="ra">Your answer: <span class="you">'+esc(m.you)+'</span> · Correct: <span class="ans">'+esc(m.ans)+'</span></div><div class="rx">💡 '+esc(m.exp||'')+'</div></div>'}).join('')}
+var bubbleOpener=null;function anyBubble(){return!!document.querySelector('.bubble.show')}function closeBubbles(){document.querySelectorAll('.bubble.show').forEach(function(x){x.classList.remove('show')});if(bubbleOpener){bubbleOpener.focus();bubbleOpener=null}}function openBubble(id,opener){closeBubbles();bubbleOpener=opener||document.activeElement;var el=$(id);el.classList.add('show');var c=el.querySelector('.bx');if(c)c.focus()}
+function useHint(){if(!run)return;var z=run.queue[run.qi];if(z._answered){openBubble('hintBubble',$('hintTool'));$('hintText').innerHTML='<b>Already answered.</b> Replay the audio if you want to review it.';return}if(run.hints<=0){openBubble('hintBubble',$('hintTool'));$('hintText').innerHTML='<b>No hints left.</b> Replay the audio and trust your ears.';return}run.hints--;$('hintBadge').textContent=run.hints;openBubble('hintBubble',$('hintTool'));$('hintText').innerHTML='<b>Hint</b><br>'+esc(z.hint)}
+function showNotes(){if(!run)return;openBubble('notesBubble',$('notesTool'));$('notesText').innerHTML='<b>Listening notes — '+esc(run.m.name)+'</b><br>'+esc(run.m.cat)+'. '+esc(run.m.intro.replace(/<[^>]+>/g,''))}
+function renderAccent(){var h=$('accentHelp');h.innerHTML='';[['US','🇺🇸 US'],['UK','🇬🇧 UK']].forEach(function(a){var b=document.createElement('button');b.textContent=a[1];b.className=state.settings.accent===a[0]?'on':'';b.setAttribute('aria-pressed',String(state.settings.accent===a[0]));b.addEventListener('click',function(){state.settings.accent=a[0];save();renderAccent();if(run)speakCurrent()});h.appendChild(b)})}
+function shade(hex,amt){var c=hex.replace('#',''),n=parseInt(c,16),r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return'#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
+function hasAliveResources(){return state.resources.water>0&&state.resources.food>0&&state.resources.energy>0}
+function hasResume(){return !!(state.adventure.active&&hasAliveResources()&&state.completed.indexOf(8)<0&&(state.adventure.answered>0||state.completed.length>0||state.unlocked>1||state.resources.signal>0))}
+function updateContinue(){$('continueBtn').disabled=!hasResume();$('continueBtn').title=hasResume()?'Resume the current adventure':'No adventure to continue'}
+function freshAdventure(){state.resources={water:100,food:100,energy:100,shelter:100,signal:0};state.unlocked=1;state.completed=[];state.adventure={active:true,answered:0,correct:0,byCat:{}};save();updateContinue();startMission(0)}
+function startNew(confirmExisting){if(confirmExisting&&hasResume()&&!confirm('Start a new adventure? Your current island progress and resources will reset. Your long-term logbook will be kept.'))return;freshAdventure()}
+function continueAdventure(){if(!hasResume()){freshAdventure();return}var idx=Math.max(0,state.unlocked-1);for(var i=0;i<MISSIONS.length;i++){if(MISSIONS[i].id<=state.unlocked&&state.completed.indexOf(MISSIONS[i].id)<0){idx=i;break}}startMission(idx)}
+function resetProgress(){if(!confirm('Reset ALL Survival Island progress, stats and mistakes? This cannot be undone.'))return;cancelSpeech();bgm.pause();try{bgm.currentTime=0}catch(e){}localStorage.removeItem(KEY);state=defaults();save();reflectMusic();renderMap();updateContinue();announce('Progress reset.');show('menu')}
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-act]');if(a){var x=a.getAttribute('data-act');if(x==='start')startNew(true);else if(x==='restart')startNew(false);else if(x==='continue')continueAdventure();else if(x==='map'){renderMap();show('map')}else if(x==='logbook'){renderLogbook();show('logbook')}else if(x==='review'){renderReview();show('review')}else if(x==='how')show('how');else if(x==='menu')show('menu');else if(x==='reset')resetProgress();return}var c=e.target.closest&&e.target.closest('[data-close]');if(c){$(c.getAttribute('data-close')).classList.remove('show');if(bubbleOpener){bubbleOpener.focus();bubbleOpener=null}}});
+$('playBtn').addEventListener('click',speakCurrent);$('replayTool').addEventListener('click',speakCurrent);$('hintTool').addEventListener('click',useHint);$('notesTool').addEventListener('click',showNotes);$('helpTool').addEventListener('click',function(){renderAccent();openBubble('helpBubble',$('helpTool'))});$('abandonBtn').addEventListener('click',function(){if(confirm('Abandon this mission and return to the map? Your current adventure resources and recorded answers remain saved.')){cancelSpeech();run=null;renderMap();show('map')}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&anyBubble()){closeBubbles();return}if(!$('mission').classList.contains('active')||!run||anyBubble())return;var k=e.key.toLowerCase();if(k==='p'||k==='r'){e.preventDefault();speakCurrent()}else if(k==='h'){e.preventDefault();useHint()}else if(['1','2','3','4'].indexOf(k)>=0){var i=parseInt(k,10)-1,b=$('opts').querySelectorAll('.opt')[i];if(b&&!b.disabled)b.click()}});
+function boot(){reflectMusic();renderMap();updateContinue();show('loading');var msgs=['Exploring the island…','Searching for water…','Building shelter…','Following the jungle trail…','Preparing the rescue signal…'],reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches,pct=0,i=0;if(reduce){$('loadFill').style.width='100%';setTimeout(function(){show('menu')},120);return}var t=setInterval(function(){pct=Math.min(100,pct+Math.random()*22+10);$('loadFill').style.width=pct+'%';i=Math.min(msgs.length-1,Math.floor(pct/20));$('loadMsg').textContent=msgs[i];if(pct>=100){clearInterval(t);setTimeout(function(){show('menu')},300)}},300);if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}}
 boot();
 </script>
 </body>
