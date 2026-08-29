@@ -3,1138 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Corporate Mysteries — a business investigation game that secretly trains TOEIC Listening Parts 3 & 4. Listen to office conversations and announcements, collect clues, and solve the case.">
+<meta name="description" content="Corporate Mysteries — a business investigation game that trains TOEIC Listening Parts 3 & 4.">
 <title>Corporate Mysteries — Business Investigation</title>
 <style>
-/* ============================================================================
-   CORPORATE MYSTERIES — style.css
-   Modern corporate / business-intelligence aesthetic.
-   ============================================================================ */
 :root{
-  --navy:#0F172A;        /* deep navy   */
-  --steel:#334155;       /* steel blue  */
-  --gold:#D4A017;        /* accent gold */
-  --gold-soft:#E9C457;
-  --bg:#F8FAFC;          /* light bg    */
-  --ok:#22C55E;          /* success     */
-  --no:#EF4444;          /* failure     */
-  --line:#E2E8F0;
-  --slate:#64748B;
-  --card:#FFFFFF;
-  --shadow:0 12px 30px rgba(15,23,42,.14);
-  --shadow-sm:0 4px 12px rgba(15,23,42,.10);
+  --navy:#0F172A;--steel:#334155;--gold:#D4A017;--gold-soft:#E9C457;
+  --bg:#F8FAFC;--ok:#22C55E;--no:#EF4444;--line:#E2E8F0;--slate:#64748B;
+  --card:#FFFFFF;--shadow:0 12px 30px rgba(15,23,42,.14);--shadow-sm:0 4px 12px rgba(15,23,42,.10);
   --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;height:100%;}
-body{font-family:var(--font);background:var(--bg);color:var(--navy);-webkit-font-smoothing:antialiased;line-height:1.5;}
-button{font-family:inherit;cursor:pointer;}
-img{display:block;max-width:100%;}
-a{color:inherit;}
-
-/* ---------- High-contrast mode ---------- */
-body.hc{--bg:#000;--card:#0a0a0a;--navy:#fff;--steel:#fff;--line:#fff;--slate:#e5e5e5;}
-body.hc .btn-ghost{color:#fff;border-color:#fff;}
-body.hc .panel,body.hc .doc-card{border:2px solid #fff;}
-
-/* ---------- Layout shell ---------- */
-.app{min-height:100%;display:flex;flex-direction:column;}
-.screen{display:none;flex:1;}
-.screen.active{display:block;}
-.container{max-width:1040px;margin:0 auto;padding:24px 20px 60px;}
-.scene-bg{background-size:cover;background-position:center;}
-
-/* ---------- Top bar (persistent controls) ---------- */
-.topbar{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;box-shadow:var(--shadow-sm);}
-.topbar .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em;}
-.topbar .brand .logo{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#9a7412);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);}
-.topbar .spacer{flex:1;}
-.topbar .ctrl{display:flex;align-items:center;gap:8px;}
-.icon-btn{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:9px;padding:8px 11px;font-size:13px;font-weight:600;}
-.icon-btn:hover{background:rgba(255,255,255,.20);}
-.icon-btn[aria-pressed="true"]{background:var(--gold);color:var(--navy);border-color:var(--gold);}
-.icon-btn:focus-visible,.btn:focus-visible,.opt:focus-visible,.thumb:focus-visible{outline:3px solid var(--gold-soft);outline-offset:2px;}
-.vol{display:flex;align-items:center;gap:6px;}
-.vol input[type=range]{width:90px;accent-color:var(--gold);}
-@media (max-width:640px){ .vol{display:none;} .topbar .brand span.full{display:none;} }
-
-/* ---------- Buttons ---------- */
-.btn{background:var(--gold);color:var(--navy);border:none;border-radius:11px;padding:13px 20px;font-size:15px;font-weight:700;box-shadow:var(--shadow-sm);transition:transform .07s,filter .15s;}
-.btn:hover{filter:brightness(1.05);}
-.btn:active{transform:translateY(1px);}
-.btn-navy{background:var(--navy);color:#fff;}
-.btn-steel{background:var(--steel);color:#fff;}
-.btn-ok{background:var(--ok);color:#06230f;}
-.btn-danger{background:var(--no);color:#fff;}
-.btn-ghost{background:transparent;color:var(--navy);border:2px solid var(--line);box-shadow:none;}
-.btn[disabled]{opacity:.45;cursor:not-allowed;}
-.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
-
-/* ---------- Hero / Home ---------- */
-.hero{position:relative;border-radius:18px;overflow:hidden;color:#fff;box-shadow:var(--shadow);
-  background:linear-gradient(135deg,#0F172A,#1e293b 60%,#334155);}
-.hero .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.32;}
-.hero .hero-in{position:relative;padding:46px 30px;}
-.hero .kicker{color:var(--gold-soft);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;}
-.hero h1{margin:8px 0 8px;font-size:clamp(30px,5.4vw,50px);line-height:1.04;}
-.hero p{max-width:560px;color:#cbd5e1;margin:0 0 22px;}
-
-/* ---------- Panels & grids ---------- */
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow-sm);}
-.grid{display:grid;gap:16px;}
-.grid.cols2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
-.grid.cols3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
-.section-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin:0 0 12px;}
-.h-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
-.page-title{font-size:clamp(22px,4vw,32px);margin:0;}
-
-/* ---------- Dashboard stats ---------- */
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;box-shadow:var(--shadow-sm);}
-.stat .v{font-size:26px;font-weight:800;color:var(--navy);}
-.stat .k{font-size:12px;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
-.rank-pill{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border-radius:999px;padding:8px 14px;font-weight:700;}
-.rank-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
-
-.badge-grid{display:flex;flex-wrap:wrap;gap:10px;}
-.badge{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;background:#fff;color:var(--slate);}
-.badge.earned{background:#fff7e6;border-color:var(--gold);color:var(--navy);}
-.badge .ic{font-size:16px;filter:grayscale(1);opacity:.5;}
-.badge.earned .ic{filter:none;opacity:1;}
-
-/* ---------- Case cards ---------- */
-.case-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:var(--shadow-sm);}
-.case-card .cover{height:150px;background:linear-gradient(135deg,#1e293b,#334155);background-size:cover;background-position:center;}
-.case-card .cc-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1;}
-.case-card h3{margin:0;font-size:18px;}
-.case-card p{margin:0;color:var(--slate);font-size:14px;flex:1;}
-.tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:#eef2f7;color:var(--steel);}
-.tag.done{background:#dcfce7;color:#15803d;}
-.tag.locked{background:#f1f5f9;color:#94a3b8;}
-
-/* ---------- Briefing ---------- */
-.briefing-cover{height:230px;border-radius:14px;background:linear-gradient(135deg,#0F172A,#334155);background-size:cover;background-position:center;box-shadow:var(--shadow);}
-
-/* ---------- Investigation ---------- */
-.audio-shell{display:grid;gap:18px;grid-template-columns:1fr;}
-.scene{height:210px;border-radius:14px;background:linear-gradient(135deg,#1e293b,#334155);background-size:cover;background-position:center;position:relative;box-shadow:var(--shadow-sm);}
-.scene .scene-tag{position:absolute;left:14px;bottom:14px;background:rgba(15,23,42,.78);color:#fff;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;backdrop-filter:blur(2px);}
-.audio-kind{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);}
-
-.player{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;}
-.player .pbtn{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px;}
-.player .pbtn.sec{background:rgba(255,255,255,.12);color:#fff;}
-.player .pbtn:disabled{opacity:.4;cursor:not-allowed;}
-.player .now{flex:1;min-width:120px;font-size:13px;color:#cbd5e1;}
-.eq{display:flex;gap:3px;align-items:flex-end;height:20px;}
-.eq i{width:4px;height:6px;background:var(--gold-soft);border-radius:2px;}
-.eq.on i{animation:eq .8s ease-in-out infinite;}
-.eq.on i:nth-child(2){animation-delay:.15s;} .eq.on i:nth-child(3){animation-delay:.3s;} .eq.on i:nth-child(4){animation-delay:.45s;}
-@keyframes eq{0%,100%{height:6px;}50%{height:18px;}}
-
-.transcript{margin-top:14px;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;background:#fbfdff;}
-.transcript.locked{text-align:center;color:var(--slate);font-style:italic;}
-.transcript .line{margin:8px 0;}
-.transcript .line b{color:var(--steel);}
-.transcript .line.female b{color:#b4338a;} .transcript .line.male b{color:#2563eb;}
-
-.qcard{margin-top:8px;}
-.qprompt{font-weight:700;font-size:16px;margin:0 0 12px;}
-.opts{display:flex;flex-direction:column;gap:9px;}
-.opt{display:flex;align-items:center;gap:11px;text-align:left;width:100%;background:#fff;border:2px solid var(--line);border-radius:11px;padding:12px 14px;font-size:15px;color:var(--navy);transition:border-color .12s,background .12s;}
-.opt:hover:not(:disabled){border-color:var(--gold);background:#fffdf5;}
-.opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
-.opt.correct{border-color:var(--ok);background:#f0fdf4;}
-.opt.correct .key{background:var(--ok);}
-.opt.wrong{border-color:var(--no);background:#fef2f2;}
-.opt.wrong .key{background:var(--no);}
-.opt:disabled{cursor:default;}
-
-.feedback{margin-top:12px;border-radius:11px;padding:12px 14px;font-size:14px;display:none;}
-.feedback.show{display:block;}
-.feedback.ok{background:#f0fdf4;border:1px solid var(--ok);}
-.feedback.no{background:#fef2f2;border:1px solid var(--no);}
-.feedback .fh{font-weight:700;margin-bottom:3px;}
-.qprogress{font-size:13px;color:var(--slate);margin-bottom:8px;}
-
-.toast{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--navy);color:#fff;border-left:4px solid var(--gold);border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);max-width:300px;transform:translateY(140%);transition:transform .35s ease;}
-.toast.show{transform:translateY(0);}
-.toast .t-h{font-weight:700;color:var(--gold-soft);font-size:13px;}
-
-/* ---------- Evidence board ---------- */
-.board{border-radius:16px;padding:18px;background-size:cover;background-position:center;background-color:#23303f;box-shadow:var(--shadow);}
-.clue-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-.clue{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);opacity:0;transform:translateY(10px) scale(.98);animation:clueIn .45s ease forwards;}
-@keyframes clueIn{to{opacity:1;transform:none;}}
-.clue img{height:96px;width:100%;object-fit:cover;background:#eef2f7;}
-.clue .cl-b{padding:10px 12px;}
-.clue .cl-b h4{margin:0 0 3px;font-size:14px;}
-.clue .cl-b p{margin:0;font-size:12px;color:var(--slate);}
-.clue.empty{display:flex;align-items:center;justify-content:center;min-height:150px;border-style:dashed;color:var(--slate);font-size:13px;opacity:1;transform:none;animation:none;background:rgba(255,255,255,.6);}
-
-/* ---------- Case solved ---------- */
-.solved-hero{border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:linear-gradient(135deg,#0F172A,#334155);}
-.solved-hero .img{height:240px;background-size:cover;background-position:center;}
-.rating{font-size:22px;letter-spacing:3px;color:var(--gold);}
-.rating .off{color:#cbd5e1;}
-
-/* ---------- Modal ---------- */
-.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,.55);}
-.modal.show{display:flex;}
-.modal-card{background:var(--card);border-radius:14px;max-width:440px;width:100%;padding:22px;box-shadow:var(--shadow);}
-.modal-card h3{margin:0 0 10px;}
-.modal-card p{color:var(--slate);}
-
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
-.muted{color:var(--slate);}
-.center{text-align:center;}
-.mt{margin-top:18px;} .mb{margin-bottom:18px;}
-
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{font-family:var(--font);background:var(--bg);color:var(--navy);line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer}img{display:block;max-width:100%}a{color:inherit}.app{min-height:100vh;display:flex;flex-direction:column}.screen{display:none;flex:1}.screen.active{display:block}.container{max-width:1040px;margin:0 auto;padding:24px 20px 60px}
+.topbar{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;box-shadow:var(--shadow-sm)}.brand{display:flex;align-items:center;gap:10px;font-weight:700}.logo{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#9a7412);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);background-size:cover;background-position:center}.spacer{flex:1}.ctrl,.vol{display:flex;align-items:center;gap:8px}.vol input{width:90px;accent-color:var(--gold)}
+.icon-btn{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.20);border-radius:9px;padding:8px 11px;font-size:13px;font-weight:700}.icon-btn:hover{background:rgba(255,255,255,.20)}.icon-btn[aria-pressed="true"]{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.btn{background:var(--gold);color:var(--navy);border:none;border-radius:11px;padding:13px 20px;font-size:15px;font-weight:700;box-shadow:var(--shadow-sm)}.btn:hover{filter:brightness(1.05)}.btn:active{transform:translateY(1px)}.btn-steel{background:var(--steel);color:#fff}.btn-ok{background:var(--ok);color:#06230f}.btn-danger{background:var(--no);color:#fff}.btn-ghost{background:transparent;color:var(--navy);border:2px solid var(--line);box-shadow:none}.btn[disabled]{opacity:.48;cursor:not-allowed}.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.icon-btn:focus-visible,.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--gold-soft);outline-offset:2px}
+.hero{position:relative;border-radius:18px;overflow:hidden;color:#fff;box-shadow:var(--shadow);background:linear-gradient(135deg,#0F172A,#1e293b 60%,#334155)}.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.32}.hero-in{position:relative;padding:46px 30px}.kicker{color:var(--gold-soft);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}.hero h1{margin:8px 0;font-size:clamp(30px,5.4vw,50px);line-height:1.04}.hero p{max-width:600px;color:#cbd5e1;margin:0 0 22px}
+.panel,.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow-sm)}.grid{display:grid;gap:16px}.grid.cols2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.section-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin:0 0 12px}.h-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}.page-title{font-size:clamp(22px,4vw,32px);margin:0}.stat{text-align:center}.stat .v{font-size:26px;font-weight:800}.stat .k{font-size:12px;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}.rank-pill{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border-radius:999px;padding:8px 14px;font-weight:700}.rank-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.badge-grid{display:flex;flex-wrap:wrap;gap:10px}.badge{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;background:#fff;color:var(--slate)}.badge.earned{background:#fff7e6;border-color:var(--gold);color:var(--navy)}.badge .ic{font-size:16px;filter:grayscale(1);opacity:.5}.badge.earned .ic{filter:none;opacity:1}
+.case-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:var(--shadow-sm)}.case-card .cover{height:150px;background:linear-gradient(135deg,#1e293b,#334155);background-size:cover;background-position:center}.cc-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}.cc-body h3,.cc-body p{margin:0}.cc-body p{color:var(--slate);font-size:14px;flex:1}.tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:#eef2f7;color:var(--steel)}.tag.done{background:#dcfce7;color:#15803d}
+.briefing-cover,.scene{border-radius:14px;background:linear-gradient(135deg,#0F172A,#334155);background-size:cover;background-position:center;box-shadow:var(--shadow)}.briefing-cover{height:230px}.scene{height:210px;position:relative}.scene-tag{position:absolute;left:14px;bottom:14px;background:rgba(15,23,42,.82);color:#fff;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600}.audio-kind{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.player{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px}.pbtn{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px}.pbtn.sec{background:rgba(255,255,255,.12);color:#fff}.pbtn:disabled{opacity:.4;cursor:not-allowed}.now{flex:1;min-width:150px;font-size:13px;color:#cbd5e1}.eq{display:flex;gap:3px;align-items:flex-end;height:20px}.eq i{width:4px;height:6px;background:var(--gold-soft);border-radius:2px}.eq.on i{animation:eq .8s ease-in-out infinite}.eq.on i:nth-child(2){animation-delay:.15s}.eq.on i:nth-child(3){animation-delay:.3s}.eq.on i:nth-child(4){animation-delay:.45s}@keyframes eq{0%,100%{height:6px}50%{height:18px}}
+.transcript{margin-top:14px;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;background:#fbfdff}.transcript.locked{text-align:center;color:var(--slate);font-style:italic}.line{margin:8px 0}.line.female b{color:#b4338a}.line.male b{color:#2563eb}.qcard{margin-top:18px}.qprompt{font-weight:700;font-size:16px;margin:0 0 12px}.opts{display:flex;flex-direction:column;gap:9px}.opt{display:flex;align-items:center;gap:11px;text-align:left;width:100%;background:#fff;border:2px solid var(--line);border-radius:11px;padding:12px 14px;font-size:15px;color:var(--navy)}.opt:hover:not(:disabled){border-color:var(--gold);background:#fffdf5}.opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}.opt.correct{border-color:var(--ok);background:#f0fdf4}.opt.correct .key{background:var(--ok)}.opt.wrong{border-color:var(--no);background:#fef2f2}.opt.wrong .key{background:var(--no)}.opt:disabled{cursor:default}.feedback{margin-top:12px;border-radius:11px;padding:12px 14px;font-size:14px;display:none}.feedback.show{display:block}.feedback.ok{background:#f0fdf4;border:1px solid var(--ok)}.feedback.no{background:#fef2f2;border:1px solid var(--no)}.feedback .fh{font-weight:700}.qprogress,.muted{font-size:13px;color:var(--slate)}
+.board{border-radius:16px;padding:18px;background-size:cover;background-position:center;background-color:#23303f;box-shadow:var(--shadow)}.clue-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.clue{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);animation:clueIn .45s ease forwards}.clue img{height:96px;width:100%;object-fit:cover;background:#eef2f7}.cl-b{padding:10px 12px}.cl-b h4,.cl-b p{margin:0}.cl-b p{font-size:12px;color:var(--slate)}.clue.empty{display:flex;align-items:center;justify-content:center;min-height:150px;border-style:dashed;color:var(--slate);font-size:13px;background:rgba(255,255,255,.85)}@keyframes clueIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.solved-hero{border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:linear-gradient(135deg,#0F172A,#334155)}.solved-hero .img{height:240px;background-size:cover;background-position:center}.rating{font-size:22px;letter-spacing:3px;color:var(--gold)}.rating .off{color:#cbd5e1}.toast{position:fixed;right:18px;bottom:18px;z-index:70;background:var(--navy);color:#fff;border-left:4px solid var(--gold);border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);max-width:320px;transform:translateY(140%);transition:transform .35s ease}.toast.show{transform:translateY(0)}.toast .t-h{font-weight:700;color:var(--gold-soft)}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,.60)}.modal.show{display:flex}.modal-card{background:var(--card);border-radius:14px;max-width:460px;width:100%;padding:22px;box-shadow:var(--shadow)}.modal-card h3{margin:0 0 10px}.mt{margin-top:18px}.mb{margin-bottom:18px}.center{text-align:center}.listen-note{margin:10px 0 0;color:var(--slate);font-size:13px}
+body.hc{background:#000;color:#fff;--bg:#000;--card:#050505;--line:#fff;--slate:#f3f4f6}body.hc .panel,body.hc .stat,body.hc .case-card,body.hc .modal-card{background:#050505;color:#fff;border-color:#fff}body.hc .topbar,body.hc .player{background:#000;color:#fff;border-bottom:1px solid #fff}body.hc .page-title,body.hc .stat .v,body.hc .cc-body h3{color:#fff}body.hc .opt{background:#000;color:#fff;border-color:#fff}body.hc .opt:hover:not(:disabled){background:#1a1a1a}body.hc .transcript{background:#000;color:#fff;border-color:#fff}body.hc .badge{background:#000;color:#fff;border-color:#fff}body.hc .badge.earned{background:#1a1a1a;color:#fff;border-color:var(--gold)}body.hc .btn-ghost{color:#fff;border-color:#fff}body.hc .clue{color:#111}body.hc .clue.empty{background:#111;color:#fff}body.hc .feedback.ok{background:#06230f;color:#fff}body.hc .feedback.no{background:#2b0808;color:#fff}
+@media(max-width:640px){.brand .full{display:none}.vol input[type=range]{display:none}.hero-in{padding:34px 22px}.container{padding-left:14px;padding-right:14px}.player{align-items:stretch}.pbtn{flex:1}.now{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<audio id="bgm" loop preload="auto" src="audio/corporate_mysteries_main_theme.mp3"></audio>
-
+<audio id="bgm" loop preload="metadata" src="audio/corporate_mysteries_main_theme.mp3"></audio>
 <div class="app">
-
-  <!-- ===================== TOP BAR ===================== -->
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo" id="brandLogo" style="background-size:cover;background-position:center">CM</span>
-      <span class="full">Corporate Mysteries</span>
-    </div>
-    <div class="spacer"></div>
-    <div class="ctrl">
-      <span class="vol" title="Music volume">
-        <button class="icon-btn" id="musicBtn" aria-pressed="false">🔇 Music</button>
-        <input type="range" id="volRange" min="0" max="100" value="40" aria-label="Music volume">
-      </span>
-      <button class="icon-btn" id="contrastBtn" aria-pressed="false" title="High contrast">◑ Contrast</button>
-      <a class="icon-btn" href="index.html" title="Back to TOEIC Trainer">↩ Trainer</a>
-    </div>
-  </header>
-
-  <!-- ===================== HOME ===================== -->
-  <section id="scr-home" class="screen active">
-    <div class="container">
-      <div class="hero">
-        <div class="hero-bg" id="homeBg"></div>
-        <div class="hero-in">
-          <div class="kicker">Tri-State Investigations</div>
-          <h1>Corporate Mysteries</h1>
-          <p>Step into the role of a corporate investigator. Listen to what happens around the office, gather the evidence, and crack the case — no exam in sight.</p>
-          <div class="btn-row">
-            <button class="btn" data-act="start">▶ Start Investigating</button>
-            <button class="btn btn-steel" data-act="cases">📁 Case Files</button>
-            <button class="btn btn-ghost" data-act="how" style="color:#fff;border-color:rgba(255,255,255,.4)">❓ How it works</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="h-row" style="margin-top:26px">
-        <h2 class="page-title" id="homeName">Welcome, investigator</h2>
-        <span class="rank-pill"><span class="dot"></span><span id="dashRank">Intern Investigator</span></span>
-      </div>
-
-      <div class="grid cols2 mb">
-        <div class="stat"><div class="v" id="dashScore">0</div><div class="k">Score</div></div>
-        <div class="stat"><div class="v" id="dashCases">0 / 1</div><div class="k">Cases solved</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">Badges</div>
-        <div class="badge-grid" id="dashBadges"></div>
-      </div>
-
-      <div class="btn-row mt">
-        <button class="btn btn-ghost btn-danger" data-act="reset" style="color:#fff">↺ Reset Progress</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== CASE SELECTION ===================== -->
-  <section id="scr-cases" class="screen">
-    <div class="scene-bg" id="dashBg"></div>
-    <div class="container">
-      <div class="h-row">
-        <h2 class="page-title">Case Files</h2>
-        <button class="btn btn-ghost" data-act="home">‹ Dashboard</button>
-      </div>
-      <div class="grid cols2" id="caseList"></div>
-    </div>
-  </section>
-
-  <!-- ===================== BRIEFING ===================== -->
-  <section id="scr-briefing" class="screen">
-    <div class="container">
-      <div class="briefing-cover mb" id="briefCover"></div>
-      <h2 class="page-title" id="briefTitle">Case</h2>
-      <div class="panel mt">
-        <div class="section-title">Case briefing</div>
-        <p id="briefText" style="font-size:16px"></p>
-        <div class="btn-row mt">
-          <button class="btn" data-act="begin-investigation">▶ Begin Investigation</button>
-          <button class="btn btn-ghost" data-act="cases">‹ Back to Case Files</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== INVESTIGATION ===================== -->
-  <section id="scr-investigation" class="screen">
-    <div class="container">
-      <div class="h-row">
-        <div>
-          <span class="audio-kind" id="invKind">Conversation</span>
-          <h2 class="page-title" id="invTitle">Audio</h2>
-          <div class="muted" id="invStep">Audio 1 of 4</div>
-        </div>
-        <div class="btn-row">
-          <span class="badge" id="clueTally">Clues: 0 / 7</span>
-          <button class="btn btn-steel" data-act="view-board">🧷 Evidence Board</button>
-        </div>
-      </div>
-
-      <div class="scene mb" id="invScene"><span class="scene-tag" id="invSceneTag">Scene</span></div>
-
-      <div class="player">
-        <button class="pbtn" id="playBtn">▶ Play audio</button>
-        <button class="pbtn sec" id="replayBtn" disabled>↻ Replay</button>
-        <button class="pbtn sec" id="stopBtn" disabled>■ Stop</button>
-        <span class="eq" id="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span class="now" id="nowPlaying">Ready to play.</span>
-        <button class="pbtn sec" id="transcriptBtn" aria-pressed="false" disabled>📄 Transcript</button>
-      </div>
-
-      <div class="transcript locked" id="invTranscript">🔒 Transcript locked — listen first, then unlock it.</div>
-
-      <div class="panel qcard mt">
-        <div class="qprogress" id="qProgress">Question 1</div>
-        <p class="qprompt" id="qPrompt"></p>
-        <div class="opts" id="qOpts"></div>
-        <div class="feedback" id="qFeedback" aria-live="polite"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== EVIDENCE BOARD ===================== -->
-  <section id="scr-board" class="screen">
-    <div class="container">
-      <div class="h-row">
-        <h2 class="page-title">Evidence Board</h2>
-        <span class="muted" id="boardCount">0 / 7 clues collected</span>
-      </div>
-      <div class="board" id="boardBg">
-        <div class="clue-grid" id="boardClues"></div>
-      </div>
-      <div class="btn-row mt">
-        <button class="btn" id="toDeductionBtn" data-act="to-deduction" style="display:none">🔎 Make Final Deduction</button>
-        <button class="btn btn-ghost" id="backToInvBtn" data-act="back-to-inv">‹ Back to Investigation</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== FINAL DEDUCTION ===================== -->
-  <section id="scr-deduction" class="screen">
-    <div class="container">
-      <h2 class="page-title mb">Final Deduction</h2>
-      <div class="scene mb" id="dedScene"><span class="scene-tag">Where is the contract now?</span></div>
-      <div class="panel">
-        <p class="qprompt" id="dedPrompt"></p>
-        <div class="opts" id="dedOpts"></div>
-        <div class="feedback" id="dedFeedback" aria-live="polite"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== CASE SOLVED ===================== -->
-  <section id="scr-solved" class="screen">
-    <div class="container">
-      <div class="solved-hero mb">
-        <div class="img" id="solvedImg"></div>
-      </div>
-      <div class="h-row">
-        <h2 class="page-title" id="solvedTitle">Case Solved</h2>
-        <div class="rating" id="solvedRating">★★★</div>
-      </div>
-      <div class="grid cols2 mb" id="solvedStats"></div>
-      <div class="panel">
-        <div class="section-title">Badges earned</div>
-        <div class="badge-grid" id="solvedBadges"></div>
-      </div>
-      <div class="btn-row mt">
-        <button class="btn" data-act="cases">📁 Back to Case Files</button>
-        <button class="btn btn-ghost" data-act="home">🏠 Dashboard</button>
-      </div>
-    </div>
-  </section>
-
+<header class="topbar"><div class="brand"><span class="logo" id="brandLogo">CM</span><span class="full">Corporate Mysteries</span></div><div class="spacer"></div><div class="ctrl"><span class="vol"><button class="icon-btn" id="musicBtn" aria-pressed="false">🔇 Music</button><input type="range" id="volRange" min="0" max="100" value="40" aria-label="Music volume"></span><button class="icon-btn" id="contrastBtn" aria-pressed="false">◑ Contrast</button><a class="icon-btn" href="index.html">↩ Trainer</a></div></header>
+<section id="scr-home" class="screen active"><div class="container"><div class="hero"><div class="hero-bg" id="homeBg"></div><div class="hero-in"><div class="kicker">Tri-State Investigations</div><h1>Corporate Mysteries</h1><p>Step into the role of a corporate investigator. Listen to what happens around the office, gather the evidence, and crack the case — no exam in sight.</p><div class="btn-row"><button class="btn" data-act="start">▶ Start Investigating</button><button class="btn btn-steel" data-act="cases">📁 Case Files</button><button class="btn btn-ghost" data-act="how" style="color:#fff;border-color:rgba(255,255,255,.45)">❓ How it works</button></div></div></div><div class="h-row" style="margin-top:26px"><h2 class="page-title" id="homeName">Welcome, investigator</h2><span class="rank-pill"><span class="dot"></span><span id="dashRank">Intern Investigator</span></span></div><div class="grid cols2 mb"><div class="stat"><div class="v" id="dashScore">0</div><div class="k">Score</div></div><div class="stat"><div class="v" id="dashCases">0 / 1</div><div class="k">Cases solved</div></div></div><div class="panel"><div class="section-title">Badges</div><div class="badge-grid" id="dashBadges"></div></div><div class="btn-row mt"><button class="btn btn-danger" data-act="reset">↺ Reset Progress</button></div></div></section>
+<section id="scr-cases" class="screen"><div class="container"><div class="h-row"><h2 class="page-title">Case Files</h2><button class="btn btn-ghost" data-act="home">‹ Dashboard</button></div><div class="grid cols2" id="caseList"></div></div></section>
+<section id="scr-briefing" class="screen"><div class="container"><div class="briefing-cover mb" id="briefCover"></div><h2 class="page-title" id="briefTitle">Case</h2><div class="panel mt"><div class="section-title">Case briefing</div><p id="briefText"></p><div class="btn-row mt"><button class="btn" data-act="begin-investigation">▶ Begin Investigation</button><button class="btn btn-ghost" data-act="cases">‹ Back to Case Files</button></div></div></div></section>
+<section id="scr-investigation" class="screen"><div class="container"><div class="h-row"><div><span class="audio-kind" id="invKind">Conversation</span><h2 class="page-title" id="invTitle">Audio</h2><div class="muted" id="invStep">Audio 1 of 4</div></div><div class="btn-row"><span class="badge" id="clueTally">Clues: 0 / 7</span><button class="btn btn-steel" data-act="view-board">🧷 Evidence Board</button></div></div><div class="scene mb" id="invScene"><span class="scene-tag" id="invSceneTag">Scene</span></div><div class="player"><button class="pbtn" id="playBtn">▶ Play audio</button><button class="pbtn sec" id="replayBtn" disabled>↻ Replay</button><button class="pbtn sec" id="stopBtn" disabled>■ Stop</button><span class="eq" id="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="now" id="nowPlaying">Ready to play.</span><button class="pbtn sec" id="transcriptBtn" aria-pressed="false" disabled>📄 Transcript</button></div><div class="transcript locked" id="invTranscript">🔒 Transcript locked — listen first, then unlock it.</div><div class="panel qcard"><div class="qprogress" id="qProgress">Question 1</div><p class="qprompt" id="qPrompt"></p><div class="opts" id="qOpts"></div><p class="listen-note" id="listenNote">Listen to the full audio before answering.</p><div class="feedback" id="qFeedback" aria-live="polite"></div></div></div></section>
+<section id="scr-board" class="screen"><div class="container"><div class="h-row"><h2 class="page-title">Evidence Board</h2><span class="muted" id="boardCount">0 / 7 clues collected</span></div><div class="board" id="boardBg"><div class="clue-grid" id="boardClues"></div></div><div class="btn-row mt"><button class="btn" id="toDeductionBtn" data-act="to-deduction" style="display:none">🔎 Make Final Deduction</button><button class="btn btn-ghost" id="backToInvBtn" data-act="back-to-inv">‹ Back to Investigation</button></div></div></section>
+<section id="scr-deduction" class="screen"><div class="container"><h2 class="page-title mb">Final Deduction</h2><div class="scene mb" id="dedScene"><span class="scene-tag">Where is the contract?</span></div><div class="panel"><p class="qprompt" id="dedPrompt"></p><div class="opts" id="dedOpts"></div><div class="feedback" id="dedFeedback" aria-live="polite"></div></div></div></section>
+<section id="scr-solved" class="screen"><div class="container"><div class="solved-hero mb"><div class="img" id="solvedImg"></div></div><div class="h-row"><h2 class="page-title" id="solvedTitle">Investigation Complete</h2><div class="rating" id="solvedRating">★★★</div></div><div class="grid cols2 mb" id="solvedStats"></div><div class="panel"><div class="section-title">Badges unlocked this run</div><div class="badge-grid" id="solvedBadges"></div></div><div class="btn-row mt"><button class="btn" data-act="cases">📁 Back to Case Files</button><button class="btn btn-ghost" data-act="home">🏠 Dashboard</button></div></div></section>
 </div>
-
-<!-- ===================== TOAST ===================== -->
 <div class="toast" id="toast"><div class="t-h" id="toastHead">Notice</div><div id="toastBody"></div></div>
-
-<!-- ===================== NAME MODAL ===================== -->
-<div class="modal" id="nameModal">
-  <div class="modal-card">
-    <h3>Sign in to the agency</h3>
-    <p>What name should appear on your investigator badge?</p>
-    <input id="nameInput" maxlength="24" placeholder="Your name" autocomplete="off"
-      style="width:100%;padding:12px;border:2px solid var(--line);border-radius:10px;font-size:16px;margin:10px 0 14px">
-    <button class="btn" id="nameOk" style="width:100%">Start Investigating ▶</button>
-  </div>
-</div>
-
-<!-- ===================== HOW MODAL ===================== -->
-<div class="modal" id="howModal">
-  <div class="modal-card">
-    <h3>How it works</h3>
-    <p style="color:var(--navy)">You're a corporate investigator. For each case you:</p>
-    <ol style="color:var(--steel);line-height:1.7;padding-left:20px">
-      <li><b>Listen</b> to office conversations and announcements (your device reads them aloud — male &amp; female voices).</li>
-      <li><b>Answer</b> questions about what you heard. The transcript stays locked until you've listened.</li>
-      <li><b>Collect clues</b> — each correct key answer pins evidence to the board.</li>
-      <li><b>Deduce</b> the solution, earn badges, and climb the investigator ranks.</li>
-    </ol>
-    <p class="muted">Tip: use keys 1–4 to answer, and the Contrast button for a high-contrast view. Everything is saved automatically.</p>
-    <button class="btn" data-act="close-modal" style="width:100%">Got it</button>
-  </div>
-</div>
-
-<!-- data.js MUST load before script.js -->
+<div class="modal" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameTitle"><div class="modal-card"><h3 id="nameTitle">Sign in to the agency</h3><p>What name should appear on your investigator badge?</p><label for="nameInput">Investigator name</label><input id="nameInput" maxlength="24" placeholder="Your name" autocomplete="off" style="width:100%;padding:12px;border:2px solid var(--line);border-radius:10px;font-size:16px;margin:8px 0 14px"><button class="btn" id="nameOk" style="width:100%">Start Investigating ▶</button></div></div>
+<div class="modal" id="howModal" role="dialog" aria-modal="true" aria-labelledby="howTitle"><div class="modal-card"><h3 id="howTitle">How it works</h3><ol style="line-height:1.7;padding-left:20px"><li><b>Listen</b> to office conversations and announcements.</li><li><b>Answer</b> the questions after each audio. The transcript stays locked until the full audio has played.</li><li><b>Collect clues</b> by answering key questions correctly.</li><li><b>Deduce</b> the solution, earn badges, and climb the investigator ranks.</li></ol><p class="muted">Tip: use keys 1–4 to answer. Your best score for a case is saved; replaying cannot inflate your rank.</p><button class="btn" data-act="close-modal" style="width:100%">Got it</button></div></div>
 <script>
-/* ============================================================================
-   CORPORATE MYSTERIES — data.js
-   ----------------------------------------------------------------------------
-   ALL game content lives here. To add a new case in the future, copy one of the
-   objects in GAME_DATA.cases and change its text/questions/clues. No other file
-   needs to change.
-
-   A case object looks like this:
-   {
-     id, title, cover, briefing, scenes{}, clues{}, audios[], finalDeduction{}
-   }
-   Each audio: { id, title, scene, kind, lines[], questions[] }
-     line:     { who, gender:'female'|'male', text }
-     question: { prompt, options[4], answer:index, unlock:'clueKey'|null, skill }
-   ============================================================================ */
-
-window.GAME_DATA = {
-
-  /* ---- Investigator ranks (unlocked by total score) ---- */
-  ranks: [
-    { name: "Intern Investigator",    min: 0 },
-    { name: "Junior Investigator",    min: 600 },
-    { name: "Corporate Investigator", min: 1200 },
-    { name: "Senior Investigator",    min: 1900 },
-    { name: "Chief Investigator",     min: 2600 }
+window.GAME_DATA={
+  ranks:[
+    {name:"Intern Investigator",min:0},{name:"Junior Investigator",min:400},{name:"Corporate Investigator",min:800},{name:"Senior Investigator",min:1100},{name:"Chief Investigator",min:1400}
   ],
-
-  /* ---- Badge catalogue (id -> label + icon) ---- */
-  badges: {
-    voicemail:  { label: "Voicemail Expert",   icon: "\uD83D\uDCFC" },
-    delivery:   { label: "Delivery Expert",    icon: "\uD83D\uDCE6" },
-    meeting:    { label: "Meeting Specialist", icon: "\uD83D\uDCC5" },
-    printer:    { label: "Printer Expert",     icon: "\uD83D\uDDA8\uFE0F" },
-    inference:  { label: "Inference Master",   icon: "\uD83E\uDDE0" },
-    detective:  { label: "Listening Detective",icon: "\uD83D\uDD0E" }
+  badges:{
+    voicemail:{label:"Voicemail Expert",icon:"📼"},delivery:{label:"Delivery Expert",icon:"📦"},meeting:{label:"Meeting Specialist",icon:"📅"},printer:{label:"Printer Expert",icon:"🖨️"},inference:{label:"Inference Master",icon:"🧠"},detective:{label:"Listening Detective",icon:"🔎"}
   },
-
-  /* ---- Branding (graceful fallback if image is missing) ---- */
-  brand: {
-    logo:      "images/corporate_mysteries_logo.png",
-    home:      "images/corporate_mysteries_home.png",
-    dashboard: "images/corporate_mysteries_dashboard.png"
-  },
-
-  /* ======================= CASES ======================= */
-  cases: [
-    {
-      id: "case001",
-      title: "The Missing Contract",
-      locked: false,
-      cover: "images/case001_cover_missing_contract.png",
-      solved: "images/case001_case_solved.png",
-      boardEmpty: "images/case001_evidence_board_empty.png",
-      boardComplete: "images/case001_evidence_board_complete.png",
-      summary: "A major contract has vanished before an important client meeting.",
-      briefing:
-        "A major contract has disappeared before an important client meeting at Anderson Ltd. " +
-        "It was last seen on a manager's desk, and the client arrives this afternoon. " +
-        "Listen carefully to the people in the office, collect clues, and work out where the contract is now.",
-
-      /* clue cards revealed on the evidence board */
-      clues: {
-        contract:        { name: "The Contract",      img: "images/case001_clue_contract.png",         note: "Draft service agreement, Anderson Ltd." },
-        voicemail:       { name: "Voicemail",         img: "images/case001_clue_voicemail.png",        note: "Laura explains where she put it." },
-        printer:         { name: "Printer / Copy Room",img: "images/case001_clue_printer.png",          note: "Printer was out of paper." },
-        visitor_badge:   { name: "Visitor Badge",     img: "images/case001_clue_visitor_badge.png",    note: "A courier signed in this morning." },
-        delivery_envelope:{ name: "Delivery Envelope", img: "images/case001_clue_delivery_envelope.png", note: "Envelope left for the sales department." },
-        access_log:      { name: "Access Log",        img: "images/case001_clue_access_log.png",       note: "Who entered the building, and when." },
-        meeting_schedule:{ name: "Meeting Schedule",  img: "images/case001_clue_meeting_schedule.png", note: "The client meeting was moved." }
-      },
-
-      /* scene backgrounds for each audio (fallback gradient if missing) */
-      scenes: {
-        open_office:    "images/case001_open_office.png",
-        meeting_204:    "images/case001_meeting_room_204.png",
-        reception:      "images/case001_reception_desk.png",
-        copy_room:      "images/case001_copy_room.png",
-        manager_office: "images/case001_manager_office.png",
-        room_312:       "images/case001_room_312.png"
-      },
-
-      audios: [
-        /* -------- AUDIO 1 : conversation -------- */
-        {
-          id: "a1",
-          title: "The Missing File",
-          scene: "open_office",
-          kind: "Conversation",
-          lines: [
-            { who: "Woman", gender: "female", text: "Have you seen the Anderson contract? It was on my desk this morning, but now it's gone." },
-            { who: "Man",   gender: "male",   text: "I saw it in the meeting room after yesterday's presentation. Maybe someone left it there." },
-            { who: "Woman", gender: "female", text: "I checked the meeting room before lunch, and it wasn't there." },
-            { who: "Man",   gender: "male",   text: "Then maybe Laura took it to make copies. She was preparing documents for the client meeting." },
-            { who: "Woman", gender: "female", text: "Good idea. I'll ask her before the meeting starts." }
-          ],
-          questions: [
-            { prompt: "What are the speakers mainly discussing?",
-              options: ["A missing document", "A cancelled meeting", "A new client", "A printer problem"],
-              answer: 0, unlock: "contract", skill: "main idea" },
-            { prompt: "Where did the man last see the contract?",
-              options: ["On the woman's desk", "In the meeting room", "At reception", "In the printer room"],
-              answer: 1, unlock: null, skill: "detail" },
-            { prompt: "What will the woman probably do next?",
-              options: ["Call the client", "Cancel the meeting", "Ask Laura", "Print a new agenda"],
-              answer: 2, unlock: null, skill: "inference" }
-          ]
-        },
-
-        /* -------- AUDIO 2 : voicemail (monologue) -------- */
-        {
-          id: "a2",
-          title: "Voicemail from Laura",
-          scene: "copy_room",
-          kind: "Voicemail",
-          lines: [
-            { who: "Laura", gender: "female", text: "Hello, this is Laura from administration. I'm calling about the Anderson contract." },
-            { who: "Laura", gender: "female", text: "I took it from the meeting room this morning because the manager asked me to prepare two extra copies." },
-            { who: "Laura", gender: "female", text: "The printer was out of paper, so I left the original document in the copy room." },
-            { who: "Laura", gender: "female", text: "I'll be back from lunch at two o'clock." }
-          ],
-          questions: [
-            { prompt: "Why is Laura calling?",
-              options: ["To explain where she put a document", "To cancel a meeting", "To order more paper", "To report a broken printer"],
-              answer: 0, unlock: "voicemail", skill: "purpose" },
-            { prompt: "Why did she take the contract?",
-              options: ["To read it at home", "To prepare extra copies", "To give it to the client", "To throw it away"],
-              answer: 1, unlock: null, skill: "detail" },
-            { prompt: "Where did she leave it?",
-              options: ["On the manager's desk", "In the meeting room", "In the copy room", "At reception"],
-              answer: 2, unlock: "printer", skill: "detail" }
-          ]
-        },
-
-        /* -------- AUDIO 3 : conversation at reception -------- */
-        {
-          id: "a3",
-          title: "At Reception",
-          scene: "reception",
-          kind: "Conversation",
-          lines: [
-            { who: "Man",   gender: "male",   text: "Excuse me, did anyone from Anderson Ltd come by this morning?" },
-            { who: "Woman", gender: "female", text: "Yes, a courier arrived around ten thirty. He left an envelope for the sales department." },
-            { who: "Man",   gender: "male",   text: "Did he take anything with him?" },
-            { who: "Woman", gender: "female", text: "No. He only delivered the envelope. But he asked where the copy room was." },
-            { who: "Man",   gender: "male",   text: "That's strange. Thanks. I'll check the visitor log." }
-          ],
-          questions: [
-            { prompt: "Who visited the office this morning?",
-              options: ["A client", "A courier", "A job applicant", "An auditor"],
-              answer: 1, unlock: "visitor_badge", skill: "detail" },
-            { prompt: "What did the visitor do?",
-              options: ["Picked up a parcel", "Delivered an envelope", "Signed a contract", "Repaired the printer"],
-              answer: 1, unlock: "delivery_envelope", skill: "detail" },
-            { prompt: "What will the man do next?",
-              options: ["Call the courier", "Check the visitor log", "Go to lunch", "Email the client"],
-              answer: 1, unlock: "access_log", skill: "inference" }
-          ]
-        },
-
-        /* -------- AUDIO 4 : office announcement (monologue) -------- */
-        {
-          id: "a4",
-          title: "Office Announcement",
-          scene: "meeting_204",
-          kind: "Announcement",
-          lines: [
-            { who: "Announcer", gender: "male", text: "Attention everyone." },
-            { who: "Announcer", gender: "male", text: "The client meeting with Anderson Ltd has been moved from Room 204 to Room 312, because the projector in Room 204 is not working." },
-            { who: "Announcer", gender: "male", text: "Please bring all printed documents to Room 312 before two fifteen." },
-            { who: "Announcer", gender: "male", text: "The meeting will begin at two thirty." }
-          ],
-          questions: [
-            { prompt: "What is being announced?",
-              options: ["A meeting room change", "A new employee", "A fire drill", "A holiday schedule"],
-              answer: 0, unlock: "meeting_schedule", skill: "main idea" },
-            { prompt: "Why was the change made?",
-              options: ["The room was too small", "The projector was not working", "There were too many guests", "The room was double-booked"],
-              answer: 1, unlock: null, skill: "detail" },
-            { prompt: "What should employees do?",
-              options: ["Stay at their desks", "Bring printed documents to Room 312", "Email the client", "Reschedule the meeting"],
-              answer: 1, unlock: null, skill: "detail" }
-          ]
-        }
-      ],
-
-      /* -------- Final deduction -------- */
-      finalDeduction: {
-        scene: "room_312",
-        prompt: "Putting all the clues together, where is the Anderson contract most likely now?",
-        options: ["Copy room", "Reception", "Room 312", "With the courier"],
-        answer: 2,
-        explain: "Laura left the original in the copy room, but the meeting moved to Room 312 and staff were told to bring all printed documents there before 2:15. The contract was most likely carried to Room 312 for the meeting."
-      }
-    }
-
-    /* To add CASE 002: copy the object above, change id/title/text/audios/clues. */
-  ]
+  brand:{logo:"images/corporate_mysteries_logo.png",home:"images/corporate_mysteries_home.png",dashboard:"images/corporate_mysteries_dashboard.png"},
+  cases:[{
+    id:"case001",title:"The Missing Contract",locked:false,cover:"images/case001_cover_missing_contract.png",solved:"images/case001_case_solved.png",boardEmpty:"images/case001_evidence_board_empty.png",boardComplete:"images/case001_evidence_board_complete.png",summary:"A major contract has vanished before an important client meeting.",
+    briefing:"A major contract has disappeared before an important client meeting at Anderson Ltd. It was last seen on a manager's desk, and the client arrives this afternoon. Listen carefully to the people in the office, collect clues, and work out where the contract is now.",
+    clues:{
+      contract:{name:"The Contract",img:"images/case001_clue_contract.png",note:"Draft service agreement, Anderson Ltd."},voicemail:{name:"Voicemail",img:"images/case001_clue_voicemail.png",note:"Laura explains where she put it."},printer:{name:"Printer / Copy Room",img:"images/case001_clue_printer.png",note:"Printer was out of paper."},visitor_badge:{name:"Visitor Badge",img:"images/case001_clue_visitor_badge.png",note:"A courier signed in this morning."},delivery_envelope:{name:"Delivery Envelope",img:"images/case001_clue_delivery_envelope.png",note:"Envelope left for the sales department."},access_log:{name:"Access Log",img:"images/case001_clue_access_log.png",note:"Who entered the building, and when."},meeting_schedule:{name:"Meeting Schedule",img:"images/case001_clue_meeting_schedule.png",note:"The client meeting was moved."}
+    },
+    scenes:{open_office:"images/case001_open_office.png",meeting_204:"images/case001_meeting_room_204.png.png",reception:"images/case001_reception_desk.png",copy_room:"images/case001_copy_room.png",room_312:"images/case001_room_312.png"},
+    audios:[
+      {id:"a1",title:"The Missing File",scene:"open_office",kind:"Conversation",lines:[{who:"Woman",gender:"female",text:"Have you seen the Anderson contract? It was on my desk this morning, but now it's gone."},{who:"Man",gender:"male",text:"I saw it in the meeting room after yesterday's presentation. Maybe someone left it there."},{who:"Woman",gender:"female",text:"I checked the meeting room before lunch, and it wasn't there."},{who:"Man",gender:"male",text:"Then maybe Laura took it to make copies. She was preparing documents for the client meeting."},{who:"Woman",gender:"female",text:"Good idea. I'll ask her before the meeting starts."}],questions:[
+        {prompt:"What are the speakers mainly discussing?",options:["A missing document","A cancelled meeting","A new client","A printer problem"],answer:0,unlock:"contract",skill:"main idea"},
+        {prompt:"Where did the man last see the contract?",options:["On the woman's desk","In the meeting room","At reception","In the copy room"],answer:1,unlock:null,skill:"detail"},
+        {prompt:"Who will the woman probably contact next?",options:["The client","The receptionist","Laura","The courier"],answer:2,unlock:null,skill:"inference"}
+      ]},
+      {id:"a2",title:"Voicemail from Laura",scene:"copy_room",kind:"Voicemail",lines:[{who:"Laura",gender:"female",text:"Hello, this is Laura from administration. I'm calling about the Anderson contract."},{who:"Laura",gender:"female",text:"I took it from the meeting room this morning because the manager asked me to prepare two extra copies."},{who:"Laura",gender:"female",text:"The printer was out of paper, so I left the original document in the copy room."},{who:"Laura",gender:"female",text:"I'll be back from lunch at two o'clock."}],questions:[
+        {prompt:"Why is Laura calling?",options:["To cancel a meeting","To order more paper","To report a broken printer","To explain where she put a document"],answer:3,unlock:"voicemail",skill:"purpose"},
+        {prompt:"Why did she take the contract?",options:["To prepare extra copies","To read it at home","To give it to the client","To throw it away"],answer:0,unlock:null,skill:"detail"},
+        {prompt:"Where did she leave the original?",options:["On the manager's desk","In the copy room","In the meeting room","At reception"],answer:1,unlock:"printer",skill:"detail"}
+      ]},
+      {id:"a3",title:"At Reception",scene:"reception",kind:"Conversation",lines:[{who:"Man",gender:"male",text:"Excuse me, did anyone from Anderson Ltd come by this morning?"},{who:"Woman",gender:"female",text:"Yes, a courier arrived around ten thirty. He left an envelope for the sales department."},{who:"Man",gender:"male",text:"Did he take anything with him?"},{who:"Woman",gender:"female",text:"No. He only delivered the envelope. But he asked where the copy room was."},{who:"Man",gender:"male",text:"That's strange. Thanks. I'll check the visitor log."}],questions:[
+        {prompt:"Who visited the office this morning?",options:["A client","A job applicant","A courier","An auditor"],answer:2,unlock:"visitor_badge",skill:"detail"},
+        {prompt:"What did the visitor do?",options:["Picked up a parcel","Signed a contract","Repaired the printer","Delivered an envelope"],answer:3,unlock:"delivery_envelope",skill:"detail"},
+        {prompt:"What does the man say he will check?",options:["The visitor log","The copy machine","The meeting schedule","The client email"],answer:0,unlock:"access_log",skill:"detail"}
+      ]},
+      {id:"a4",title:"Office Announcement",scene:"meeting_204",kind:"Announcement",lines:[{who:"Announcer",gender:"male",text:"Attention everyone."},{who:"Announcer",gender:"male",text:"The client meeting with Anderson Ltd has been moved from Room 204 to Room 312, because the projector in Room 204 is not working."},{who:"Announcer",gender:"male",text:"Please bring all printed documents to Room 312 before two fifteen."},{who:"Announcer",gender:"male",text:"The meeting will begin at two thirty."}],questions:[
+        {prompt:"What is being announced?",options:["A new employee","A meeting room change","A fire drill","A holiday schedule"],answer:1,unlock:"meeting_schedule",skill:"main idea"},
+        {prompt:"Why was the change made?",options:["The room was too small","There were too many guests","The projector was not working","The room was double-booked"],answer:2,unlock:null,skill:"detail"},
+        {prompt:"What are employees asked to bring to Room 312?",options:["Their laptops","The visitor log","The client email","All printed documents"],answer:3,unlock:null,skill:"detail"}
+      ]}
+    ],
+    finalDeduction:{scene:"copy_room",prompt:"Putting all the clues together, what is the last confirmed location of the Anderson contract?",options:["The copy room","Reception","Room 312","With the courier"],answer:0,explain:"Laura explicitly says that she left the original document in the copy room. The later announcement says printed documents should be brought to Room 312, but it never confirms that this contract was actually moved. The last confirmed location is therefore the copy room."}
+  }]
 };
-
 </script>
 <script>
-/* ============================================================================
-   CORPORATE MYSTERIES — script.js
-   Client-side engine: routing, speech synthesis, music, investigation flow,
-   evidence board, ranks, badges, accessibility, localStorage.
-   ============================================================================ */
-(function () {
-  "use strict";
-
-  var DATA = window.GAME_DATA;
-  var KEY = "CORP_MYSTERIES_V1";
-  var $ = function (s, r) { return (r || document).querySelector(s); };
-  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
-
-  /* ----------------------------- STATE ----------------------------- */
-  function defaultState() {
-    return {
-      name: "",
-      score: 0,
-      completed: {},        // caseId -> { accuracy, stars, badges:[] }
-      badges: {},           // badgeId -> true
-      settings: { music: false, volume: 0.4, highContrast: false }
-    };
-  }
-  var state = load();
-  function load() {
-    try {
-      var raw = localStorage.getItem(KEY);
-      if (raw) {
-        var s = JSON.parse(raw), d = defaultState();
-        s.settings = Object.assign(d.settings, s.settings || {});
-        s.completed = s.completed || {}; s.badges = s.badges || {}; s.score = s.score || 0; s.name = s.name || "";
-        return s;
-      }
-    } catch (e) {}
-    return defaultState();
-  }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
-
-  /* runtime session for the active case */
-  var run = null;
-
-  /* ----------------------------- RANK / BADGES ----------------------------- */
-  function currentRank() {
-    var r = DATA.ranks[0];
-    for (var i = 0; i < DATA.ranks.length; i++) if (state.score >= DATA.ranks[i].min) r = DATA.ranks[i];
-    return r.name;
-  }
-  function awardBadge(id) {
-    if (!state.badges[id]) { state.badges[id] = true; save(); toast("Badge unlocked", (DATA.badges[id].icon) + " " + DATA.badges[id].label); }
-  }
-
-  /* ----------------------------- IMAGE FALLBACK ----------------------------- */
-  /* set a background image, but keep the CSS gradient if the file is missing */
-  function bgImage(el, url) {
-    if (!el) return;
-    var img = new Image();
-    img.onload = function () { el.style.backgroundImage = "url('" + url + "')"; };
-    img.onerror = function () { /* keep gradient fallback */ };
-    img.src = url;
-  }
-
-  /* ----------------------------- MUSIC ----------------------------- */
-  var bgm = $("#bgm");
-  function applyMusic() {
-    bgm.volume = state.settings.volume;
-    var btn = $("#musicBtn");
-    btn.setAttribute("aria-pressed", state.settings.music ? "true" : "false");
-    btn.textContent = state.settings.music ? "\uD83D\uDD0A Music" : "\uD83D\uDD07 Music";
-    $("#volRange").value = String(Math.round(state.settings.volume * 100));
-  }
-  function startMusic() { if (state.settings.music && bgm.paused) { var p = bgm.play(); if (p && p.catch) p.catch(function () {}); } }
-  $("#musicBtn").addEventListener("click", function () {
-    state.settings.music = !state.settings.music; save(); applyMusic();
-    if (state.settings.music) startMusic(); else bgm.pause();
-  });
-  $("#volRange").addEventListener("input", function () {
-    state.settings.volume = Math.max(0, Math.min(1, parseInt(this.value, 10) / 100)); bgm.volume = state.settings.volume; save();
-  });
-  function firstGesture() { startMusic(); document.removeEventListener("pointerdown", firstGesture); document.removeEventListener("keydown", firstGesture); }
-  document.addEventListener("pointerdown", firstGesture);
-  document.addEventListener("keydown", firstGesture);
-
-  /* ----------------------------- HIGH CONTRAST ----------------------------- */
-  function applyContrast() {
-    document.body.classList.toggle("hc", !!state.settings.highContrast);
-    $("#contrastBtn").setAttribute("aria-pressed", state.settings.highContrast ? "true" : "false");
-  }
-  $("#contrastBtn").addEventListener("click", function () { state.settings.highContrast = !state.settings.highContrast; save(); applyContrast(); });
-
-  /* ----------------------------- SPEECH ----------------------------- */
-  var synth = window.speechSynthesis;
-  var voices = [];
-  function loadVoices() { voices = synth ? synth.getVoices() : []; }
-  if (synth) { loadVoices(); if (typeof synth.onvoiceschanged !== "undefined") synth.onvoiceschanged = loadVoices; }
-
-  var FEMALE_HINTS = ["female", "samantha", "victoria", "zira", "susan", "karen", "moira", "tessa", "fiona", "serena", "amelie", "anna", "google uk english female", "google us english"];
-  var MALE_HINTS = ["male", "daniel", "alex", "david", "fred", "rishi", "thomas", "google uk english male", "mark", "george", "oliver"];
-  function pickVoice(gender) {
-    var en = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf("en") === 0; });
-    if (!en.length) en = voices;
-    var hints = gender === "male" ? MALE_HINTS : FEMALE_HINTS;
-    for (var i = 0; i < en.length; i++) {
-      var n = (en[i].name || "").toLowerCase();
-      for (var j = 0; j < hints.length; j++) if (n.indexOf(hints[j]) >= 0) return en[i];
-    }
-    return en[0] || null;
-  }
-
-  var speech = { playing: false, lines: [], idx: 0, onLine: null, onDone: null, timer: null };
-  function speakSequence(lines, onLine, onDone) {
-    if (!synth) { if (onDone) onDone(); return; }
-    stopSpeech();
-    speech.lines = lines; speech.idx = 0; speech.onLine = onLine; speech.onDone = onDone; speech.playing = true;
-    nextLine();
-  }
-  function nextLine() {
-    if (!speech.playing) return;
-    if (speech.idx >= speech.lines.length) { speech.playing = false; setEq(false); if (speech.onDone) speech.onDone(); return; }
-    var line = speech.lines[speech.idx];
-    if (speech.onLine) speech.onLine(speech.idx);
-    var u = new SpeechSynthesisUtterance(line.text);
-    var v = pickVoice(line.gender); if (v) u.voice = v;
-    u.lang = (v && v.lang) || "en-US";
-    u.rate = 0.96; u.pitch = line.gender === "male" ? 0.85 : 1.15;
-    u.onend = function () {
-      speech.idx++;
-      speech.timer = setTimeout(nextLine, 550); /* automatic pause between lines */
-    };
-    u.onerror = function () { speech.idx++; speech.timer = setTimeout(nextLine, 200); };
-    setEq(true);
-    synth.speak(u);
-  }
-  function stopSpeech() {
-    speech.playing = false; if (speech.timer) { clearTimeout(speech.timer); speech.timer = null; }
-    if (synth) synth.cancel(); setEq(false);
-  }
-  function setEq(on) { var eq = $("#eq"); if (eq) eq.classList.toggle("on", on); }
-
-  /* ----------------------------- ROUTER ----------------------------- */
-  var SCREENS = ["home", "cases", "briefing", "investigation", "board", "deduction", "solved"];
-  function show(id) {
-    stopSpeech();
-    SCREENS.forEach(function (s) { var el = $("#scr-" + s); if (el) el.classList.toggle("active", s === id); });
-    window.scrollTo(0, 0);
-  }
-
-  /* ----------------------------- TOAST ----------------------------- */
-  var toastTimer = null;
-  function toast(head, body) {
-    var t = $("#toast"); $("#toastHead").textContent = head; $("#toastBody").textContent = body;
-    t.classList.add("show"); if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3200);
-  }
-
-  /* ============================================================================
-     HOME / DASHBOARD
-     ============================================================================ */
-  function renderHome() {
-    bgImage($("#homeBg"), DATA.brand.home);
-    $("#homeName").textContent = state.name ? ("Welcome back, " + state.name) : "Welcome, investigator";
-    $("#dashRank").textContent = currentRank();
-    $("#dashScore").textContent = state.score;
-    var done = Object.keys(state.completed).length;
-    $("#dashCases").textContent = done + " / " + DATA.cases.length;
-    // badges
-    var bg = $("#dashBadges"); bg.innerHTML = "";
-    Object.keys(DATA.badges).forEach(function (id) {
-      var b = DATA.badges[id], earned = !!state.badges[id];
-      var el = document.createElement("div");
-      el.className = "badge" + (earned ? " earned" : "");
-      el.innerHTML = '<span class="ic">' + b.icon + '</span>' + b.label;
-      bg.appendChild(el);
-    });
-  }
-
-  /* ============================================================================
-     CASE SELECTION
-     ============================================================================ */
-  function renderCases() {
-    bgImage($("#dashBg"), DATA.brand.dashboard);
-    var host = $("#caseList"); host.innerHTML = "";
-    DATA.cases.forEach(function (c) {
-      var done = !!state.completed[c.id];
-      var card = document.createElement("div");
-      card.className = "case-card";
-      var cover = document.createElement("div"); cover.className = "cover"; host.appendChild(card);
-      bgImage(cover, c.cover);
-      var tag = done ? '<span class="tag done">Solved</span>' : (c.locked ? '<span class="tag locked">Locked</span>' : '<span class="tag">Open case</span>');
-      card.appendChild(cover);
-      var body = document.createElement("div"); body.className = "cc-body";
-      body.innerHTML = tag + '<h3>Case ' + c.id.replace("case", "") + ' · ' + c.title + '</h3><p>' + c.summary + '</p>';
-      var btn = document.createElement("button");
-      btn.className = "btn" + (c.locked ? " btn-ghost" : "");
-      btn.textContent = c.locked ? "Locked" : (done ? "Replay case" : "Open investigation");
-      btn.disabled = !!c.locked;
-      btn.addEventListener("click", function () { openCase(c); });
-      body.appendChild(btn);
-      card.appendChild(body);
-    });
-  }
-
-  /* ============================================================================
-     CASE OPEN -> BRIEFING
-     ============================================================================ */
-  function openCase(c) {
-    run = {
-      c: c, audioIdx: 0, qIdx: 0,
-      correct: 0, total: 0,
-      clues: {}, perAudio: {}, finalCorrect: false
-    };
-    renderBriefing();
-  }
-  function renderBriefing() {
-    var c = run.c;
-    bgImage($("#briefCover"), c.cover);
-    $("#briefTitle").textContent = "Case " + c.id.replace("case", "") + " — " + c.title;
-    $("#briefText").textContent = c.briefing;
-    show("briefing");
-  }
-
-  /* ============================================================================
-     INVESTIGATION (audio loop)
-     ============================================================================ */
-  function startInvestigation() { run.audioIdx = 0; run.qIdx = 0; renderAudio(); show("investigation"); }
-
-  function renderAudio() {
-    var c = run.c, audio = c.audios[run.audioIdx];
-    run.qIdx = 0; run._played = false;
-    run.perAudio[audio.id] = run.perAudio[audio.id] || { correct: 0, total: audio.questions.length };
-
-    $("#invStep").textContent = "Audio " + (run.audioIdx + 1) + " of " + c.audios.length;
-    $("#invKind").textContent = audio.kind;
-    $("#invTitle").textContent = audio.title;
-
-    var scene = $("#invScene");
-    scene.style.backgroundImage = "";
-    bgImage(scene, c.scenes[audio.scene]);
-    $("#invSceneTag").textContent = audio.title;
-
-    // transcript locked
-    var tr = $("#invTranscript");
-    tr.className = "transcript locked";
-    tr.innerHTML = synth ? "\uD83D\uDD12 Transcript locked — listen first, then unlock it." : "Speech is not supported in this browser; transcript shown below.";
-    if (!synth) { buildTranscript(audio); run._played = true; }
-    $("#transcriptBtn").disabled = !run._played;
-    $("#transcriptBtn").setAttribute("aria-pressed", "false");
-
-    $("#nowPlaying").textContent = "Ready to play.";
-    $("#replayBtn").disabled = true;
-    renderQuestion();
-    updateBoardTally();
-  }
-
-  function buildTranscript(audio) {
-    var tr = $("#invTranscript");
-    tr.className = "transcript";
-    tr.innerHTML = audio.lines.map(function (l) {
-      return '<div class="line ' + (l.gender) + '"><b>' + esc(l.who) + ':</b> ' + esc(l.text) + '</div>';
-    }).join("");
-  }
-
-  function playAudio() {
-    var audio = run.c.audios[run.audioIdx];
-    $("#playBtn").disabled = true; $("#replayBtn").disabled = true; $("#stopBtn").disabled = false;
-    speakSequence(audio.lines,
-      function (i) { $("#nowPlaying").textContent = audio.lines[i].who + " is speaking…"; },
-      function () {
-        $("#nowPlaying").textContent = "Playback finished.";
-        $("#playBtn").disabled = false; $("#replayBtn").disabled = false; $("#stopBtn").disabled = true;
-        run._played = true; $("#transcriptBtn").disabled = false;
-      });
-  }
-  $("#playBtn").addEventListener("click", playAudio);
-  $("#replayBtn").addEventListener("click", playAudio);
-  $("#stopBtn").addEventListener("click", function () {
-    stopSpeech(); $("#nowPlaying").textContent = "Stopped.";
-    $("#playBtn").disabled = false; $("#replayBtn").disabled = !run._played; $("#stopBtn").disabled = true;
-  });
-  $("#transcriptBtn").addEventListener("click", function () {
-    if (this.getAttribute("aria-pressed") === "true") {
-      this.setAttribute("aria-pressed", "false");
-      var audio = run.c.audios[run.audioIdx];
-      var tr = $("#invTranscript"); tr.className = "transcript locked";
-      tr.innerHTML = "\uD83D\uDD12 Transcript hidden. Tap to show.";
-    } else {
-      this.setAttribute("aria-pressed", "true");
-      buildTranscript(run.c.audios[run.audioIdx]);
-    }
-  });
-
-  function renderQuestion() {
-    var audio = run.c.audios[run.audioIdx];
-    var q = audio.questions[run.qIdx]; q._answered = false;
-    $("#qProgress").textContent = "Question " + (run.qIdx + 1) + " of " + audio.questions.length;
-    $("#qPrompt").textContent = q.prompt;
-    var fb = $("#qFeedback"); fb.className = "feedback"; fb.innerHTML = "";
-    var host = $("#qOpts"); host.innerHTML = "";
-    q.options.forEach(function (text, i) {
-      var b = document.createElement("button");
-      b.className = "opt";
-      b.innerHTML = '<span class="key">' + String.fromCharCode(65 + i) + '</span><span>' + esc(text) + '</span>';
-      b.addEventListener("click", function () { answer(i); });
-      host.appendChild(b);
-    });
-  }
-
-  function answer(i) {
-    var audio = run.c.audios[run.audioIdx];
-    var q = audio.questions[run.qIdx]; if (q._answered) return; q._answered = true;
-    var correct = i === q.answer;
-    $$("#qOpts .opt").forEach(function (b, idx) {
-      b.disabled = true;
-      if (idx === q.answer) b.classList.add("correct");
-      else if (idx === i) b.classList.add("wrong");
-    });
-    run.total++;
-    if (correct) {
-      run.correct++; run.perAudio[audio.id].correct++; state.score += 100; save();
-      if (q.unlock && !run.clues[q.unlock]) { run.clues[q.unlock] = true; var cl = run.c.clues[q.unlock]; toast("Clue added to the board", cl.name); }
-    }
-    var fb = $("#qFeedback"); fb.className = "feedback show " + (correct ? "ok" : "no");
-    fb.innerHTML = '<div class="fh">' + (correct ? "\u2713 Correct" : "\u2717 Not quite") + '</div>' +
-      (correct ? "" : '<div>Correct answer: <b>' + esc(q.options[q.answer]) + '</b></div>') +
-      '<div class="muted" style="margin-top:4px">Skill: ' + esc(q.skill) + '</div>' +
-      '<div style="margin-top:11px"><button class="btn btn-ok" id="qNext">' +
-      (run.qIdx + 1 < audio.questions.length ? "Next question \u203A" : (run.audioIdx + 1 < run.c.audios.length ? "Next audio \u203A" : "Go to evidence board \u203A")) +
-      '</button></div>';
-    $("#qNext").addEventListener("click", nextQuestion);
-    $("#qNext").focus();
-    updateBoardTally();
-  }
-
-  function nextQuestion() {
-    var audio = run.c.audios[run.audioIdx];
-    run.qIdx++;
-    if (run.qIdx < audio.questions.length) { renderQuestion(); return; }
-    // audio finished -> check per-audio badge
-    awardAudioBadge(audio);
-    run.audioIdx++;
-    if (run.audioIdx < run.c.audios.length) { stopSpeech(); renderAudio(); }
-    else { renderBoard(true); }
-  }
-
-  function awardAudioBadge(audio) {
-    var pa = run.perAudio[audio.id];
-    var perfect = pa.correct === pa.total;
-    if (!perfect) return;
-    if (audio.id === "a2") awardBadge("voicemail");
-    if (audio.id === "a3") awardBadge("delivery");
-    if (audio.id === "a4") awardBadge("meeting");
-    // printer badge: got the copy-room question (a2 q3 unlock 'printer')
-    if (run.clues.printer) awardBadge("printer");
-  }
-
-  /* ============================================================================
-     EVIDENCE BOARD
-     ============================================================================ */
-  function updateBoardTally() {
-    var n = Object.keys(run.clues).length, total = Object.keys(run.c.clues).length;
-    var el = $("#clueTally"); if (el) el.textContent = "Clues: " + n + " / " + total;
-  }
-  function renderBoard(fromInvestigation) {
-    var c = run.c;
-    var hasAll = Object.keys(run.clues).length === Object.keys(c.clues).length;
-    bgImage($("#boardBg"), hasAll ? c.boardComplete : c.boardEmpty);
-    var host = $("#boardClues"); host.innerHTML = "";
-    var keys = Object.keys(c.clues);
-    keys.forEach(function (k, i) {
-      if (run.clues[k]) {
-        var cl = c.clues[k];
-        var card = document.createElement("div"); card.className = "clue"; card.style.animationDelay = (i * 0.06) + "s";
-        var im = document.createElement("img"); im.alt = cl.name; im.src = cl.img;
-        var b = document.createElement("div"); b.className = "cl-b"; b.innerHTML = "<h4>" + esc(cl.name) + "</h4><p>" + esc(cl.note) + "</p>";
-        card.appendChild(im); card.appendChild(b); host.appendChild(card);
-      } else {
-        var e = document.createElement("div"); e.className = "clue empty"; e.textContent = "Locked clue"; host.appendChild(e);
-      }
-    });
-    $("#boardCount").textContent = Object.keys(run.clues).length + " / " + keys.length + " clues collected";
-    // continue button: only go to deduction once all audios are done
-    var allAudiosDone = run.audioIdx >= c.audios.length;
-    $("#toDeductionBtn").style.display = allAudiosDone ? "inline-block" : "none";
-    $("#backToInvBtn").style.display = allAudiosDone ? "none" : "inline-block";
-    show("board");
-  }
-
-  /* ============================================================================
-     FINAL DEDUCTION
-     ============================================================================ */
-  function renderDeduction() {
-    var c = run.c, fd = c.finalDeduction;
-    bgImage($("#dedScene"), c.scenes[fd.scene]);
-    $("#dedPrompt").textContent = fd.prompt;
-    var fb = $("#dedFeedback"); fb.className = "feedback"; fb.innerHTML = "";
-    var host = $("#dedOpts"); host.innerHTML = "";
-    fd._answered = false;
-    fd.options.forEach(function (text, i) {
-      var b = document.createElement("button");
-      b.className = "opt";
-      b.innerHTML = '<span class="key">' + String.fromCharCode(65 + i) + '</span><span>' + esc(text) + '</span>';
-      b.addEventListener("click", function () { answerDeduction(i); });
-      host.appendChild(b);
-    });
-    show("deduction");
-  }
-  function answerDeduction(i) {
-    var fd = run.c.finalDeduction; if (fd._answered) return; fd._answered = true;
-    var correct = i === fd.answer; run.finalCorrect = correct;
-    $$("#dedOpts .opt").forEach(function (b, idx) {
-      b.disabled = true;
-      if (idx === fd.answer) b.classList.add("correct");
-      else if (idx === i) b.classList.add("wrong");
-    });
-    run.total++; if (correct) { run.correct++; state.score += 200; save(); }
-    var fb = $("#dedFeedback"); fb.className = "feedback show " + (correct ? "ok" : "no");
-    fb.innerHTML = '<div class="fh">' + (correct ? "\u2713 Case cracked!" : "\u2717 Close, but not quite") + '</div>' +
-      '<div>' + esc(fd.explain) + '</div>' +
-      '<div style="margin-top:11px"><button class="btn btn-ok" id="dedNext">See the result \u203A</button></div>';
-    $("#dedNext").addEventListener("click", finishCase);
-    $("#dedNext").focus();
-  }
-
-  /* ============================================================================
-     CASE SOLVED
-     ============================================================================ */
-  function finishCase() {
-    var c = run.c;
-    var acc = run.total ? Math.round((run.correct / run.total) * 100) : 0;
-    var stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
-    // badges
-    if (run.finalCorrect) awardBadge("inference");
-    awardBadge("detective");
-    // record completion (keep best)
-    var prev = state.completed[c.id];
-    if (!prev || acc > prev.accuracy) state.completed[c.id] = { accuracy: acc, stars: stars };
-    save();
-
-    bgImage($("#solvedImg"), c.solved);
-    $("#solvedTitle").textContent = c.title + " — Solved";
-    $("#solvedStats").innerHTML =
-      stat(acc + "%", "Accuracy") +
-      stat(run.correct + "/" + run.total, "Correct answers") +
-      stat(Object.keys(run.clues).length + "/" + Object.keys(c.clues).length, "Clues collected") +
-      stat(currentRank(), "Rank");
-    var rating = "";
-    for (var s = 0; s < 3; s++) rating += s < stars ? "\u2605" : '<span class="off">\u2605</span>';
-    $("#solvedRating").innerHTML = rating;
-    // badges earned this case
-    var earned = Object.keys(state.badges).map(function (id) { return '<div class="badge earned"><span class="ic">' + DATA.badges[id].icon + '</span>' + DATA.badges[id].label + '</div>'; }).join("");
-    $("#solvedBadges").innerHTML = earned || '<span class="muted">No badges yet.</span>';
-    chime();
-    show("solved");
-  }
-  function stat(v, k) { return '<div class="stat"><div class="v">' + v + '</div><div class="k">' + k + '</div></div>'; }
-
-  /* victory chime via WebAudio (no extra file needed) */
-  function chime() {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
-      var ctx = new AC(); var notes = [523.25, 659.25, 783.99, 1046.5]; var t = ctx.currentTime;
-      notes.forEach(function (f, i) {
-        var o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = "triangle"; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
-        var st = t + i * 0.12; g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(0.25, st + 0.03);
-        g.gain.exponentialRampToValueAtTime(0.0001, st + 0.4); o.start(st); o.stop(st + 0.42);
-      });
-    } catch (e) {}
-  }
-
-  /* ----------------------------- NAME MODAL ----------------------------- */
-  function ensureName(after) {
-    if (state.name) { after(); return; }
-    $("#nameInput").value = ""; $("#nameModal").classList.add("show");
-    setTimeout(function () { $("#nameInput").focus(); }, 60);
-    $("#nameModal")._after = after;
-  }
-  $("#nameOk").addEventListener("click", function () {
-    state.name = ($("#nameInput").value.trim() || "Investigator").slice(0, 24); save();
-    $("#nameModal").classList.remove("show");
-    var after = $("#nameModal")._after; if (after) after();
-  });
-  $("#nameInput").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#nameOk").click(); });
-
-  /* ----------------------------- RESET ----------------------------- */
-  function resetProgress() {
-    if (!confirm("Reset ALL progress: completed cases, score, rank, badges and your name? This cannot be undone.")) return;
-    localStorage.removeItem(KEY); state = defaultState(); save();
-    applyMusic(); applyContrast(); renderHome(); toast("Done", "Progress has been reset."); show("home");
-  }
-
-  /* ----------------------------- GLOBAL EVENTS ----------------------------- */
-  document.addEventListener("click", function (e) {
-    var a = e.target.closest && e.target.closest("[data-act]");
-    if (!a) return;
-    var act = a.getAttribute("data-act");
-    if (act === "cases") { renderCases(); show("cases"); }
-    else if (act === "home") { renderHome(); show("home"); }
-    else if (act === "start") { ensureName(function () { renderCases(); show("cases"); }); }
-    else if (act === "how") { $("#howModal").classList.add("show"); }
-    else if (act === "reset") { resetProgress(); }
-    else if (act === "begin-investigation") { startInvestigation(); }
-    else if (act === "view-board") { renderBoard(false); }
-    else if (act === "back-to-inv") { show("investigation"); }
-    else if (act === "to-deduction") { renderDeduction(); }
-    else if (act === "close-modal") { $$(".modal").forEach(function (m) { m.classList.remove("show"); }); }
-  });
-
-  /* keyboard 1-4 to answer in investigation & deduction */
-  document.addEventListener("keydown", function (e) {
-    if (["1", "2", "3", "4"].indexOf(e.key) < 0) return;
-    var host = null;
-    if ($("#scr-investigation").classList.contains("active")) host = $("#qOpts");
-    else if ($("#scr-deduction").classList.contains("active")) host = $("#dedOpts");
-    if (!host) return;
-    var opts = host.querySelectorAll(".opt"); var i = parseInt(e.key, 10) - 1;
-    if (opts[i] && !opts[i].disabled) opts[i].click();
-  });
-
-  /* ----------------------------- HELPERS ----------------------------- */
-  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-
-  /* ----------------------------- BOOT ----------------------------- */
-  function boot() {
-    applyMusic(); applyContrast();
-    // brand logo fallback
-    var logo = $("#brandLogo");
-    if (logo) { var im = new Image(); im.onload = function () { logo.style.backgroundImage = "url('" + DATA.brand.logo + "')"; logo.textContent = ""; }; im.src = DATA.brand.logo; }
-    renderHome(); show("home");
-  }
-  boot();
+(function(){"use strict";
+const DATA=window.GAME_DATA,KEY="CORP_MYSTERIES_V2",$=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function defaultState(){return{name:"",score:0,completed:{},badges:{},settings:{music:false,volume:.4,highContrast:false}}}
+let state=load(),run=null;
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw),d=defaultState();s.settings=Object.assign(d.settings,s.settings||{});s.completed=s.completed||{};s.badges=s.badges||{};s.score=Number(s.score)||0;s.name=s.name||"";return s}}catch(e){}return defaultState()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(h,b){const t=$("#toast");$("#toastHead").textContent=h;$("#toastBody").textContent=b;t.classList.add("show");clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),3200)}
+function bgImage(el,url){if(!el||!url)return;const img=new Image();img.onload=()=>el.style.backgroundImage=`url('${url}')`;img.onerror=()=>{};img.src=url}
+function currentRank(){let r=DATA.ranks[0];DATA.ranks.forEach(x=>{if(state.score>=x.min)r=x});return r.name}
+function awardBadge(id){if(!DATA.badges[id])return;if(!state.badges[id]){state.badges[id]=true;if(run&&!run.badgesEarned.includes(id))run.badgesEarned.push(id);save();toast("Badge unlocked",DATA.badges[id].icon+" "+DATA.badges[id].label)}}
+const bgm=$("#bgm");
+function applyMusic(){bgm.volume=state.settings.volume;$("#musicBtn").setAttribute("aria-pressed",state.settings.music?"true":"false");$("#musicBtn").textContent=state.settings.music?"🔊 Music":"🔇 Music";$("#volRange").value=Math.round(state.settings.volume*100)}
+function startMusic(){if(state.settings.music&&bgm.paused){const p=bgm.play();if(p&&p.catch)p.catch(()=>toast("Music unavailable","Your browser blocked or could not play the background music."))}}
+function stopMusic(resetTime){bgm.pause();if(resetTime){try{bgm.currentTime=0}catch(e){}}}
+$("#musicBtn").addEventListener("click",()=>{state.settings.music=!state.settings.music;save();applyMusic();state.settings.music?startMusic():stopMusic(false)});
+$("#volRange").addEventListener("input",function(){state.settings.volume=Math.max(0,Math.min(1,parseInt(this.value,10)/100));bgm.volume=state.settings.volume;save()});
+bgm.addEventListener("error",()=>{state.settings.music=false;save();applyMusic();$("#musicBtn").disabled=true;toast("Music unavailable","The background-music file could not be loaded.")});
+function firstGesture(){startMusic();document.removeEventListener("pointerdown",firstGesture);document.removeEventListener("keydown",firstGesture)}document.addEventListener("pointerdown",firstGesture);document.addEventListener("keydown",firstGesture);
+function applyContrast(){document.body.classList.toggle("hc",!!state.settings.highContrast);$("#contrastBtn").setAttribute("aria-pressed",state.settings.highContrast?"true":"false")}
+$("#contrastBtn").addEventListener("click",()=>{state.settings.highContrast=!state.settings.highContrast;save();applyContrast()});
+const synth=window.speechSynthesis;let voices=[];
+function loadVoices(){voices=synth?synth.getVoices():[]}if(synth){loadVoices();if("onvoiceschanged" in synth)synth.onvoiceschanged=loadVoices}
+const FEMALE_HINTS=["female","samantha","victoria","zira","susan","karen","moira","tessa","fiona","serena","anna"],MALE_HINTS=["male","daniel","david","rishi","thomas","mark","george","oliver"];
+function pickVoice(gender){let enGB=voices.filter(v=>/^en-GB/i.test(v.lang||"")),en=voices.filter(v=>/^en/i.test(v.lang||""));let pool=enGB.length?enGB:(en.length?en:voices),hints=gender==="male"?MALE_HINTS:FEMALE_HINTS;for(const v of pool){const n=(v.name||"").toLowerCase();if(hints.some(h=>n.includes(h)))return v}return pool[0]||null}
+const speech={playing:false,lines:[],idx:0,timer:null,onLine:null,onDone:null,errors:0};
+function setEq(on){$("#eq").classList.toggle("on",on)}
+function stopSpeech(){speech.playing=false;clearTimeout(speech.timer);speech.timer=null;if(synth)synth.cancel();setEq(false)}
+function speakSequence(lines,onLine,onDone){if(!synth){onDone&&onDone(true);return}stopSpeech();Object.assign(speech,{playing:true,lines,idx:0,onLine,onDone,errors:0});nextLine()}
+function nextLine(){if(!speech.playing)return;if(speech.idx>=speech.lines.length){speech.playing=false;setEq(false);speech.onDone&&speech.onDone(speech.errors===speech.lines.length);return}const line=speech.lines[speech.idx];speech.onLine&&speech.onLine(speech.idx);const u=new SpeechSynthesisUtterance(line.text),v=pickVoice(line.gender);if(v)u.voice=v;u.lang=(v&&v.lang)||"en-GB";u.rate=.96;u.pitch=line.gender==="male"?.9:1.08;u.onend=()=>{speech.idx++;speech.timer=setTimeout(nextLine,450)};u.onerror=()=>{speech.errors++;speech.idx++;speech.timer=setTimeout(nextLine,120)};setEq(true);synth.speak(u)}
+const SCREENS=["home","cases","briefing","investigation","board","deduction","solved"];
+function normalisePlayerAfterLeave(){if(!run)return;$("#playBtn").disabled=false;$("#replayBtn").disabled=!run._played;$("#stopBtn").disabled=true;if(speech.playing||$("#nowPlaying").textContent.includes("speaking"))$("#nowPlaying").textContent=run._played?"Playback finished.":"Playback stopped."}
+function show(id){if(id!=="investigation"){stopSpeech();normalisePlayerAfterLeave()}SCREENS.forEach(s=>{const el=$("#scr-"+s);if(el)el.classList.toggle("active",s===id)});window.scrollTo(0,0)}
+function renderHome(){bgImage($("#homeBg"),DATA.brand.home);$("#homeName").textContent=state.name?"Welcome back, "+state.name:"Welcome, investigator";$("#dashRank").textContent=currentRank();$("#dashScore").textContent=state.score;$("#dashCases").textContent=Object.keys(state.completed).length+" / "+DATA.cases.length;const host=$("#dashBadges");host.innerHTML="";Object.keys(DATA.badges).forEach(id=>{const b=DATA.badges[id],el=document.createElement("div");el.className="badge"+(state.badges[id]?" earned":"");el.innerHTML=`<span class="ic">${b.icon}</span>${esc(b.label)}`;host.appendChild(el)})}
+function renderCases(){const host=$("#caseList");host.innerHTML="";DATA.cases.forEach(c=>{const done=!!state.completed[c.id],card=document.createElement("div");card.className="case-card";const cover=document.createElement("div");cover.className="cover";bgImage(cover,c.cover);card.appendChild(cover);const body=document.createElement("div");body.className="cc-body";body.innerHTML=`<span class="tag${done?" done":""}">${done?"Solved":"Open case"}</span><h3>Case ${esc(c.id.replace("case",""))} · ${esc(c.title)}</h3><p>${esc(c.summary)}</p>`;const btn=document.createElement("button");btn.className="btn";btn.textContent=done?"Replay case":"Open investigation";btn.addEventListener("click",()=>openCase(c));body.appendChild(btn);card.appendChild(body);host.appendChild(card)});show("cases")}
+function openCase(c){run={c,audioIdx:0,qIdx:0,correct:0,total:0,points:0,clues:{},perAudio:{},finalCorrect:false,badgesEarned:[],_played:false};bgImage($("#briefCover"),c.cover);$("#briefTitle").textContent="Case "+c.id.replace("case","")+" — "+c.title;$("#briefText").textContent=c.briefing;show("briefing")}
+function startInvestigation(){run.audioIdx=0;run.qIdx=0;renderAudio();show("investigation")}
+function setQuestionEnabled(enabled){$$("#qOpts .opt").forEach(b=>b.disabled=!enabled);$("#listenNote").style.display=enabled?"none":"block"}
+function renderAudio(){const c=run.c,audio=c.audios[run.audioIdx];run.qIdx=0;run._played=false;run.perAudio[audio.id]={correct:0,total:audio.questions.length};$("#invStep").textContent=`Audio ${run.audioIdx+1} of ${c.audios.length}`;$("#invKind").textContent=audio.kind;$("#invTitle").textContent=audio.title;const scene=$("#invScene");scene.style.backgroundImage="";bgImage(scene,c.scenes[audio.scene]);$("#invSceneTag").textContent=audio.title;const tr=$("#invTranscript");tr.className="transcript locked";tr.textContent="🔒 Transcript locked — listen first, then unlock it.";$("#transcriptBtn").disabled=true;$("#transcriptBtn").setAttribute("aria-pressed","false");$("#replayBtn").disabled=true;$("#stopBtn").disabled=true;$("#playBtn").disabled=!synth;$("#nowPlaying").textContent=synth?"Ready to play.":"Speech playback is not supported in this browser.";renderQuestion();if(!synth){buildTranscript(audio);run._played=true;$("#listenNote").textContent="Audio is unavailable in this browser; use the transcript fallback.";setQuestionEnabled(true)}else{$("#listenNote").textContent="Listen to the full audio before answering.";setQuestionEnabled(false)}updateBoardTally()}
+function buildTranscript(audio){const tr=$("#invTranscript");tr.className="transcript";tr.innerHTML=audio.lines.map(l=>`<div class="line ${esc(l.gender)}"><b>${esc(l.who)}:</b> ${esc(l.text)}</div>`).join("")}
+function playAudio(){const audio=run.c.audios[run.audioIdx];$("#playBtn").disabled=true;$("#replayBtn").disabled=true;$("#stopBtn").disabled=false;speakSequence(audio.lines,i=>$("#nowPlaying").textContent=audio.lines[i].who+" is speaking…",allFailed=>{if(allFailed){$("#nowPlaying").textContent="Speech playback failed — transcript fallback enabled.";buildTranscript(audio);run._played=true;$("#transcriptBtn").disabled=false;setQuestionEnabled(true);toast("Audio fallback","Your browser could not play the speech. The transcript has been unlocked.")}else{$("#nowPlaying").textContent="Playback finished.";run._played=true;$("#transcriptBtn").disabled=false;setQuestionEnabled(true)}$("#playBtn").disabled=false;$("#replayBtn").disabled=false;$("#stopBtn").disabled=true})}
+$("#playBtn").addEventListener("click",playAudio);$("#replayBtn").addEventListener("click",playAudio);$("#stopBtn").addEventListener("click",()=>{stopSpeech();$("#nowPlaying").textContent="Stopped.";$("#playBtn").disabled=false;$("#replayBtn").disabled=!run._played;$("#stopBtn").disabled=true});
+$("#transcriptBtn").addEventListener("click",function(){const audio=run.c.audios[run.audioIdx];if(this.getAttribute("aria-pressed")==="true"){this.setAttribute("aria-pressed","false");const tr=$("#invTranscript");tr.className="transcript locked";tr.textContent="🔒 Transcript hidden. Tap to show."}else{this.setAttribute("aria-pressed","true");buildTranscript(audio)}});
+function renderQuestion(){const audio=run.c.audios[run.audioIdx],q=audio.questions[run.qIdx];q._answered=false;$("#qProgress").textContent=`Question ${run.qIdx+1} of ${audio.questions.length}`;$("#qPrompt").textContent=q.prompt;const fb=$("#qFeedback");fb.className="feedback";fb.innerHTML="";const host=$("#qOpts");host.innerHTML="";q.options.forEach((text,i)=>{const b=document.createElement("button");b.className="opt";b.innerHTML=`<span class="key">${String.fromCharCode(65+i)}</span><span>${esc(text)}</span>`;b.addEventListener("click",()=>answer(i));host.appendChild(b)});setQuestionEnabled(!synth||run._played)}
+function answer(i){const audio=run.c.audios[run.audioIdx],q=audio.questions[run.qIdx];if(q._answered)return;q._answered=true;const correct=i===q.answer;$$("#qOpts .opt").forEach((b,idx)=>{b.disabled=true;if(idx===q.answer)b.classList.add("correct");else if(idx===i)b.classList.add("wrong")});run.total++;if(correct){run.correct++;run.points+=100;run.perAudio[audio.id].correct++;if(q.unlock&&!run.clues[q.unlock]){run.clues[q.unlock]=true;toast("Clue added to the board",run.c.clues[q.unlock].name)}}const fb=$("#qFeedback");fb.className="feedback show "+(correct?"ok":"no");fb.innerHTML=`<div class="fh">${correct?"✓ Correct":"✗ Not quite"}</div>${correct?"":`<div>Correct answer: <b>${esc(q.options[q.answer])}</b></div>`}<div class="muted" style="margin-top:4px">Skill: ${esc(q.skill)}</div><div style="margin-top:11px"><button class="btn btn-ok" id="qNext">${run.qIdx+1<audio.questions.length?"Next question ›":(run.audioIdx+1<run.c.audios.length?"Next audio ›":"Go to evidence board ›")}</button></div>`;$("#qNext").addEventListener("click",nextQuestion);$("#qNext").focus();updateBoardTally()}
+function nextQuestion(){const audio=run.c.audios[run.audioIdx];run.qIdx++;if(run.qIdx<audio.questions.length){renderQuestion();return}awardAudioBadges(audio);run.audioIdx++;if(run.audioIdx<run.c.audios.length){stopSpeech();renderAudio()}else renderBoard()}
+function awardAudioBadges(audio){if(run.clues.printer)awardBadge("printer");const pa=run.perAudio[audio.id];if(pa.correct!==pa.total)return;if(audio.id==="a2")awardBadge("voicemail");if(audio.id==="a3")awardBadge("delivery");if(audio.id==="a4")awardBadge("meeting")}
+function updateBoardTally(){if(!run)return;const n=Object.keys(run.clues).length,total=Object.keys(run.c.clues).length;$("#clueTally").textContent=`Clues: ${n} / ${total}`}
+function renderBoard(){const c=run.c,hasAll=Object.keys(run.clues).length===Object.keys(c.clues).length;bgImage($("#boardBg"),hasAll?c.boardComplete:c.boardEmpty);const host=$("#boardClues");host.innerHTML="";Object.keys(c.clues).forEach(k=>{if(run.clues[k]){const cl=c.clues[k],card=document.createElement("div");card.className="clue";const im=document.createElement("img");im.alt=cl.name;im.src=cl.img;im.onerror=()=>{im.style.display="none"};const b=document.createElement("div");b.className="cl-b";b.innerHTML=`<h4>${esc(cl.name)}</h4><p>${esc(cl.note)}</p>`;card.append(im,b);host.appendChild(card)}else{const e=document.createElement("div");e.className="clue empty";e.textContent="Locked clue";host.appendChild(e)}});$("#boardCount").textContent=`${Object.keys(run.clues).length} / ${Object.keys(c.clues).length} clues collected`;const done=run.audioIdx>=c.audios.length;$("#toDeductionBtn").style.display=done?"inline-block":"none";$("#backToInvBtn").style.display=done?"none":"inline-block";show("board")}
+function renderDeduction(){const c=run.c,fd=c.finalDeduction;bgImage($("#dedScene"),c.scenes[fd.scene]);$("#dedPrompt").textContent=fd.prompt;const fb=$("#dedFeedback");fb.className="feedback";fb.innerHTML="";const host=$("#dedOpts");host.innerHTML="";fd._answered=false;fd.options.forEach((text,i)=>{const b=document.createElement("button");b.className="opt";b.innerHTML=`<span class="key">${String.fromCharCode(65+i)}</span><span>${esc(text)}</span>`;b.addEventListener("click",()=>answerDeduction(i));host.appendChild(b)});show("deduction")}
+function answerDeduction(i){const fd=run.c.finalDeduction;if(fd._answered)return;fd._answered=true;run.finalCorrect=i===fd.answer;$$("#dedOpts .opt").forEach((b,idx)=>{b.disabled=true;if(idx===fd.answer)b.classList.add("correct");else if(idx===i)b.classList.add("wrong")});run.total++;if(run.finalCorrect){run.correct++;run.points+=200}const fb=$("#dedFeedback");fb.className="feedback show "+(run.finalCorrect?"ok":"no");fb.innerHTML=`<div class="fh">${run.finalCorrect?"✓ Case cracked!":"✗ Deduction incorrect"}</div><div>${esc(fd.explain)}</div><div style="margin-top:11px"><button class="btn btn-ok" id="dedNext">See the result ›</button></div>`;$("#dedNext").addEventListener("click",finishCase);$("#dedNext").focus()}
+function stat(v,k){return `<div class="stat"><div class="v">${esc(v)}</div><div class="k">${esc(k)}</div></div>`}
+function finishCase(){const c=run.c,acc=run.total?Math.round(run.correct/run.total*100):0,stars=acc>=90?3:acc>=70?2:1,prev=state.completed[c.id];if(run.finalCorrect){awardBadge("inference");if(acc>=70)awardBadge("detective");const oldPoints=prev&&Number(prev.points)||0;if(!prev||run.points>oldPoints){state.score+=Math.max(0,run.points-oldPoints)}if(!prev||acc>(prev.accuracy||0)||run.points>oldPoints){state.completed[c.id]={accuracy:Math.max(acc,prev&&prev.accuracy||0),stars:Math.max(stars,prev&&prev.stars||0),points:Math.max(run.points,oldPoints)}}save()}bgImage($("#solvedImg"),c.solved);$("#solvedTitle").textContent=run.finalCorrect?c.title+" — Solved":c.title+" — Investigation complete (case not solved)";$("#solvedStats").innerHTML=stat(acc+"%","Accuracy")+stat(run.correct+"/"+run.total,"Correct answers")+stat(Object.keys(run.clues).length+"/"+Object.keys(c.clues).length,"Clues collected")+stat(currentRank(),"Rank");let rating="";for(let s=0;s<3;s++)rating+=s<stars?"★":'<span class="off">★</span>';$("#solvedRating").innerHTML=rating;const earned=run.badgesEarned.map(id=>`<div class="badge earned"><span class="ic">${DATA.badges[id].icon}</span>${esc(DATA.badges[id].label)}</div>`).join("");$("#solvedBadges").innerHTML=earned||'<span class="muted">No new badges unlocked in this run.</span>';if(run.finalCorrect)chime();show("solved")}
+function chime(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=new AC(),notes=[523.25,659.25,783.99,1046.5],t=ctx.currentTime;notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="triangle";o.frequency.value=f;o.connect(g);g.connect(ctx.destination);const st=t+i*.12;g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.25,st+.03);g.gain.exponentialRampToValueAtTime(.0001,st+.4);o.start(st);o.stop(st+.42)})}catch(e){}}
+function ensureName(after){if(state.name){after();return}$("#nameInput").value="";$("#nameModal").classList.add("show");$("#nameModal")._after=after;setTimeout(()=>$("#nameInput").focus(),60)}
+$("#nameOk").addEventListener("click",()=>{state.name=($("#nameInput").value.trim()||"Investigator").slice(0,24);save();$("#nameModal").classList.remove("show");const after=$("#nameModal")._after;if(after)after()});$("#nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#nameOk").click()});
+function resetProgress(){if(!confirm("Reset ALL progress: completed cases, score, rank, badges and your name? This cannot be undone."))return;localStorage.removeItem(KEY);state=defaultState();save();stopSpeech();stopMusic(true);applyMusic();applyContrast();renderHome();toast("Done","Progress has been reset.");show("home")}
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("[data-act]");if(!a)return;const act=a.getAttribute("data-act");if(act==="cases")ensureName(renderCases);else if(act==="home"){renderHome();show("home")}else if(act==="start")ensureName(renderCases);else if(act==="how")$("#howModal").classList.add("show");else if(act==="reset")resetProgress();else if(act==="begin-investigation")startInvestigation();else if(act==="view-board")renderBoard();else if(act==="back-to-inv")show("investigation");else if(act==="to-deduction")renderDeduction();else if(act==="close-modal")$$('.modal').forEach(m=>m.classList.remove("show"))});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$$('.modal').forEach(m=>m.classList.remove("show"));if(!["1","2","3","4"].includes(e.key))return;let host=null;if($("#scr-investigation").classList.contains("active"))host=$("#qOpts");else if($("#scr-deduction").classList.contains("active"))host=$("#dedOpts");if(!host)return;const opts=host.querySelectorAll(".opt"),i=parseInt(e.key,10)-1;if(opts[i]&&!opts[i].disabled)opts[i].click()});
+function boot(){applyMusic();applyContrast();const logo=$("#brandLogo"),im=new Image();im.onload=()=>{logo.style.backgroundImage=`url('${DATA.brand.logo}')`;logo.textContent=""};im.src=DATA.brand.logo;renderHome();show("home")}boot();
 })();
-
 </script>
 </body>
 </html>
