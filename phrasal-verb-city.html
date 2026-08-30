@@ -2,577 +2,75 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Phrasal Verb City — 10 themed districts and 100 contextual phrasal-verb exercises for TOEIC practice.">
 <title>Phrasal Verb City — Homemade TOEIC Trainer</title>
-<!--
-  PHRASAL VERB CITY — jeu de phrasal verbs TOEIC (autonome, HTML/CSS/JS).
-  =====================================================================
-  Assets attendus :
-     images/phrasal-verb-city/*.jpg   (fournis)
-     audio/theme_phrasal_verb_city_main.mp3
-  Sauvegarde locale : localStorage "phrasalVerbCity_v1".
-  Pour AJOUTER/CORRIGER un phrasal verb : repère "var BANK =" et modifie la ligne
-     [verbe, sens_anglais, traduction_FR, "exemple avec ___", explication].
-  Si tu REMPLACES une image/son : monte la version dans "var V" ci-dessous.
--->
 <style>
-:root{
-  --bg:#EAF2F8; --ink:#22364A; --ink-soft:#5C708A; --line:#DCE6EF; --card:#FFFFFF;
-  --blue:#4F8FE0; --blue-d:#356FC0; --teal:#3FB6A8; --green:#6BC68B; --coral:#F0876F; --gold:#E7B54C; --purple:#9B86D6; --pink:#E79BC0;
-  --blue-soft:#E6F0FB; --teal-soft:#E0F5F2; --green-soft:#E8F6ED; --coral-soft:#FDECE6; --gold-soft:#FBF1D8;
-  --r:22px; --r-sm:14px; --shadow:0 14px 40px rgba(34,54,74,.16);
-  --display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --tap:54px;
-}
-*{ box-sizing:border-box; }
-html,body{ margin:0; }
-body{ font-family:var(--body); color:var(--ink); background:var(--bg); line-height:1.55; min-height:100vh; overflow-x:hidden; }
-h1,h2,h3{ font-family:var(--display); line-height:1.12; margin:0; }
-.wrap{ max-width:1000px; margin:0 auto; min-height:100vh; }
-.screen{ display:none; padding:22px 18px 48px; min-height:100vh; }
-.screen.active{ display:block; animation:fade .35s ease; }
-@keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
-.bg{ position:fixed; inset:0; background-size:cover; background-position:center; z-index:-2; }
-.bg-veil{ position:fixed; inset:0; background:linear-gradient(180deg, rgba(234,242,248,.55), rgba(234,242,248,.85)); z-index:-1; }
-.panel{ background:rgba(255,255,255,.9); backdrop-filter:blur(6px); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; }
-.eyebrow{ text-transform:uppercase; letter-spacing:.16em; font-size:.72rem; font-weight:800; color:var(--blue-d); }
-.center{ text-align:center; }
-.muted{ color:var(--ink-soft); }
-
-.btn{ font-family:var(--display); font-weight:700; font-size:1rem; cursor:pointer; border:1px solid transparent; border-radius:999px; min-height:var(--tap); padding:0 24px; display:inline-flex; align-items:center; justify-content:center; gap:9px; transition:transform .12s, box-shadow .2s, background .2s; text-decoration:none; color:#fff; }
-.btn:active{ transform:translateY(1px); }
-.btn:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
-.btn.primary{ background:linear-gradient(135deg,var(--blue),var(--blue-d)); box-shadow:0 10px 24px rgba(53,111,192,.34); }
-.btn.teal{ background:linear-gradient(135deg,var(--teal),#2DA395); }
-.btn.gold{ background:linear-gradient(135deg,#F0CB6A,var(--gold)); color:#5b4a12; }
-.btn.coral{ background:linear-gradient(135deg,var(--coral),#E06A4E); }
-.btn.ghost{ background:rgba(255,255,255,.92); border-color:var(--line); color:var(--ink); }
-.btn.ghost:hover{ border-color:var(--blue); }
-.btn.block{ width:100%; }
-.btn.small{ min-height:42px; font-size:.92rem; padding:0 16px; }
-.btn:disabled{ opacity:.5; cursor:default; }
-
-.music-toggle{ position:fixed; top:14px; right:14px; z-index:6; min-height:44px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.95); color:var(--ink); font-family:var(--display); font-weight:700; padding:0 16px; cursor:pointer; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:8px; }
-
-/* MENU */
-#menu .hero-card{ max-width:520px; margin:7vh auto 0; }
-#menu h1{ font-size:clamp(1.9rem,6vw,3rem); background:linear-gradient(120deg,var(--blue-d),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.menu-btns{ display:flex; flex-direction:column; gap:11px; margin-top:18px; }
-
-/* MAP */
-.map-banner{ width:100%; max-height:240px; object-fit:cover; border-radius:var(--r-sm); border:1px solid var(--line); margin-bottom:14px; }
-.districts{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
-.district{ text-align:left; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); box-shadow:var(--shadow); overflow:hidden; cursor:pointer; transition:transform .15s, box-shadow .2s; padding:0; }
-.district:hover:not(.locked){ transform:translateY(-3px); box-shadow:0 18px 40px rgba(34,54,74,.2); }
-.district .thumb{ height:84px; background-size:cover; background-position:center; position:relative; }
-.district .num{ position:absolute; left:8px; top:8px; width:24px; height:24px; border-radius:50%; background:rgba(34,54,74,.8); color:#fff; font-weight:800; font-size:.78rem; display:grid; place-items:center; }
-.district .ic{ position:absolute; right:8px; top:6px; font-size:1.25rem; filter:drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
-.district .meta{ padding:10px 12px; }
-.district .nm{ font-weight:700; font-size:.95rem; }
-.district .st{ font-size:.76rem; color:var(--ink-soft); margin-top:2px; }
-.district.locked{ opacity:.55; cursor:not-allowed; filter:grayscale(.4); }
-.district.done{ border-color:var(--green); box-shadow:0 0 0 2px rgba(107,198,139,.45), var(--shadow); }
-.district.done .thumb::after{ content:"✓"; position:absolute; right:8px; bottom:6px; width:24px; height:24px; background:var(--green); color:#fff; border-radius:50%; display:grid; place-items:center; font-weight:800; }
-
-/* HUD + quiz */
-.hud{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.chip{ background:rgba(255,255,255,.95); border:1px solid var(--line); border-radius:999px; padding:7px 13px; font-weight:700; font-size:.86rem; }
-.chip b{ color:var(--blue-d); }
-.bar{ height:10px; border-radius:999px; background:#DCE6EF; overflow:hidden; border:1px solid var(--line); margin:2px 0 14px; }
-.bar > i{ display:block; height:100%; background:linear-gradient(90deg,var(--teal),var(--green)); transition:width .35s; }
-.q{ font-size:1.14rem; font-weight:700; margin:4px 0; }
-.q .tag{ display:inline-block; font-size:.64rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-d); background:var(--blue-soft); border-radius:999px; padding:3px 10px; margin-bottom:8px; }
-.opts{ display:grid; gap:10px; margin-top:12px; }
-.opt{ text-align:left; font:inherit; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 15px; min-height:48px; cursor:pointer; display:flex; gap:11px; align-items:center; transition:border-color .15s, background .15s, transform .1s; }
-.opt:hover:not(:disabled){ border-color:var(--blue); transform:translateX(2px); }
-.opt:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
-.opt:disabled{ cursor:default; }
-.opt .k{ width:26px; height:26px; flex:none; border-radius:7px; background:var(--blue-soft); color:var(--blue-d); font-weight:800; display:grid; place-items:center; font-size:.82rem; }
-.opt.ok{ background:var(--green-soft); border-color:var(--green); } .opt.ok .k{ background:var(--green); color:#fff; }
-.opt.no{ background:var(--coral-soft); border-color:var(--coral); } .opt.no .k{ background:var(--coral); color:#fff; }
-.why{ margin-top:14px; background:var(--blue-soft); border:1px solid var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; display:none; }
-.why.show{ display:block; }
-.why .pv{ font-family:var(--display); font-weight:800; color:var(--blue-d); }
-.why .fr{ color:var(--ink); } .why .ex{ font-style:italic; color:var(--ink-soft); }
-.action-row{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; }
-.learn{ display:grid; gap:8px; margin-top:12px; }
-.learn .lv{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 13px; }
-.learn .lv b{ color:var(--blue-d); font-family:var(--display); }
-.learn .lv .fr{ color:var(--ink-soft); }
-
-/* stats / passport-like */
-.stats-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:16px 0; }
-.sbox{ background:#fff; border:1px solid var(--line); border-radius:var(--r-sm); padding:12px 8px; text-align:center; }
-.sbox .v{ font-family:var(--display); font-weight:800; font-size:1.35rem; color:var(--blue-d); }
-.sbox .l{ font-size:.62rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-top:2px; }
-@media (max-width:620px){ .stats-grid{ grid-template-columns:repeat(2,1fr); } }
-.badges{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
-.badge{ width:108px; text-align:center; opacity:.4; filter:grayscale(1); transition:.3s; }
-.badge.earned{ opacity:1; filter:none; }
-.badge .ic{ font-size:1.8rem; }
-.badge .nm{ font-size:.72rem; font-weight:700; margin-top:2px; }
-.title-img{ width:100%; max-height:240px; object-fit:cover; border-radius:var(--r-sm); margin-bottom:14px; border:1px solid var(--line); }
-.confetti{ position:fixed; inset:0; pointer-events:none; z-index:50; }
-.foot{ text-align:center; color:var(--ink-soft); font-size:.84rem; margin-top:18px; }
-.lives{ font-size:1.1rem; letter-spacing:2px; }
-@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms!important; transition-duration:.001ms!important; } }
+:root{--bg:#EAF2F8;--ink:#22364A;--soft:#5C708A;--line:#DCE6EF;--card:#fff;--blue:#4F8FE0;--blue-d:#356FC0;--teal:#3FB6A8;--green:#6BC68B;--coral:#F0876F;--gold:#E7B54C;--purple:#9B86D6;--pink:#E79BC0;--blue-soft:#E6F0FB;--green-soft:#E8F6ED;--coral-soft:#FDECE6;--r:22px;--rs:14px;--shadow:0 14px 40px rgba(34,54,74,.16);--display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--tap:54px}
+*{box-sizing:border-box}html,body{margin:0}html{scroll-behavior:smooth}body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.55;min-height:100vh;overflow-x:hidden}h1,h2,h3{font-family:var(--display);line-height:1.12;margin:0}button{font:inherit}.wrap{max-width:1000px;margin:0 auto;min-height:100vh}.screen{display:none;padding:22px 18px 48px;min-height:100vh}.screen.active{display:block;animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.bg{position:fixed;inset:0;background-size:cover;background-position:center;z-index:-2}.bg-veil{position:fixed;inset:0;background:linear-gradient(180deg,rgba(234,242,248,.55),rgba(234,242,248,.88));z-index:-1}.panel{background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:800;color:var(--blue-d)}.center{text-align:center}.muted{color:var(--soft)}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:99;background:#fff;padding:10px 14px;border-radius:8px}.btn{font-family:var(--display);font-weight:700;font-size:1rem;cursor:pointer;border:1px solid transparent;border-radius:999px;min-height:var(--tap);padding:0 24px;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:transform .12s,box-shadow .2s,background .2s;text-decoration:none;color:#fff}.btn:active{transform:translateY(1px)}.btn:focus-visible,.opt:focus-visible,.district:focus-visible{outline:3px solid var(--blue);outline-offset:2px}.btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue-d));box-shadow:0 10px 24px rgba(53,111,192,.34)}.btn.teal{background:linear-gradient(135deg,var(--teal),#2DA395)}.btn.gold{background:linear-gradient(135deg,#F0CB6A,var(--gold));color:#5b4a12}.btn.coral{background:linear-gradient(135deg,var(--coral),#E06A4E)}.btn.ghost{background:rgba(255,255,255,.95);border-color:var(--line);color:var(--ink)}.btn.block{width:100%}.btn.small{min-height:42px;font-size:.92rem;padding:0 16px}.btn:disabled{opacity:.5;cursor:default}.music-toggle{position:fixed;top:14px;right:14px;z-index:60;min-height:44px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.96);color:var(--ink);font-family:var(--display);font-weight:700;padding:0 16px;cursor:pointer;box-shadow:var(--shadow)}#menu .hero-card{max-width:540px;margin:7vh auto 0}#menu h1{font-size:clamp(1.9rem,6vw,3rem);background:linear-gradient(120deg,var(--blue-d),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}.menu-btns{display:flex;flex-direction:column;gap:11px;margin-top:18px}.map-banner,.title-img{width:100%;max-height:240px;object-fit:cover;border-radius:var(--rs);border:1px solid var(--line);margin-bottom:14px}.districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.district{text-align:left;color:inherit;background:#fff;border:1px solid var(--line);border-radius:var(--rs);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;padding:0}.district:hover:not(.locked){transform:translateY(-2px)}.district .thumb{height:84px;background-size:cover;background-position:center;position:relative}.district .num{position:absolute;left:8px;top:8px;width:24px;height:24px;border-radius:50%;background:rgba(34,54,74,.82);color:#fff;font-weight:800;font-size:.78rem;display:grid;place-items:center}.district .ic{position:absolute;right:8px;top:6px;font-size:1.25rem}.district .meta{padding:10px 12px}.district .nm{font-weight:700;font-size:.95rem}.district .st{font-size:.76rem;color:var(--soft);margin-top:2px}.district.locked{opacity:.55;cursor:not-allowed;filter:grayscale(.4)}.district.done{border-color:var(--green);box-shadow:0 0 0 2px rgba(107,198,139,.45),var(--shadow)}.district.done .thumb::after{content:"✓";position:absolute;right:8px;bottom:6px;width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:grid;place-items:center;font-weight:800}.hud{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px}.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.chip{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:700;font-size:.86rem}.chip b{color:var(--blue-d)}.bar{height:10px;border-radius:999px;background:#DCE6EF;overflow:hidden;border:1px solid var(--line);margin:2px 0 14px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .3s}.q{font-size:1.14rem;font-weight:700;margin:4px 0}.q .tag{display:inline-block;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-d);background:var(--blue-soft);border-radius:999px;padding:3px 10px;margin-bottom:8px}.opts{display:grid;gap:10px;margin-top:12px}.opt{text-align:left;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;min-height:48px;cursor:pointer;display:flex;gap:11px;align-items:center}.opt:hover:not(:disabled){border-color:var(--blue);transform:translateX(2px)}.opt:disabled{cursor:default}.opt .k{width:26px;height:26px;flex:none;border-radius:7px;background:var(--blue-soft);color:var(--blue-d);font-weight:800;display:grid;place-items:center;font-size:.82rem}.opt.ok{background:var(--green-soft);border-color:var(--green)}.opt.ok .k{background:var(--green);color:#fff}.opt.no{background:var(--coral-soft);border-color:var(--coral)}.opt.no .k{background:var(--coral);color:#fff}.why{margin-top:14px;background:var(--blue-soft);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:.95rem;display:none}.why.show{display:block}.why .pv{font-family:var(--display);font-weight:800;color:var(--blue-d)}.why .ex{font-style:italic;color:var(--soft)}.action-row{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}.learn{display:grid;gap:8px;margin-top:12px}.learn .lv{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 13px}.learn .lv b{color:var(--blue-d);font-family:var(--display)}.learn .fr{color:var(--soft)}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px auto;max-width:560px}.sbox{background:#fff;border:1px solid var(--line);border-radius:var(--rs);padding:12px 8px;text-align:center}.sbox .v{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--blue-d)}.sbox .l{font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--soft);margin-top:2px}.foot{text-align:center;color:var(--soft);font-size:.84rem;margin-top:18px}.lives{font-size:1.1rem;letter-spacing:2px}.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:var(--blue-d);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;z-index:80;box-shadow:var(--shadow);max-width:92vw;text-align:center}.toast[hidden]{display:none}.resume-note{padding:10px 13px;border-radius:12px;background:var(--blue-soft);border:1px solid var(--line);margin:12px 0}.audio-error{color:#8a2d24;font-size:.8rem;margin-top:5px}
+@media(max-width:620px){.stats-grid{grid-template-columns:1fr}.panel{padding:18px}.music-toggle{top:8px;right:8px}.screen{padding-top:62px}.chips{width:100%}.chip{font-size:.78rem;padding:6px 9px}.action-row .btn{width:100%}.districts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){.districts{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.screen.active{animation:none}*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
 </head>
 <body>
-<div class="bg" id="bg"></div>
-<div class="bg-veil"></div>
-<button class="music-toggle" id="musicToggle" aria-label="Activer ou couper la musique">🔇 Music OFF</button>
-
-<div class="wrap">
-
-  <!-- MENU -->
-  <section class="screen active" id="menu">
-    <div class="panel hero-card center">
-      <div class="eyebrow">Homemade TOEIC Trainer</div>
-      <h1>🏙️ Phrasal Verb City</h1>
-      <p class="muted">Explore the city. Unlock districts. Master phrasal verbs.</p>
-      <div class="menu-btns">
-        <button class="btn primary block" id="btnStart">▶ Start game</button>
-        <button class="btn ghost block" id="btnContinue">↩ Continue</button>
-        <button class="btn ghost block" id="btnMap">🗺️ City map</button>
-        <button class="btn ghost block" id="btnHow">❓ How to play</button>
-        <button class="btn ghost block" id="btnReset">🗑️ Reset progress</button>
-        <a class="btn ghost block" href="index.html">← Back to site</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW TO PLAY -->
-  <section class="screen" id="how">
-    <div class="panel" style="max-width:640px;margin:7vh auto 0">
-      <div class="eyebrow">How to play</div>
-      <h2 style="margin:6px 0 12px">Save the city, one district at a time</h2>
-      <ul class="muted" style="line-height:1.8">
-        <li>The city has <b>10 districts</b>. Each teaches <b>10 useful phrasal verbs</b> for the TOEIC.</li>
-        <li>Answer the exercises. <b>+10</b> per correct answer, and a <b>+5 bonus</b> for every 3 correct in a row.</li>
-        <li>Stuck? Use the <b>Hint</b> button to see the meaning (it costs <b>−2 points</b>).</li>
-        <li>Finish a district to earn its <b>badge</b> and unlock the next one.</li>
-        <li>Complete all 10 to <b>save the city</b>, then try the optional <b>Challenge mode</b> (3 lives!).</li>
-        <li>Your progress is saved automatically on this device.</li>
-      </ul>
-      <div class="center" style="margin-top:14px"><button class="btn primary" data-go="menu">Got it</button></div>
-    </div>
-  </section>
-
-  <!-- MAP -->
-  <section class="screen" id="map">
-    <div class="panel">
-      <div class="hud">
-        <div><div class="eyebrow">City map</div><h2>Choose a district</h2></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <span class="chip">Score <b id="mapScore">0</b></span>
-          <span class="chip">Districts <b id="mapDone">0/10</b></span>
-          <button class="btn gold small" id="btnChallenge" style="display:none">⚡ Challenge</button>
-          <button class="btn ghost small" data-go="menu">Menu</button>
-        </div>
-      </div>
-      <img class="map-banner" id="mapImg" alt="Map of Phrasal Verb City">
-      <div class="districts" id="districtList"></div>
-      <p class="foot">Locked districts open once you complete the previous one.</p>
-    </div>
-  </section>
-
-  <!-- DISTRICT INTRO -->
-  <section class="screen" id="intro">
-    <div class="panel">
-      <img class="title-img" id="introImg" alt="">
-      <div class="eyebrow" id="introTheme">Theme</div>
-      <h2 id="introName" style="margin:4px 0 6px">District</h2>
-      <p class="muted" id="introDesc">Learn 10 phrasal verbs, then take on the exercises.</p>
-      <div class="action-row">
-        <button class="btn ghost small" id="btnLearn">📖 See the 10 phrasal verbs</button>
-        <button class="btn primary" id="btnBeginEx">Start exercises →</button>
-      </div>
-      <div class="learn" id="learnList" style="display:none"></div>
-      <div style="margin-top:14px"><button class="btn ghost small" data-go="map">← Back to map</button></div>
-    </div>
-  </section>
-
-  <!-- QUIZ -->
-  <section class="screen" id="quiz">
-    <div class="panel">
-      <div class="hud">
-        <div><div class="eyebrow" id="quizDistrict">District</div><h2 id="quizTheme">Exercises</h2></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-          <span class="chip">Q <b id="qNum">1/10</b></span>
-          <span class="chip">Score <b id="qScore">0</b></span>
-          <span class="chip">Acc <b id="qAcc">100%</b></span>
-          <span class="chip" id="qStreakChip" style="display:none">🔥 <b id="qStreak">0</b></span>
-          <span class="chip lives" id="qLives" style="display:none"></span>
-        </div>
-      </div>
-      <div class="bar"><i id="qBar" style="width:0"></i></div>
-      <div id="quizArea"></div>
-    </div>
-  </section>
-
-  <!-- VICTORY -->
-  <section class="screen" id="victory">
-    <div class="panel center">
-      <img class="title-img" id="winImg" alt="City saved">
-      <div class="eyebrow">Mission complete</div>
-      <h1 style="color:var(--blue-d)">🎉 CITY SAVED!</h1>
-      <p class="muted">You mastered Phrasal Verb City.</p>
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);max-width:540px;margin:16px auto">
-        <div class="sbox"><div class="v" id="vScore">0</div><div class="l">Final score</div></div>
-        <div class="sbox"><div class="v" id="vAcc">0%</div><div class="l">Accuracy</div></div>
-        <div class="sbox"><div class="v" id="vBadges">0/10</div><div class="l">Badges</div></div>
-      </div>
-      <p class="muted" id="vBestWeak" style="margin:0"></p>
-      <div class="center" style="margin-top:16px">
-        <button class="btn gold" id="btnChallenge2">⚡ Challenge mode</button>
-        <button class="btn ghost" data-go="map" style="margin-left:8px">City map</button>
-        <button class="btn ghost" id="btnRestartAll" style="margin-left:8px">Restart</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- GAME OVER (challenge fail) -->
-  <section class="screen" id="gameover">
-    <div class="panel center">
-      <img class="title-img" id="overImg" alt="City overrun">
-      <div class="eyebrow" style="color:var(--coral)">Challenge failed</div>
-      <h1 style="color:var(--coral)">⚠️ CITY OVERRUN!</h1>
-      <p class="muted">The phrasal verbs escaped. Don't worry — try again, Agent.</p>
-      <div class="center" style="margin-top:14px">
-        <button class="btn primary" id="btnTryAgain">↺ Try again</button>
-        <button class="btn ghost" data-go="map" style="margin-left:8px">Return to map</button>
-      </div>
-    </div>
-  </section>
-
-</div>
-
+<a class="skip" href="#main">Skip to main content</a>
+<div class="bg" id="bg"></div><div class="bg-veil"></div>
+<button class="music-toggle" id="musicToggle" type="button" aria-pressed="false">🔇 Music OFF</button>
+<div class="wrap" id="main">
+<section class="screen active" id="menu"><div class="panel hero-card center"><div class="eyebrow">Homemade TOEIC Trainer</div><h1>🏙️ Phrasal Verb City</h1><p class="muted">Explore the city. Unlock districts. Master phrasal verbs.</p><p class="resume-note" id="resumeNote" hidden>Your current attempt is saved. You can resume exactly where you stopped.</p><div class="menu-btns"><button class="btn primary block" id="btnStart" type="button">▶ Enter the city</button><button class="btn teal block" id="btnContinue" type="button" hidden>↩ Continue current attempt</button><button class="btn ghost block" id="btnMap" type="button">🗺️ City map</button><button class="btn ghost block" id="btnHow" type="button">❓ How to play</button><button class="btn ghost block" id="btnReset" type="button">🗑️ Reset progress</button><a class="btn ghost block" href="index.html">← Back to site</a></div><div class="audio-error" id="audioError" role="status" aria-live="polite"></div></div></section>
+<section class="screen" id="how"><div class="panel" style="max-width:650px;margin:7vh auto 0"><div class="eyebrow">How to play</div><h2 style="margin:6px 0 12px">Save the city, one district at a time</h2><ul class="muted" style="line-height:1.8"><li>The city has <b>10 districts</b>. Each contains <b>10 useful multi-word verbs</b> used in workplace and everyday English.</li><li>Each district contains 10 exercises with balanced A/B/C/D answer positions.</li><li><b>+10</b> per correct answer and <b>+5</b> for every 3 correct answers in a row.</li><li>A hint costs <b>−2 points</b> from the current attempt only.</li><li>Replaying a district can improve its record, but cannot inflate your city score.</li><li>Complete all 10 districts to save the city and unlock the optional <b>Challenge mode</b> with 3 lives.</li><li>Your current question and progress are saved automatically on this device.</li></ul><div class="center"><button class="btn primary" type="button" data-go="menu">Got it</button></div></div></section>
+<section class="screen" id="map"><div class="panel"><div class="hud"><div><div class="eyebrow">City map</div><h2>Choose a district</h2></div><div class="chips"><span class="chip">City score <b id="mapScore">0</b></span><span class="chip">Districts <b id="mapDone">0/10</b></span><button class="btn teal small" id="mapResume" type="button" hidden>↩ Resume</button><button class="btn gold small" id="btnChallenge" type="button" hidden>⚡ Challenge</button><button class="btn ghost small" type="button" data-go="menu">Menu</button></div></div><img class="map-banner" id="mapImg" alt="Map of Phrasal Verb City"><div class="districts" id="districtList"></div><p class="foot">Locked districts open once you complete the previous one. Replays improve records only when you beat your previous result.</p></div></section>
+<section class="screen" id="intro"><div class="panel"><img class="title-img" id="introImg" alt=""><div class="eyebrow" id="introTheme">Theme</div><h2 id="introName" style="margin:4px 0 6px">District</h2><p class="muted" id="introDesc"></p><div id="introRecord" class="resume-note" hidden></div><div class="action-row"><button class="btn ghost small" id="btnLearn" type="button">📖 See the 10 verbs</button><button class="btn primary" id="btnBeginEx" type="button">Start exercises →</button></div><div class="learn" id="learnList" hidden></div><div style="margin-top:14px"><button class="btn ghost small" type="button" data-go="map">← Back to map</button></div></div></section>
+<section class="screen" id="quiz"><div class="panel"><div class="hud"><div><div class="eyebrow" id="quizDistrict">District</div><h2 id="quizTheme">Exercises</h2></div><div class="chips"><span class="chip">Q <b id="qNum">1/10</b></span><span class="chip">Attempt <b id="qScore">0</b></span><span class="chip">Acc <b id="qAcc">100%</b></span><span class="chip" id="qStreakChip" hidden>🔥 <b id="qStreak">0</b></span><span class="chip lives" id="qLives" hidden></span></div></div><div class="bar" id="progressWrap" role="progressbar" aria-label="Question progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="qBar" style="width:0"></i></div><div id="quizArea" aria-live="polite"></div><div style="margin-top:14px"><button class="btn ghost small" id="saveExit" type="button">← Save &amp; return to map</button></div></div></section>
+<section class="screen" id="victory"><div class="panel center"><img class="title-img" id="winImg" alt="City saved"><div class="eyebrow">Mission complete</div><h1 style="color:var(--blue-d)">🎉 CITY SAVED!</h1><p class="muted">You completed all ten districts.</p><div class="stats-grid"><div class="sbox"><div class="v" id="vScore">0</div><div class="l">City score</div></div><div class="sbox"><div class="v" id="vAcc">0%</div><div class="l">Best accuracy</div></div><div class="sbox"><div class="v" id="vBadges">0/10</div><div class="l">Badges</div></div></div><p class="muted" id="vBestWeak"></p><div class="action-row" style="justify-content:center"><button class="btn gold" id="btnChallenge2" type="button">⚡ Challenge mode</button><button class="btn ghost" type="button" data-go="map">City map</button><button class="btn ghost" id="btnRestartAll" type="button">Restart city</button></div></div></section>
+<section class="screen" id="challengeWin"><div class="panel center"><img class="title-img" id="challengeImg" alt="Phrasal Verb City"><div class="eyebrow">Challenge complete</div><h1 style="color:var(--teal)">⚡ CHALLENGE CLEARED!</h1><p class="muted">You survived the 15-question mixed challenge.</p><div class="stats-grid"><div class="sbox"><div class="v" id="cScore">0</div><div class="l">Challenge score</div></div><div class="sbox"><div class="v" id="cAcc">0%</div><div class="l">Accuracy</div></div><div class="sbox"><div class="v" id="cBest">0</div><div class="l">Best challenge</div></div></div><div class="action-row" style="justify-content:center"><button class="btn gold" id="challengeAgain" type="button">⚡ Play again</button><button class="btn ghost" type="button" data-go="map">Return to map</button></div></div></section>
+<section class="screen" id="gameover"><div class="panel center"><img class="title-img" id="overImg" alt="City overrun"><div class="eyebrow" style="color:var(--coral)">Challenge failed</div><h1 style="color:var(--coral)">⚠️ CITY OVERRUN!</h1><p class="muted">You lost all three lives. Your city score is safe: Challenge mode never changes district records.</p><div class="action-row" style="justify-content:center"><button class="btn primary" id="btnTryAgain" type="button">↺ Try again</button><button class="btn ghost" type="button" data-go="map">Return to map</button></div></div></section>
+</div><div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 <script>
 "use strict";
-var IMG="images/phrasal-verb-city/", AUD="audio/", V="?v=1";
-var BG={ menu:IMG+"phrasal_verb_city_map.jpg"+V, map:IMG+"phrasal_verb_city_map.jpg"+V, how:IMG+"city_park.jpg"+V,
-  victory:IMG+"victory_city_saved.jpg"+V, gameover:IMG+"game_over_city_overrun.jpg"+V };
-var DISTRICTS=[
- {key:"d1", name:"Office Tower",         theme:"Work, business, meetings, projects", img:IMG+"office_tower.jpg"+V,         badge:"Office Strategist",   icon:"\uD83C\uDFE2"},
- {key:"d2", name:"Airport",              theme:"Travel, transport, business trips",  img:IMG+"airport.jpg"+V,              badge:"Travel Expert",       icon:"\u2708\uFE0F"},
- {key:"d3", name:"Hospital",             theme:"Health, recovery, emergencies",      img:IMG+"hospital.jpg"+V,             badge:"Health Guardian",     icon:"\uD83C\uDFE5"},
- {key:"d4", name:"Police Station",       theme:"Investigation, problems, evidence",  img:IMG+"police_station.jpg"+V,       badge:"Investigation Master",icon:"\uD83D\uDE93"},
- {key:"d5", name:"Shopping Mall",        theme:"Shopping, customers, money",         img:IMG+"shopping_mall.jpg"+V,        badge:"Smart Shopper",       icon:"\uD83D\uDECD\uFE0F"},
- {key:"d6", name:"Factory",              theme:"Production, logistics, operations",  img:IMG+"factory.jpg"+V,              badge:"Operations Expert",   icon:"\uD83C\uDFED"},
- {key:"d7", name:"Residential District", theme:"Daily life, home, neighbours",       img:IMG+"residential_district.jpg"+V, badge:"Neighbourhood Hero",  icon:"\uD83C\uDFD8\uFE0F"},
- {key:"d8", name:"University",           theme:"Study, learning, academic life",     img:IMG+"university.jpg"+V,           badge:"Study Champion",      icon:"\uD83C\uDF93"},
- {key:"d9", name:"Train Station",        theme:"Commuting, schedules, delays",       img:IMG+"train_station.jpg"+V,        badge:"Commuter Pro",        icon:"\uD83D\uDE89"},
- {key:"d10",name:"City Park",            theme:"Free time, movement, social life",   img:IMG+"city_park.jpg"+V,            badge:"City Explorer",       icon:"\uD83C\uDF33"}
-];
-var BADGE_ICON={}; DISTRICTS.forEach(function(d){ BADGE_ICON[d.badge]=d.icon; });
-
-var BANK={
- d1:[
-  ["carry out","do or perform (a task, plan)","réaliser, effectuer","The team will ___ a full safety audit next week.","carry out = perform a task, plan or order."],
-  ["set up","arrange or establish","mettre en place, organiser","We need to ___ a meeting with the new client.","set up = arrange or establish something."],
-  ["take over","take control of","reprendre, prendre le contrôle de","A larger firm will ___ our company next year.","take over = take control of something."],
-  ["bring up","mention or raise a topic","soulever, aborder","She will ___ the budget problem at the meeting.","bring up = introduce a topic in conversation."],
-  ["follow up","take further action; check progress","faire un suivi, relancer","Please ___ on the client's email by Friday.","follow up (on) = take further action about something."],
-  ["put forward","propose or suggest","proposer, soumettre","He wants to ___ a new plan to cut costs.","put forward = propose an idea or plan."],
-  ["deal with","handle or manage","gérer, s'occuper de","Customer service will ___ the complaint today.","deal with = handle a problem or task."],
-  ["look over","review or examine quickly","parcourir, examiner","Could you ___ this report before I send it?","look over = examine or review something."],
-  ["call off","cancel","annuler","They had to ___ the meeting because of the storm.","call off = cancel a planned event."],
-  ["work out","find a solution; calculate","trouver une solution, calculer","Let's ___ the details of the contract together.","work out = solve or figure something out."]
- ],
- d2:[
-  ["check in","register on arrival","s'enregistrer","You should ___ at least two hours before the flight.","check in = register at an airport or hotel."],
-  ["take off","leave the ground (plane)","décoller","The plane will ___ at nine o'clock.","take off = (for a plane) leave the ground."],
-  ["get on","board a large vehicle","monter (dans)","Passengers can ___ the plane now.","get on = board a plane, bus or train."],
-  ["get off","leave a large vehicle","descendre (de)","We will ___ the plane as soon as it lands.","get off = leave a plane, bus or train."],
-  ["set off","begin a journey","se mettre en route, partir","We need to ___ early to avoid the traffic.","set off = start a journey."],
-  ["see off","say goodbye to a traveller","accompagner (dire au revoir)","Her family came to ___ her at the airport.","see off = go with someone to say goodbye."],
-  ["pick up","collect someone or something","récupérer, aller chercher","I'll ___ you at the arrivals gate.","pick up = collect someone or something."],
-  ["drop off","leave someone or something at a place","déposer","Can you ___ me at the terminal?","drop off = leave someone/something somewhere."],
-  ["hold up","delay","retarder","Bad weather may ___ the flight.","hold up = cause a delay."],
-  ["come back","return","revenir","She will ___ from her trip on Monday.","come back = return to a place."]
- ],
- d3:[
-  ["pass out","faint, lose consciousness","s'évanouir","He might ___ if he doesn't drink some water.","pass out = lose consciousness."],
-  ["come round","regain consciousness","reprendre connaissance","The patient began to ___ after the operation.","come round = become conscious again."],
-  ["get over","recover from an illness","se remettre de","It took her a week to ___ the flu.","get over = recover from an illness or problem."],
-  ["fight off","resist or defeat an illness","combattre, repousser","Vitamin C can help you ___ a cold.","fight off = resist an illness."],
-  ["look after","take care of","s'occuper de, prendre soin de","Nurses ___ their patients day and night.","look after = take care of someone."],
-  ["bring around","make someone conscious again","ranimer","The doctors managed to ___ the patient.","bring around = make an unconscious person wake up."],
-  ["check up on","make sure someone is okay","prendre des nouvelles de","The nurse will ___ the patient every hour.","check up on = check someone's condition."],
-  ["calm down","become or make less upset","se calmer","Try to ___ before the examination.","calm down = relax, stop being upset."],
-  ["break down","collapse; stop working","s'effondrer; tomber en panne","She might ___ from stress and exhaustion.","break down = collapse emotionally, or stop working."],
-  ["cut down on","reduce the amount of","réduire (sa consommation de)","The doctor told him to ___ salt and sugar.","cut down on = reduce how much you use."]
- ],
- d4:[
-  ["look into","investigate","enquêter sur","The police will ___ the robbery.","look into = investigate something."],
-  ["find out","discover information","découvrir, apprendre","We need to ___ who sent the message.","find out = discover a fact."],
-  ["track down","find after searching","retrouver, localiser","They managed to ___ the suspect.","track down = find after a long search."],
-  ["give away","reveal a secret","révéler, trahir","One small detail can ___ the thief's identity.","give away = reveal something accidentally."],
-  ["break into","enter by force","entrer par effraction","Someone tried to ___ the office last night.","break into = enter a place illegally."],
-  ["turn up","appear or arrive","apparaître, se présenter","The missing files finally ___ in a drawer.","turn up = appear, often unexpectedly."],
-  ["point out","draw attention to","faire remarquer, signaler","She ___ a serious mistake in the report.","point out = mention or indicate something."],
-  ["make up","invent a story","inventer","He ___ an excuse for being late.","make up = invent something untrue."],
-  ["cover up","hide the truth","dissimuler, étouffer","They tried to ___ the scandal.","cover up = hide something dishonest."],
-  ["get away with","escape punishment for","s'en tirer (sans punition)","He thought he could ___ cheating.","get away with = do wrong without being punished."]
- ],
- d5:[
-  ["try on","put on clothes to test them","essayer (un vêtement)","Can I ___ these shoes in size 40?","try on = put on clothes to see if they fit."],
-  ["pay for","give money for","payer","You can ___ your items at the counter.","pay for = give money to buy something."],
-  ["sell out","be completely sold","être épuisé (vendu)","The concert tickets ___ in one hour.","sell out = be sold completely."],
-  ["run out of","have no more of","être à court de","The shop ___ that model last week.","run out of = have none left."],
-  ["pick out","choose, select","choisir, sélectionner","Help me ___ a gift for my colleague.","pick out = choose from several options."],
-  ["give back","return something","rendre","Please ___ the receipt to the cashier.","give back = return something to someone."],
-  ["take back","return to the shop","rapporter, retourner","I want to ___ this jacket; it's too small.","take back = return goods to a store."],
-  ["look for","search for","chercher","I'm ___ a present for my manager.","look for = try to find something."],
-  ["queue up","wait in line","faire la queue","Customers had to ___ outside the store.","queue up = wait in a line."],
-  ["check out","pay and leave; have a look","passer en caisse; regarder","You can ___ at the self-service tills.","check out = pay and leave (a shop/hotel)."]
- ],
- d6:[
-  ["carry out","perform a task","effectuer","Workers ___ safety checks every morning.","carry out = perform a task or procedure."],
-  ["shut down","stop operating, close","arrêter, fermer","They will ___ the plant for maintenance.","shut down = stop a machine or close operations."],
-  ["start up","begin operating, launch","démarrer, lancer","It takes an hour to ___ the machines.","start up = begin operating."],
-  ["speed up","go faster","accélérer","We must ___ production to meet the deadline.","speed up = increase the speed."],
-  ["slow down","go slower","ralentir","Please ___ the line to reduce errors.","slow down = reduce the speed."],
-  ["cut back","reduce","réduire","The company had to ___ on spending.","cut back (on) = reduce an amount."],
-  ["bring in","introduce, bring inside","introduire, faire entrer","They will ___ new equipment next month.","bring in = introduce something new."],
-  ["send out","dispatch, distribute","envoyer, expédier","We ___ the orders every Friday.","send out = dispatch to many people."],
-  ["take over","take control of","reprendre","A new manager will ___ the night shift.","take over = take control of something."],
-  ["phase out","gradually stop using","supprimer progressivement","The factory will ___ old machines by 2026.","phase out = remove gradually."]
- ],
- d7:[
-  ["look after","take care of","s'occuper de","Could you ___ my plants while I'm away?","look after = take care of someone/something."],
-  ["grow up","become an adult","grandir","Children ___ so fast these days.","grow up = develop from child to adult."],
-  ["clean up","make tidy","nettoyer, ranger","Let's ___ the kitchen after dinner.","clean up = make a place tidy and clean."],
-  ["throw away","put in the bin","jeter","Don't ___ those old documents yet.","throw away = get rid of, discard."],
-  ["get along with","have a good relationship with","bien s'entendre avec","I ___ my neighbours very well.","get along with = have a friendly relationship."],
-  ["drop by","visit briefly","passer (rapidement)","Feel free to ___ this weekend.","drop by = make a short, casual visit."],
-  ["come over","visit someone's home","venir (chez quelqu'un)","Why don't you ___ for dinner tonight?","come over = come to someone's home."],
-  ["move in","start living in a new home","emménager","Our new neighbours will ___ next week.","move in = start living somewhere."],
-  ["move out","leave a home","déménager (partir)","They decided to ___ of the old flat.","move out = leave the place where you live."],
-  ["wake up","stop sleeping","se réveiller","I ___ at six o'clock every morning.","wake up = stop sleeping."]
- ],
- d8:[
-  ["find out","discover","découvrir","I need to ___ the exact exam date.","find out = discover information."],
-  ["look into","research, examine","se pencher sur, étudier","The professor will ___ the topic further.","look into = examine or research."],
-  ["go over","review","revoir, réviser","Let's ___ the lecture notes before the test.","go over = review carefully."],
-  ["write down","note in writing","noter, écrire","Remember to ___ the assignment details.","write down = record in writing."],
-  ["hand in","submit","rendre, remettre","You must ___ your essay by Monday.","hand in = give work to a teacher."],
-  ["point out","draw attention to","faire remarquer","The tutor ___ several errors in my work.","point out = indicate something."],
-  ["catch up","get up to date","rattraper (son retard)","I missed a class and need to ___.","catch up = reach the same level as others."],
-  ["read through","read carefully from start to end","lire en entier","Please ___ the instructions before starting.","read through = read something completely."],
-  ["work out","solve, understand","résoudre, comprendre","I can't ___ this difficult problem.","work out = solve or figure out."],
-  ["figure out","understand or solve","comprendre, trouver","She finally ___ how to use the software.","figure out = understand after thinking."]
- ],
- d9:[
-  ["get on","board","monter dans","Hurry up, let's ___ the train!","get on = board a train, bus or plane."],
-  ["get off","leave (train)","descendre de","We ___ at the next station.","get off = leave a train, bus or plane."],
-  ["see off","say goodbye to a traveller","accompagner","I went to ___ my friend at the station.","see off = say goodbye to someone leaving."],
-  ["pick up","collect","récupérer","I'll ___ you when your train arrives.","pick up = collect someone."],
-  ["drop off","leave someone at a place","déposer","She ___ her son at the station every day.","drop off = leave someone somewhere."],
-  ["hold up","delay","retarder","An accident ___ all the morning trains.","hold up = cause a delay."],
-  ["set off","begin a journey","partir, se mettre en route","They ___ at dawn to catch the first train.","set off = start a journey."],
-  ["come back","return","revenir","He'll ___ on the last train tonight.","come back = return."],
-  ["run late","be behind schedule","être en retard","Sorry, I'm going to ___ because of the traffic.","run late = be later than planned."],
-  ["turn back","go back the way you came","faire demi-tour","The driver had to ___ because of the floods.","turn back = return the way you came."]
- ],
- d10:[
-  ["hang out","spend time relaxing","traîner, passer du temps","We like to ___ in the park on Sundays.","hang out = spend time relaxing with others."],
-  ["walk around","walk in an area","se promener","Let's ___ the park for a while.","walk around = walk in a place casually."],
-  ["run into","meet by chance","tomber sur, croiser","I ___ an old friend near the fountain.","run into = meet someone unexpectedly."],
-  ["come across","find by chance","tomber sur (trouver)","I ___ a lovely café by the lake.","come across = find something by chance."],
-  ["sit down","take a seat","s'asseoir","Let's ___ on this bench for a moment.","sit down = take a seat."],
-  ["stand up","rise to your feet","se lever","Everyone ___ when the concert began.","stand up = rise to your feet."],
-  ["chill out","relax","se détendre","After the exams, I just want to ___.","chill out = relax completely."],
-  ["look around","explore visually","regarder autour, explorer","Take your time and ___ the gardens.","look around = explore a place visually."],
-  ["wander around","walk slowly with no goal","flâner, errer","We spent the afternoon ___ the old town.","wander around = stroll without a plan."],
-  ["stop by","make a short visit","passer (faire un saut)","I'll ___ the park on my way home.","stop by = visit briefly."]
- ]
-};
-
-/* ===== State ===== */
-var SKEY="phrasalVerbCity_v1";
-function load(){ try{ return JSON.parse(localStorage.getItem(SKEY))||null; }catch(e){ return null; } }
-function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
-var S = load() || { completed:{}, badges:[], totalScore:0, bestScore:0, totalCorrect:0, totalAnswered:0, music:false, dstats:{} };
-
-function $(id){ return document.getElementById(id); }
-function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
-function accPct(){ return S.totalAnswered? Math.round(100*S.totalCorrect/S.totalAnswered):100; }
-function dindex(key){ for(var i=0;i<DISTRICTS.length;i++) if(DISTRICTS[i].key===key) return i; return -1; }
-function unlocked(i){ return i===0 || !!S.completed[DISTRICTS[i-1].key]; }
-function allDone(){ return DISTRICTS.every(function(d){ return S.completed[d.key]; }); }
-
-/* ===== Screens ===== */
-function showScreen(id,bg){ var secs=document.querySelectorAll(".screen"); for(var i=0;i<secs.length;i++) secs[i].classList.toggle("active", secs[i].id===id);
-  $("bg").style.backgroundImage="url('"+(bg||BG[id]||BG.menu)+"')"; window.scrollTo(0,0); }
-document.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ var d=b.getAttribute("data-go"); if(d==="map") renderMap(); showScreen(d); }); });
-
-/* ===== Music ===== */
-var audio=new Audio(AUD+"theme_phrasal_verb_city_main.mp3"+V); audio.loop=true; audio.preload="auto"; audio.volume=0.35;
-function reflectMusic(){ $("musicToggle").textContent = S.music ? "\uD83D\uDD0A Music ON" : "\uD83D\uDD07 Music OFF"; }
-function startMusic(){ try{ audio.play().catch(function(){}); }catch(e){} }
-function setMusic(on){ S.music=on; save(); reflectMusic(); if(on) startMusic(); else audio.pause(); }
-$("musicToggle").addEventListener("click", function(){ setMusic(!S.music); });
-window.addEventListener("pointerdown", function once(){ if(S.music) startMusic(); window.removeEventListener("pointerdown", once); }, {once:true});
-
-/* ===== Menu ===== */
-$("btnStart").addEventListener("click", function(){ if(S.music) startMusic(); renderMap(); showScreen("map"); });
-$("btnContinue").addEventListener("click", function(){ renderMap(); showScreen("map"); });
-$("btnMap").addEventListener("click", function(){ renderMap(); showScreen("map"); });
-$("btnHow").addEventListener("click", function(){ showScreen("how"); });
-$("btnReset").addEventListener("click", function(){ if(confirm("Reset all progress, badges and scores?")){ S={ completed:{}, badges:[], totalScore:0, bestScore:0, totalCorrect:0, totalAnswered:0, music:S.music, dstats:{} }; save(); renderMap(); } });
-
-/* ===== Map ===== */
-function renderMap(){
-  $("mapImg").src=BG.map; $("mapScore").textContent=S.totalScore;
-  $("mapDone").textContent=DISTRICTS.filter(function(d){return S.completed[d.key];}).length+"/10";
-  $("btnChallenge").style.display = allDone()? "" : "none";
-  var host=$("districtList"); host.innerHTML="";
-  DISTRICTS.forEach(function(d,i){
-    var open=unlocked(i), fin=!!S.completed[d.key];
-    var b=document.createElement("button");
-    b.className="district"+(open?"":" locked")+(fin?" done":"");
-    b.setAttribute("aria-label", d.name+(fin?" (completed)":(open?" (open)":" (locked)")));
-    b.innerHTML='<div class="thumb" style="background-image:url(\''+d.img+'\')"><span class="num">'+(i+1)+'</span><span class="ic" aria-hidden="true">'+d.icon+'</span></div>'
-      +'<div class="meta"><div class="nm">'+esc(d.name)+'</div><div class="st">'+(fin?('\u2713 '+esc(d.badge)):(open?'\u25B6 10 phrasal verbs':'\uD83D\uDD12 Locked'))+'</div></div>';
-    if(open) b.addEventListener("click", function(){ openIntro(i); });
-    host.appendChild(b);
-  });
-}
-$("btnChallenge").addEventListener("click", function(){ startChallenge(); });
-$("btnChallenge2") && $("btnChallenge2").addEventListener("click", function(){ startChallenge(); });
-
-/* ===== Intro ===== */
-var curIdx=-1, curD=null;
-function openIntro(i){
-  curIdx=i; curD=DISTRICTS[i];
-  $("introImg").src=curD.img; $("introImg").alt=curD.name;
-  $("introTheme").textContent=curD.theme;
-  $("introName").textContent=(i+1)+". "+curD.name;
-  $("introDesc").textContent="Learn 10 useful phrasal verbs about "+curD.theme.toLowerCase()+", then take the exercises.";
-  var ll=$("learnList"); ll.style.display="none"; ll.innerHTML="";
-  BANK[curD.key].forEach(function(r){ var div=document.createElement("div"); div.className="lv";
-    div.innerHTML='<b>'+esc(r[0])+'</b> \u2014 '+esc(r[1])+' <span class="fr">('+esc(r[2])+')</span>'; ll.appendChild(div); });
-  showScreen("intro", curD.img);
-}
-$("btnLearn").addEventListener("click", function(){ var ll=$("learnList"); ll.style.display = ll.style.display==="none"?"grid":"none"; });
-$("btnBeginEx").addEventListener("click", function(){ startQuiz(curIdx); });
-
-/* ===== Quiz ===== */
-var mode="district", queue=[], pos=0, answered=false, hintUsed=false, streak=0, dKey=null, dCorrect=0, lives=0;
-function makeQ(entry, pool, idx){
-  var v=entry[0], m=entry[1], fr=entry[2], ex=entry[3], expl=entry[4];
-  var others=shuffle(pool.filter(function(p){return p[0]!==v;})).slice(0,3).map(function(p){return p[0];});
-  var opts=shuffle([v].concat(others));
-  var gap=(idx%2===0);
-  var prompt = gap ? ('Complete the sentence:<br><span style="font-weight:600">'+esc(ex.replace("___","______"))+'</span>')
-                   : ('Which phrasal verb means:<br><span style="font-weight:600">\u00ab '+esc(m)+' \u00bb</span>?');
-  return { v:v,m:m,fr:fr,ex:ex,expl:expl, opts:opts, a:opts.indexOf(v), tag:(gap?"Gap fill":"Meaning") , prompt:prompt };
-}
-function startQuiz(i){
-  mode="district"; curIdx=i; var d=DISTRICTS[i]; dKey=d.key; dCorrect=0; streak=0;
-  var pool=BANK[d.key];
-  queue=shuffle(pool.map(function(e){return e;})).map(function(e,k){ return makeQ(e,pool,k); });
-  pos=0; $("quizDistrict").textContent=(i+1)+". "+d.name; $("quizTheme").textContent="Exercises"; $("qLives").style.display="none";
-  showScreen("quiz", d.img); showQ();
-}
-function startChallenge(){
-  mode="challenge"; streak=0; lives=3;
-  var all=[]; DISTRICTS.forEach(function(d){ BANK[d.key].forEach(function(e){ all.push({e:e,pool:BANK[d.key]}); }); });
-  queue=shuffle(all).slice(0,15).map(function(o,k){ return makeQ(o.e,o.pool,k); });
-  pos=0; $("quizDistrict").textContent="\u26A1 Challenge mode"; $("quizTheme").textContent="Random questions"; $("qLives").style.display="";
-  showScreen("quiz", BG.how); showQ();
-}
-function updHud(){
-  $("qNum").textContent=(pos+1)+"/"+queue.length; $("qScore").textContent=S.totalScore; $("qAcc").textContent=accPct()+"%";
-  $("qStreakChip").style.display = streak>=2 ? "" : "none"; $("qStreak").textContent=streak;
-  if(mode==="challenge"){ $("qLives").textContent="\u2764".repeat(lives)+"\u2661".repeat(3-lives); }
-  $("qBar").style.width=Math.round(100*pos/queue.length)+"%";
-}
-function showQ(){
-  answered=false; hintUsed=false; updHud();
-  var q=queue[pos], opts="";
-  q.opts.forEach(function(o,k){ opts+='<button class="opt" data-k="'+k+'"><span class="k">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'; });
-  $("quizArea").innerHTML='<p class="q"><span class="tag">'+q.tag+'</span><br>'+q.prompt+'</p><div class="opts">'+opts+'</div>'
-    +'<div class="why" id="why"></div><div class="action-row"><button class="btn ghost small" id="hintBtn">\uD83D\uDCA1 Hint (\u22122)</button>'
-    +'<button class="btn primary" id="nextBtn" style="display:none">Next \u2192</button></div>';
-  Array.prototype.forEach.call($("quizArea").querySelectorAll(".opt"), function(btn){ btn.addEventListener("click", function(){ answer(+btn.getAttribute("data-k")); }); });
-  $("hintBtn").addEventListener("click", hint); $("nextBtn").addEventListener("click", next);
-}
-function hint(){
-  if(answered||hintUsed) return; hintUsed=true; S.totalScore=Math.max(0,S.totalScore-2); save();
-  var q=queue[pos], w=$("why"); w.className="why show";
-  w.innerHTML='<span class="pv">\uD83D\uDCA1 Hint:</span> it means \u00ab '+esc(q.m)+' \u00bb. <span class="muted">(\u22122 points)</span>';
-  $("hintBtn").disabled=true; updHud();
-}
-function answer(k){
-  if(answered) return; answered=true;
-  var q=queue[pos], ok=(k===q.a);
-  Array.prototype.forEach.call($("quizArea").querySelectorAll(".opt"), function(b){ b.disabled=true; var bk=+b.getAttribute("data-k"); if(bk===q.a) b.classList.add("ok"); else if(bk===k) b.classList.add("no"); });
-  var hb=$("hintBtn"); if(hb) hb.disabled=true;
-  S.totalAnswered++;
-  var bonus=false;
-  if(ok){ S.totalCorrect++; dCorrect++; streak++; S.totalScore+=10; if(streak%3===0){ S.totalScore+=5; bonus=true; } if(S.totalScore>S.bestScore) S.bestScore=S.totalScore; }
-  else { streak=0; if(mode==="challenge") lives--; }
-  save();
-  var ex=q.ex.replace("___","<b>"+esc(q.v)+"</b>");
-  var w=$("why"); w.className="why show";
-  w.innerHTML='<span class="pv">'+(ok?"\u2705 Correct! ":"\u274C Answer: ")+esc(q.v)+'</span> \u2014 <span class="fr">'+esc(q.m)+' ('+esc(q.fr)+')</span>'
-    +(bonus?' <span style="color:var(--coral);font-weight:700">+5 streak bonus \uD83D\uDD25</span>':'')
-    +'<br><span class="ex">'+ex+'</span><br>'+esc(q.expl);
-  updHud();
-  if(mode==="challenge" && lives<=0){ setTimeout(gameover, 850); return; }
-  $("nextBtn").style.display="";
-}
-function next(){ pos++; if(pos>=queue.length){ finish(); return; } showQ(); }
-function finish(){
-  if(mode==="challenge"){ victory(true); return; }
-  S.completed[dKey]=true; var d=DISTRICTS[dindex(dKey)];
-  if(S.badges.indexOf(d.badge)<0) S.badges.push(d.badge);
-  S.dstats[dKey]={correct:dCorrect, total:queue.length}; save();
-  if(allDone()){ victory(false); return; }
-  renderMap(); showScreen("map");
-  flash("\u2705 "+d.name+" repaired! Badge: "+d.badge+" \u2014 "+dCorrect+"/"+queue.length+" correct");
-}
-
-/* ===== Victory / Game over ===== */
-function victory(fromChallenge){
-  showScreen("victory", BG.victory); $("winImg").src=BG.victory;
-  $("vScore").textContent=S.totalScore; $("vAcc").textContent=accPct()+"%"; $("vBadges").textContent=S.badges.length+"/10";
-  var best=null,worst=null;
-  DISTRICTS.forEach(function(d){ var st=S.dstats[d.key]; if(!st) return; var r=st.correct/st.total; if(best===null||r>best.r) best={n:d.name,r:r}; if(worst===null||r<worst.r) worst={n:d.name,r:r}; });
-  $("vBestWeak").textContent = best ? ("Best district: "+best.n+" ("+Math.round(best.r*100)+"%) \u00B7 To review: "+worst.n+" ("+Math.round(worst.r*100)+"%)") : "";
-  fireConfetti();
-}
-function gameover(){ showScreen("gameover", BG.gameover); $("overImg").src=BG.gameover; }
-$("btnTryAgain") && $("btnTryAgain").addEventListener("click", function(){ startChallenge(); });
-$("btnRestartAll") && $("btnRestartAll").addEventListener("click", function(){ if(confirm("Restart from the beginning? (badges and scores will be reset)")){ S.completed={};S.badges=[];S.totalScore=0;S.totalCorrect=0;S.totalAnswered=0;S.dstats={}; save(); renderMap(); showScreen("map"); } });
-
-function flash(msg){
-  var t=document.createElement("div"); t.textContent=msg;
-  t.style.cssText="position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--blue-d);color:#fff;padding:12px 20px;border-radius:999px;font-family:var(--display);font-weight:700;z-index:60;box-shadow:var(--shadow);max-width:92vw;text-align:center";
-  document.body.appendChild(t); setTimeout(function(){ t.style.transition="opacity .5s"; t.style.opacity="0"; setTimeout(function(){ t.remove(); },500); }, 2200);
-}
-function fireConfetti(){
-  var c=document.createElement("canvas"); c.className="confetti"; document.body.appendChild(c);
-  var ctx=c.getContext&&c.getContext("2d"); if(!ctx){ c.remove(); return; }
-  function rs(){ c.width=innerWidth; c.height=innerHeight; } rs();
-  var cols=["#4F8FE0","#3FB6A8","#6BC68B","#E7B54C","#E79BC0","#9B86D6"];
-  var P=[]; for(var i=0;i<150;i++) P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:4+Math.random()*6,vy:2+Math.random()*4,vx:-1+Math.random()*2,col:cols[i%cols.length],a:Math.random()*6});
-  var t0=Date.now();
-  (function loop(){ ctx.clearRect(0,0,c.width,c.height); P.forEach(function(p){ p.y+=p.vy;p.x+=p.vx;p.a+=.1; ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.col;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);ctx.restore(); if(p.y>c.height)p.y=-10; });
-    if(Date.now()-t0<3500) requestAnimationFrame(loop); else c.remove(); })();
-}
-
-/* ===== Test hook ===== */
-window.__PVC={ S:function(){return S;}, startQuiz:startQuiz, startChallenge:startChallenge, openIntro:openIntro,
-  screen:function(){var a=document.querySelector(".screen.active");return a&&a.id;}, correct:function(){return queue[pos]?queue[pos].a:null;},
-  answer:answer, next:next, hint:hint, qlen:function(){return queue.length;}, lives:function(){return lives;}, mode:function(){return mode;} };
-
-/* ===== Init ===== */
-reflectMusic(); showScreen("menu");
+const DISTRICTS=[{"key":"d1","name":"Office Tower","theme":"Work, business, meetings, projects","img":"images/phrasal-verb-city/office_tower.jpg?v=2","badge":"Office Strategist","icon":"🏢"},{"key":"d2","name":"Airport","theme":"Travel, transport, business trips","img":"images/phrasal-verb-city/airport.jpg?v=2","badge":"Travel Expert","icon":"✈️"},{"key":"d3","name":"Hospital","theme":"Health, recovery, emergencies","img":"images/phrasal-verb-city/hospital.jpg?v=2","badge":"Health Guardian","icon":"🏥"},{"key":"d4","name":"Police Station","theme":"Investigation, problems, evidence","img":"images/phrasal-verb-city/police_station.jpg?v=2","badge":"Investigation Master","icon":"🚓"},{"key":"d5","name":"Shopping Mall","theme":"Shopping, customers, money","img":"images/phrasal-verb-city/shopping_mall.jpg?v=2","badge":"Smart Shopper","icon":"🛍️"},{"key":"d6","name":"Factory","theme":"Production, logistics, operations","img":"images/phrasal-verb-city/factory.jpg?v=2","badge":"Operations Expert","icon":"🏭"},{"key":"d7","name":"Residential District","theme":"Daily life, home, neighbours","img":"images/phrasal-verb-city/residential_district.jpg?v=2","badge":"Neighbourhood Hero","icon":"🏘️"},{"key":"d8","name":"University","theme":"Study, learning, academic life","img":"images/phrasal-verb-city/university.jpg?v=2","badge":"Study Champion","icon":"🎓"},{"key":"d9","name":"Train Station","theme":"Commuting, schedules, delays","img":"images/phrasal-verb-city/train_station.jpg?v=2","badge":"Commuter Pro","icon":"🚉"},{"key":"d10","name":"City Park","theme":"Free time, movement, social life","img":"images/phrasal-verb-city/city_park.jpg?v=2","badge":"City Explorer","icon":"🌳"}];
+const BANK={"d1":[["carry out","do or perform a task or plan","réaliser, effectuer","The team will ___ a full safety audit next week.","carry out = perform a task, plan or order."],["set up","arrange or establish","mettre en place, organiser","We need to ___ a meeting with the new client.","set up = arrange or establish something."],["take over","take control of","reprendre, prendre le contrôle de","A larger firm will ___ our company next year.","take over = take control of something."],["bring up","mention or raise a topic","soulever, aborder","She will ___ the budget problem at the meeting.","bring up = introduce a topic in conversation."],["follow up","take further action; check progress","faire un suivi, relancer","Please ___ on the client's email by Friday.","follow up on = take further action about something."],["put forward","propose or suggest","proposer, soumettre","He wants to ___ a new plan to cut costs.","put forward = propose an idea or plan."],["deal with","handle or manage","gérer, s'occuper de","Customer service will ___ the complaint today.","deal with = handle a problem or task."],["look over","review or examine quickly","parcourir, examiner","Could you ___ this report before I send it?","look over = examine or review something."],["call off","cancel","annuler","They had to ___ the meeting because of the storm.","call off = cancel a planned event."],["work out","find a solution; calculate","trouver une solution, calculer","Let's ___ the details of the contract together.","work out = solve or figure something out."]],"d2":[["check in","register on arrival","s'enregistrer","You should ___ at least two hours before the flight.","check in = register at an airport or hotel."],["take off","leave the ground (plane)","décoller","The plane will ___ at nine o'clock.","take off = for a plane, leave the ground."],["get on","board a large vehicle","monter dans","Passengers can ___ the plane now.","get on = board a plane, bus or train."],["get off","leave a large vehicle","descendre de","We will ___ the plane as soon as it lands.","get off = leave a plane, bus or train."],["set off","begin a journey","se mettre en route, partir","We need to ___ early to avoid the traffic.","set off = start a journey."],["see off","say goodbye to a traveller","accompagner pour dire au revoir","Her family came to ___ her at the airport.","see off = go with someone to say goodbye before a journey."],["pick up","collect someone or something","récupérer, aller chercher","I'll ___ you at the arrivals gate after you land.","pick up = collect someone or something."],["drop off","leave someone or something at a place","déposer","Can you ___ me at the departures terminal before my flight?","drop off = leave someone or something at a place."],["hold up","delay","retarder","Bad weather may ___ the flight.","hold up = cause a delay."],["come back","return","revenir","She will ___ from her trip on Monday.","come back = return to a place."]],"d3":[["pass out","faint; lose consciousness","s'évanouir","He might ___ if he doesn't drink some water.","pass out = lose consciousness."],["come round","regain consciousness","reprendre connaissance","The patient began to ___ after the operation.","come round = become conscious again."],["get over","recover from an illness or difficulty","se remettre de","It took her a week to ___ the flu.","get over = recover from an illness or problem."],["fight off","resist or defeat an illness","combattre, repousser","Rest can help you ___ an infection.","fight off = resist or overcome an illness."],["look after","take care of","s'occuper de, prendre soin de","Nurses must ___ their patients carefully.","look after = take care of someone."],["bring round","make someone conscious again","ranimer","The doctors managed to ___ the patient.","bring round = make an unconscious person conscious again."],["check up on","make sure someone is okay","prendre des nouvelles de","The nurse will ___ the patient every hour.","check up on = check someone's condition or welfare."],["calm down","become or make less upset","se calmer","Try to ___ before the examination.","calm down = become less anxious or upset."],["break down","collapse emotionally; stop working","s'effondrer ; tomber en panne","She might ___ from stress and exhaustion.","break down = collapse emotionally, or stop functioning."],["cut down on","reduce the amount of","réduire sa consommation de","The doctor told him to ___ salt and sugar.","cut down on = reduce how much of something you consume or use."]],"d4":[["look into","investigate","enquêter sur","The police will ___ the robbery.","look into = investigate something."],["find out","discover information","découvrir, apprendre","We need to ___ who sent the message.","find out = discover a fact or piece of information."],["track down","find after searching","retrouver, localiser","They managed to ___ the suspect.","track down = find someone or something after searching."],["give away","reveal a secret or identity","révéler, trahir","One small detail can ___ the thief's identity.","give away = reveal something, often accidentally."],["break into","enter by force","entrer par effraction","Someone tried to ___ the office last night.","break into = enter a place illegally, usually by force."],["turn up","appear or arrive unexpectedly","apparaître, se présenter","The missing files may ___ in an unexpected place.","turn up = appear or arrive, often unexpectedly."],["point out","draw attention to","faire remarquer, signaler","Please ___ any serious mistake you notice in the report.","point out = mention or indicate something important."],["make up","invent a story or excuse","inventer","He may ___ an excuse for being late.","make up = invent something, such as a story or excuse."],["cover up","hide the truth","dissimuler, étouffer","They tried to ___ the scandal.","cover up = hide wrongdoing or an embarrassing truth."],["get away with","escape punishment for wrongdoing","s'en tirer sans punition","He thought he could ___ cheating.","get away with = do something wrong without being punished."]],"d5":[["try on","put on clothes to test them","essayer un vêtement","Can I ___ these shoes in size 40?","try on = put on clothes or shoes to see if they fit."],["ring up","record a sale at the checkout","enregistrer un achat en caisse","The cashier can ___ your items at this counter.","ring up = enter the items and total a sale at a checkout."],["sell out","be completely sold","être épuisé, vendu","Popular concert tickets can ___ in a few minutes.","sell out = be sold completely so none remain."],["run out of","have no more of","être à court de","The shop may ___ that model before the weekend.","run out of = use or sell all of something so none remains."],["pick out","choose or select","choisir, sélectionner","Help me ___ a gift for my colleague.","pick out = choose from several options."],["give back","return something to a person","rendre","Please ___ the receipt to the cashier.","give back = return something to the person who gave it to you."],["take back","return goods to a shop","rapporter, retourner","I want to ___ this jacket; it is too small.","take back = return goods to a shop."],["look for","search for","chercher","I need to ___ a present for my manager.","look for = try to find something."],["queue up","wait in a line","faire la queue","Customers may have to ___ outside the store.","queue up = wait in a line."],["check out","pay and leave; complete a purchase","passer en caisse","You can ___ at the self-service tills.","check out = complete payment before leaving a shop or hotel."]],"d6":[["turn out","produce or manufacture","produire, fabriquer","The factory can ___ hundreds of units every day.","turn out = produce or manufacture goods, often in large quantities."],["shut down","stop operating; close","arrêter, fermer","They will ___ the plant for maintenance.","shut down = stop a machine or close operations."],["start up","begin operating; launch","démarrer, lancer","It takes an hour to ___ the machines.","start up = begin operating."],["speed up","go or make something faster","accélérer","We must ___ production to meet the deadline.","speed up = increase speed."],["slow down","go or make something slower","ralentir","Please ___ the line to reduce errors.","slow down = reduce speed."],["cut back","reduce","réduire","The company had to ___ on spending.","cut back on = reduce an amount or level of activity."],["bring in","introduce or bring inside","introduire, faire entrer","They will ___ new equipment next month.","bring in = introduce or bring something into an organisation or place."],["send out","dispatch or distribute","envoyer, expédier","We need to ___ the orders every Friday.","send out = dispatch or distribute to people or places."],["gear up","prepare for increased activity","se préparer, monter en puissance","The plant must ___ for the seasonal increase in demand.","gear up = prepare people or operations for a period of greater activity."],["phase out","gradually stop using","supprimer progressivement","The factory will ___ old machines over the next two years.","phase out = remove or stop using something gradually."]],"d7":[["settle in","become comfortable in a new home or place","prendre ses marques, s'installer","It can take a few weeks to ___ after moving house.","settle in = become comfortable and familiar with a new place."],["grow up","become an adult","grandir","Children seem to ___ so fast.","grow up = develop from a child into an adult."],["clean up","make tidy and clean","nettoyer, ranger","Let's ___ the kitchen after dinner.","clean up = make a place tidy and clean."],["throw away","discard; put in the bin","jeter","Don't ___ those old documents yet.","throw away = discard something."],["get on with","have a good relationship with","bien s'entendre avec","It helps to ___ your neighbours.","get on with = have a good relationship with someone."],["drop by","visit briefly","passer rapidement","Feel free to ___ this weekend.","drop by = make a short, informal visit."],["come over","visit someone at home","venir chez quelqu'un","Why don't you ___ for dinner tonight?","come over = visit someone at their home."],["move in","start living in a new home","emménager","Our new neighbours will ___ next week.","move in = start living in a new home."],["move out","leave a home","déménager, partir","They decided to ___ of the old flat.","move out = leave the place where you live."],["wake up","stop sleeping","se réveiller","I need to ___ at six o'clock every morning.","wake up = stop sleeping."]],"d8":[["brush up on","improve knowledge or a skill you learned before","réviser, rafraîchir ses connaissances","I need to ___ my statistics before the exam.","brush up on = improve or refresh knowledge or a skill you learned before."],["read up on","learn about a subject by reading","se documenter sur","You should ___ the topic before the seminar.","read up on = learn more about a subject by reading."],["go over","review","revoir, réviser","Let's ___ the lecture notes before the test.","go over = review carefully."],["write down","record in writing","noter, écrire","Remember to ___ the assignment details.","write down = record information in writing."],["hand in","submit","rendre, remettre","You must ___ your essay by Monday.","hand in = submit work to a teacher or organisation."],["sum up","give the main points briefly","résumer","At the end, you should ___ the main argument in one sentence.","sum up = state the main points briefly."],["catch up","reach the same level after falling behind","rattraper son retard","I missed a class and need to ___.","catch up = reach the same level after falling behind."],["read through","read carefully from start to end","lire en entier","Please ___ the instructions before starting.","read through = read something completely and carefully."],["keep up with","stay at the same pace or level","suivre le rythme de","Students need to ___ the weekly reading.","keep up with = stay at the same pace or level as work, events or people."],["figure out","understand or solve","comprendre, trouver","She managed to ___ how to use the software.","figure out = understand or solve something after thinking."]],"d9":[["pull out","leave a station","quitter la gare","The train will ___ of the station at 07:45.","pull out = leave a station or parking place."],["get in","arrive","arriver","What time does the last train ___ tonight?","get in = arrive, especially after a journey."],["go through","pass through a place","passer par","The express train will ___ three major stations before Lyon.","go through = pass through a place on the way somewhere."],["head for","go towards a place","se diriger vers","After the change, we need to ___ platform 6.","head for = move or travel towards a destination."],["stop over","break a journey temporarily","faire une escale","We may ___ in Dijon for an hour on the way to Paris.","stop over = stay somewhere briefly during a longer journey."],["move on","continue to another place or stage","continuer, poursuivre son chemin","After ten minutes at this station, the train will ___ towards Geneva.","move on = leave one place or stage and continue to the next."],["pull up","come to a stop in a vehicle","s'arrêter","The shuttle should ___ beside the station entrance.","pull up = bring a vehicle to a stop or arrive and stop."],["set out","begin a journey","partir, se mettre en route","We need to ___ before sunrise to catch the first connection.","set out = begin a journey."],["pull in","arrive at a station","entrer en gare, arriver","The train should ___ at platform 3 at 18:10.","pull in = arrive at a station, especially for a train or other vehicle."],["turn back","go back the way you came","faire demi-tour","The driver had to ___ because of the floods.","turn back = return the way you came."]],"d10":[["hang out","spend time relaxing socially","traîner, passer du temps","We like to ___ in the park on Sundays.","hang out = spend time relaxing, usually with other people."],["join in","take part in an activity","participer","Visitors can ___ the outdoor yoga session.","join in = take part in an activity with other people."],["run into","meet by chance","tomber sur, croiser","You might ___ an old friend near the fountain.","run into = meet someone unexpectedly."],["come across","find by chance","tomber sur, trouver","You may ___ a lovely café by the lake.","come across = find or meet something by chance."],["sit down","take a seat","s'asseoir","Let's ___ on this bench for a moment.","sit down = take a seat."],["stand up","rise to your feet","se lever","Everyone should ___ when the ceremony begins.","stand up = rise to your feet."],["chill out","relax","se détendre","After the exams, I just want to ___.","chill out = relax completely."],["look around","explore visually","regarder autour, explorer","Take your time and ___ the gardens.","look around = explore a place by looking at what is there."],["wander around","walk slowly with no fixed goal","flâner, errer","We can ___ the old town after lunch.","wander around = walk around slowly without a fixed destination."],["stop by","make a short visit","passer, faire un saut","I'll ___ the park on my way home.","stop by = make a short visit to a place."]]};
+const BG={menu:"images/phrasal-verb-city/phrasal_verb_city_map.jpg?v=2",map:"images/phrasal-verb-city/phrasal_verb_city_map.jpg?v=2",how:"images/phrasal-verb-city/city_park.jpg?v=2",victory:"images/phrasal-verb-city/victory_city_saved.jpg?v=2",gameover:"images/phrasal-verb-city/game_over_city_overrun.jpg?v=2"};
+const STORAGE="phrasalVerbCity_v2",OLD_STORAGE="phrasalVerbCity_v1",LETTERS="ABCD";
+const $=id=>document.getElementById(id); const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function emptyState(){return{version:2,completed:{},badges:[],districtBest:{},lifetimeCorrect:0,lifetimeAnswered:0,music:false,challengeBest:0,run:null}}
+function migrateOld(o){const s=emptyState();if(!o||typeof o!=="object")return s;s.completed=o.completed&&typeof o.completed==="object"?o.completed:{};s.badges=Array.isArray(o.badges)?o.badges:[];s.music=!!o.music;s.lifetimeCorrect=Math.max(0,Number(o.totalCorrect)||0);s.lifetimeAnswered=Math.max(s.lifetimeCorrect,Number(o.totalAnswered)||0);if(o.dstats&&typeof o.dstats==="object")DISTRICTS.forEach(d=>{const st=o.dstats[d.key];if(st&&Number.isFinite(+st.correct)){const c=Math.max(0,Math.min(10,+st.correct));s.districtBest[d.key]={score:c*10+Math.floor(c/3)*5,correct:c,total:10}}});return s}
+function normalise(raw){const s=Object.assign(emptyState(),raw||{});s.completed=s.completed&&typeof s.completed==="object"?s.completed:{};s.badges=Array.isArray(s.badges)?s.badges:[];s.districtBest=s.districtBest&&typeof s.districtBest==="object"?s.districtBest:{};s.lifetimeCorrect=Math.max(0,Number(s.lifetimeCorrect)||0);s.lifetimeAnswered=Math.max(s.lifetimeCorrect,Number(s.lifetimeAnswered)||0);s.challengeBest=Math.max(0,Number(s.challengeBest)||0);s.music=!!s.music;if(s.run&&(!Array.isArray(s.run.queue)||!Number.isInteger(s.run.pos)||s.run.pos<0||s.run.pos>=s.run.queue.length))s.run=null;return s}
+function load(){try{const v=localStorage.getItem(STORAGE);if(v)return normalise(JSON.parse(v));const old=localStorage.getItem(OLD_STORAGE);if(old)return migrateOld(JSON.parse(old))}catch(e){}return emptyState()}
+let S=load();function save(){try{localStorage.setItem(STORAGE,JSON.stringify(S))}catch(e){}}
+function districtIndex(k){return DISTRICTS.findIndex(d=>d.key===k)}function unlocked(i){return i===0||!!S.completed[DISTRICTS[i-1].key]}function allDone(){return DISTRICTS.every(d=>S.completed[d.key])}
+function cityScore(){return DISTRICTS.reduce((n,d)=>n+(S.districtBest[d.key]?.score||0),0)}function cityCorrect(){return DISTRICTS.reduce((n,d)=>n+(S.districtBest[d.key]?.correct||0),0)}function cityAccuracy(){return Math.round(cityCorrect())}
+function balancedPositions(n){let base=Math.floor(n/4),extra=n%4,counts=[base,base,base,base],order=shuffle([0,1,2,3]);for(let i=0;i<extra;i++)counts[order[i]]++;let deck=[];counts.forEach((c,p)=>{for(let i=0;i<c;i++)deck.push(p)});for(let tries=0;tries<100;tries++){const x=shuffle(deck);let ok=true;for(let i=2;i<x.length;i++)if(x[i]===x[i-1]&&x[i]===x[i-2]){ok=false;break}if(ok)return x}return shuffle(deck)}
+function showScreen(id,bg){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));$('bg').style.backgroundImage=`url('${bg||BG[id]||BG.menu}')`;window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+function updateResumeUI(){const on=!!(S.run&&!S.run.ended);$('btnContinue').hidden=!on;$('resumeNote').hidden=!on;$('mapResume').hidden=!on}
+function renderMap(){ $('mapImg').src=BG.map;$('mapScore').textContent=cityScore();$('mapDone').textContent=DISTRICTS.filter(d=>S.completed[d.key]).length+'/10';$('btnChallenge').hidden=!allDone();updateResumeUI();const host=$('districtList');host.innerHTML='';DISTRICTS.forEach((d,i)=>{const open=unlocked(i),done=!!S.completed[d.key],best=S.districtBest[d.key];const b=document.createElement('button');b.type='button';b.className='district'+(open?'':' locked')+(done?' done':'');b.setAttribute('aria-label',`${d.name}${done?' completed':open?' open':' locked'}`);b.innerHTML=`<div class="thumb" style="background-image:url('${d.img}')"><span class="num">${i+1}</span><span class="ic" aria-hidden="true">${d.icon}</span></div><div class="meta"><div class="nm">${esc(d.name)}</div><div class="st">${done?`✓ ${esc(d.badge)} · best ${best?.correct??0}/10`:open?'▶ 10 verbs':'🔒 Locked'}</div></div>`;if(open)b.addEventListener('click',()=>openIntro(i));host.appendChild(b)})}
+let curIdx=-1;
+function openIntro(i){curIdx=i;const d=DISTRICTS[i];$('introImg').src=d.img;$('introImg').alt=d.name;$('introTheme').textContent=d.theme;$('introName').textContent=`${i+1}. ${d.name}`;$('introDesc').textContent=`Learn 10 useful verbs about ${d.theme.toLowerCase()}, then take the exercises.`;const best=S.districtBest[d.key];$('introRecord').hidden=!best;$('introRecord').textContent=best?`Your record: ${best.score} points · ${best.correct}/10 correct. A replay only changes the city score if you improve it.`:'';const ll=$('learnList');ll.hidden=true;ll.innerHTML='';BANK[d.key].forEach(r=>{const div=document.createElement('div');div.className='lv';div.innerHTML=`<b>${esc(r[0])}</b> — ${esc(r[1])} <span class="fr">(${esc(r[2])})</span>`;ll.appendChild(div)});showScreen('intro',d.img)}
+function makeQuestion(entry,pool,target,gap){const [v,m,fr,ex,expl]=entry;const others=shuffle(pool.filter(p=>p[0]!==v)).slice(0,3).map(p=>p[0]);const opts=others.slice();opts.splice(target,0,v);return{v,m,fr,ex,expl,opts,a:target,tag:gap?'Gap fill':'Meaning',prompt:gap?`Complete the sentence:<br><span style="font-weight:600">${esc(ex.replace('___','______'))}</span>`:`Which verb means:<br><span style="font-weight:600">« ${esc(m)} »</span>?`,answered:false,selected:null,hintUsed:false}}
+function makeDistrictQueue(key){const pool=BANK[key], entries=shuffle(pool),positions=balancedPositions(entries.length);return entries.map((e,k)=>makeQuestion(e,pool,positions[k],k%2===0))}
+function uniqueChallengeEntries(){const chosen=[],used=new Set();for(const d of shuffle(DISTRICTS)){const candidates=shuffle(BANK[d.key]).filter(e=>!used.has(e[0]));if(candidates.length){chosen.push({e:candidates[0],pool:BANK[d.key]});used.add(candidates[0][0])}}let rest=[];DISTRICTS.forEach(d=>BANK[d.key].forEach(e=>{if(!used.has(e[0]))rest.push({e,pool:BANK[d.key]})}));for(const o of shuffle(rest)){if(chosen.length>=15)break;if(!used.has(o.e[0])){chosen.push(o);used.add(o.e[0])}}return shuffle(chosen).slice(0,15)}
+function startRun(mode,key=null){if(S.run&&!S.run.ended&&!confirm('Abandon the saved attempt and start a new one?'))return false;let queue,dIdx=-1;if(mode==='district'){dIdx=districtIndex(key);queue=makeDistrictQueue(key)}else{const raw=uniqueChallengeEntries(),positions=balancedPositions(raw.length);queue=raw.map((o,k)=>makeQuestion(o.e,o.pool,positions[k],k%2===0))}S.run={mode,dKey:key,districtIndex:dIdx,queue,pos:0,score:0,correct:0,answeredCount:0,streak:0,lives:mode==='challenge'?3:null,ended:false};save();resumeRun();return true}
+function resumeRun(){const r=S.run;if(!r||r.ended){renderMap();showScreen('map');return}if(r.mode==='district'){const d=DISTRICTS[r.districtIndex];$('quizDistrict').textContent=`${r.districtIndex+1}. ${d.name}`;$('quizTheme').textContent='Exercises';$('qLives').hidden=true;showScreen('quiz',d.img)}else{$('quizDistrict').textContent='⚡ Challenge mode';$('quizTheme').textContent='15 unique mixed questions';$('qLives').hidden=false;showScreen('quiz',BG.how)}showQ();updateResumeUI()}
+function runAcc(){const r=S.run;return r&&r.answeredCount?Math.round(100*r.correct/r.answeredCount):100}
+function updateHud(){const r=S.run,q=r.queue[r.pos];$('qNum').textContent=`${r.pos+1}/${r.queue.length}`;$('qScore').textContent=r.score;$('qAcc').textContent=runAcc()+'%';$('qStreakChip').hidden=r.streak<2;$('qStreak').textContent=r.streak;if(r.mode==='challenge')$('qLives').textContent='♥'.repeat(r.lives)+'♡'.repeat(3-r.lives);const pct=Math.round(100*(r.pos+(q?.answered?1:0))/r.queue.length);$('qBar').style.width=pct+'%';$('progressWrap').setAttribute('aria-valuenow',pct)}
+function showQ(){const r=S.run,q=r.queue[r.pos];updateHud();let opts=q.opts.map((o,k)=>`<button type="button" class="opt${q.answered?(k===q.a?' ok':k===q.selected&&q.selected!==q.a?' no':''):''}" data-k="${k}" ${q.answered?'disabled':''}><span class="k">${LETTERS[k]}</span><span>${esc(o)}</span></button>`).join('');$('quizArea').innerHTML=`<p class="q"><span class="tag">${esc(q.tag)}</span><br>${q.prompt}</p><div class="opts">${opts}</div><div class="why${q.answered||q.hintUsed?' show':''}" id="why"></div><div class="action-row"><button class="btn ghost small" id="hintBtn" type="button" ${q.answered||q.hintUsed?'disabled':''}>💡 Hint (−2)</button><button class="btn primary" id="nextBtn" type="button" ${q.answered?'':'hidden'}>${r.pos===r.queue.length-1?'Finish':'Next →'}</button></div>`;document.querySelectorAll('#quizArea .opt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.k)));$('hintBtn').addEventListener('click',hint);$('nextBtn').addEventListener('click',next);renderWhy()}
+function renderWhy(){const r=S.run,q=r.queue[r.pos],w=$('why');if(!w)return;if(q.answered){const ex=q.ex.replace('___',`<b>${esc(q.v)}</b>`);const ok=q.selected===q.a;w.className='why show';w.innerHTML=`<span class="pv">${ok?'✅ Correct!':'❌ Answer:'} ${esc(q.v)}</span> — ${esc(q.m)} (${esc(q.fr)})${q.bonus?' <b style="color:var(--coral)">+5 streak bonus 🔥</b>':''}<br><span class="ex">${ex}</span><br>${esc(q.expl)}`}else if(q.hintUsed){w.className='why show';w.innerHTML=`<span class="pv">💡 Hint:</span> it means « ${esc(q.m)} ». <span class="muted">(−2 points from this attempt)</span>`}else{w.className='why';w.innerHTML=''}}
+function hint(){const r=S.run,q=r.queue[r.pos];if(q.answered||q.hintUsed)return;q.hintUsed=true;r.score=Math.max(0,r.score-2);save();showQ()}
+function answer(k){const r=S.run,q=r.queue[r.pos];if(q.answered||r.ended)return;q.answered=true;q.selected=k;r.answeredCount++;S.lifetimeAnswered++;const ok=k===q.a;q.bonus=false;if(ok){r.correct++;S.lifetimeCorrect++;r.streak++;r.score+=10;if(r.streak%3===0){r.score+=5;q.bonus=true}}else{r.streak=0;if(r.mode==='challenge')r.lives--}save();showQ();if(r.mode==='challenge'&&r.lives<=0){r.ended=true;save();setTimeout(finishChallengeFail,350)}}
+function next(){const r=S.run;if(!r||!r.queue[r.pos].answered||r.ended)return;r.pos++;if(r.pos>=r.queue.length){finishRun();return}save();showQ()}
+function finishRun(){const r=S.run;if(r.mode==='challenge'){const score=r.score,acc=runAcc();S.challengeBest=Math.max(S.challengeBest,score);S.run=null;save();$('challengeImg').src=BG.victory;$('cScore').textContent=score;$('cAcc').textContent=acc+'%';$('cBest').textContent=S.challengeBest;showScreen('challengeWin',BG.victory);confetti();updateResumeUI();return}const d=DISTRICTS[r.districtIndex],old=S.districtBest[r.dKey]||{score:0,correct:0,total:10};S.completed[r.dKey]=true;if(!S.badges.includes(d.badge))S.badges.push(d.badge);S.districtBest[r.dKey]={score:Math.max(old.score,r.score),correct:Math.max(old.correct,r.correct),total:10};const improved=r.score>old.score||r.correct>old.correct;const result=`${d.name}: ${r.correct}/10 · ${r.score} points${improved?' · new record!':' · record unchanged'}`;S.run=null;save();if(allDone()){showVictory()}else{renderMap();showScreen('map');toast(result)}updateResumeUI()}
+function finishChallengeFail(){const r=S.run;if(!r)return;S.challengeBest=Math.max(S.challengeBest,r.score);S.run=null;save();$('overImg').src=BG.gameover;showScreen('gameover',BG.gameover);updateResumeUI()}
+function showVictory(){$('winImg').src=BG.victory;$('vScore').textContent=cityScore();$('vAcc').textContent=cityAccuracy()+'%';$('vBadges').textContent=S.badges.length+'/10';let best=null,worst=null;DISTRICTS.forEach(d=>{const st=S.districtBest[d.key];if(!st)return;const r=st.correct/10;if(!best||r>best.r)best={n:d.name,r};if(!worst||r<worst.r)worst={n:d.name,r}});$('vBestWeak').textContent=best?`Best district: ${best.n} (${Math.round(best.r*100)}%) · To review: ${worst.n} (${Math.round(worst.r*100)}%)`:'';showScreen('victory',BG.victory);confetti()}
+function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const c=document.createElement('canvas');c.style='position:fixed;inset:0;pointer-events:none;z-index:50';document.body.appendChild(c);const ctx=c.getContext('2d');if(!ctx){c.remove();return}c.width=innerWidth;c.height=innerHeight;const cols=['#4F8FE0','#3FB6A8','#6BC68B','#E7B54C','#E79BC0','#9B86D6'],p=Array.from({length:110},(_,i)=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:4+Math.random()*6,vy:2+Math.random()*4,vx:-1+Math.random()*2,col:cols[i%cols.length],a:Math.random()*6})),t=Date.now();(function loop(){ctx.clearRect(0,0,c.width,c.height);p.forEach(o=>{o.y+=o.vy;o.x+=o.vx;o.a+=.1;ctx.save();ctx.translate(o.x,o.y);ctx.rotate(o.a);ctx.fillStyle=o.col;ctx.fillRect(-o.s/2,-o.s/2,o.s,o.s);ctx.restore()});if(Date.now()-t<2500)requestAnimationFrame(loop);else c.remove()})()}
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2800)}
+const audio=new Audio('audio/theme_phrasal_verb_city_main.mp3?v=2');audio.loop=true;audio.preload='none';audio.volume=.35;function reflectMusic(){$('musicToggle').textContent=S.music?'🔊 Music ON':'🔇 Music OFF';$('musicToggle').setAttribute('aria-pressed',String(S.music))}async function startMusic(){try{await audio.play();$('audioError').textContent=''}catch(e){S.music=false;save();reflectMusic();$('audioError').textContent='Music could not start on this device.'}}function setMusic(on){S.music=on;save();reflectMusic();if(on)startMusic();else{audio.pause()}}audio.addEventListener('error',()=>{S.music=false;save();reflectMusic();$('audioError').textContent='Background music is unavailable.'});
+$('musicToggle').addEventListener('click',()=>setMusic(!S.music));$('btnStart').addEventListener('click',()=>{renderMap();showScreen('map')});$('btnContinue').addEventListener('click',resumeRun);$('mapResume').addEventListener('click',resumeRun);$('btnMap').addEventListener('click',()=>{renderMap();showScreen('map')});$('btnHow').addEventListener('click',()=>showScreen('how'));$('btnLearn').addEventListener('click',()=>{$('learnList').hidden=!$('learnList').hidden});$('btnBeginEx').addEventListener('click',()=>startRun('district',DISTRICTS[curIdx].key));$('btnChallenge').addEventListener('click',()=>startRun('challenge'));$('btnChallenge2').addEventListener('click',()=>startRun('challenge'));$('challengeAgain').addEventListener('click',()=>startRun('challenge'));$('btnTryAgain').addEventListener('click',()=>startRun('challenge'));$('saveExit').addEventListener('click',()=>{save();renderMap();showScreen('map')});
+$('btnReset').addEventListener('click',()=>{if(confirm('Reset all district progress, records and challenge scores?')){const music=S.music;S=emptyState();S.music=music;save();renderMap();updateResumeUI();toast('Progress reset.')}});$('btnRestartAll').addEventListener('click',()=>{if(confirm('Restart the city from the beginning?')){const music=S.music;S=emptyState();S.music=music;save();renderMap();showScreen('map');updateResumeUI()}});
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.go;if(id==='map')renderMap();showScreen(id)}));document.addEventListener('keydown',e=>{if(!S.run||S.run.ended||!$('quiz').classList.contains('active'))return;if(['1','2','3','4'].includes(e.key)){const q=S.run.queue[S.run.pos];if(!q.answered)answer(+e.key-1)}});
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+reflectMusic();updateResumeUI();showScreen('menu');
+window.__PVC={state:()=>S,resume:resumeRun,startDistrict:i=>startRun('district',DISTRICTS[i].key),startChallenge:()=>startRun('challenge'),cityScore,cityAccuracy,balancedPositions};
 </script>
-</body>
-</html>
+</body></html>

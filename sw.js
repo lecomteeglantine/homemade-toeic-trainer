@@ -1,5 +1,5 @@
-/* Homemade TOEIC Trainer — service worker v19 */
-const CACHE = "homemade-toeic-v19";
+/* Homemade TOEIC Trainer — service worker v20 */
+const CACHE = "homemade-toeic-v20";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "./ht-kit.css", "./ht-kit.js", "./ht-errors.js", "./toeic-bank.js",
