@@ -433,13 +433,13 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 })();
 
 /* ============================================================
-   P4 v29 — final stabilisation bridge
+   P4.5 v30 — deployment repair bridge
    Loads the shared progress contract on the legacy monolithic
    homepage, hard-disables legacy diagnostic/scoring entry points,
    and exposes one release/version contract to all pages.
    ============================================================ */
 (function(){"use strict";
-  window.HT=window.HT||{};HT.RELEASE=29;
+  window.HT=window.HT||{};HT.RELEASE=30;
   const root=()=>/(?:^|\/)homemade-toeic-trainer\/?(?:index\.html)?$/.test(location.pathname);
   const $=(s,r)=>(r||document).querySelector(s);
   function loadProgress(cb){
@@ -458,7 +458,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     ];
     const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
     while(n=walker.nextNode()){if(!n.nodeValue||!n.nodeValue.trim())continue;let v=n.nodeValue;patterns.forEach(p=>{v=v.replace(p[0],p[1])});if(v!==n.nodeValue)n.nodeValue=v;}
-    const about=$('#about .card');if(about&&!about.querySelector('[data-ht-release]')){const p=document.createElement('p');p.dataset.htRelease='29';p.className='disclaimer';p.style.marginTop='12px';p.textContent='Version pédagogique stabilisée v29 · progression stockée uniquement sur cet appareil.';about.appendChild(p);}
+    const about=$('#about .card');if(about&&!about.querySelector('[data-ht-release]')){const p=document.createElement('p');p.dataset.htRelease='30';p.className='disclaimer';p.style.marginTop='12px';p.textContent='Version pédagogique stabilisée v30 · progression stockée uniquement sur cet appareil.';about.appendChild(p);}
   }
   function hardDisableLegacy(){if(!root())return;
     try{window.startDiag=function(){location.href='diagnostic-toeic.html'};}catch(e){}
@@ -477,6 +477,6 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     const complete=core.filter(a=>a.status==='complete').length,started=core.filter(a=>a.status!=='untouched').length;
     box.innerHTML='<span class="pill blue">Progression de la plateforme</span><h3 style="margin-top:10px">'+complete+' activité'+(complete>1?'s':'')+' terminée'+(complete>1?'s':'')+' sur '+core.length+'</h3><p>'+started+' activité'+(started>1?'s':'')+' commencée'+(started>1?'s':'')+'. Les jeux gardent leurs propres scores, mais le reset et la sauvegarde utilisent désormais un registre commun.</p>';
   }
-  function init(){scrub();hardDisableLegacy();loadProgress(()=>{mountProgress();if(!HT.__progressSubscribed&&HTProgress.subscribe){HT.__progressSubscribed=true;HTProgress.subscribe(()=>mountProgress());}try{HTProgress.record('platform',{release:29,event:'loaded'})}catch(e){}});}
+  function init(){scrub();hardDisableLegacy();loadProgress(()=>{mountProgress();if(!HT.__progressSubscribed&&HTProgress.subscribe){HT.__progressSubscribed=true;HTProgress.subscribe(()=>mountProgress());}try{HTProgress.record('platform',{release:30,event:'loaded'})}catch(e){}});}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

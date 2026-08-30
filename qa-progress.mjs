@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — Progress Core contract QA v29. */
+/* Homemade TOEIC Trainer — Progress Core contract QA v30. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
@@ -77,4 +77,4 @@ P.reset({preserveSettings:true});is(notifications>=1,'progress subscribers were 
 P.record('diagnostic',{status:'complete',done:24,total:24});
 eq(P.events().length,1,'event recording');is(P.events()[0].activity==='diagnostic','event activity');
 for(let i=0;i<100;i++)P.record('training',{i});is(P.events().length<=80,'event log is not bounded');
-console.log('Progress Core QA v29: PASS — 13 adapters, resume, completion, snapshot, reset and event log validated.');
+console.log('Progress Core QA v30: PASS — 13 adapters, resume, completion, snapshot, reset and event log validated.');

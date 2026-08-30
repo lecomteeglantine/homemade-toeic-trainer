@@ -1,5 +1,5 @@
 /* ============================================================
-   Homemade TOEIC Trainer — Progress Core v1 (release v29)
+   Homemade TOEIC Trainer — Progress Core v1 (release v30)
    One read/write contract for all local progress. No server.
    ============================================================ */
 (function(global){

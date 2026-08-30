@@ -1,5 +1,5 @@
-/* Homemade TOEIC Trainer — service worker v29 P4 */
-const CACHE="homemade-toeic-v29";
+/* Homemade TOEIC Trainer — service worker v30 deployment repair */
+const CACHE="homemade-toeic-v30";
 const CORE=["./","./index.html","./offline.html","./manifest.webmanifest","./icon.svg","./icon-192.png","./icon-512.png","./ht-kit.css","./ht-kit.js","./progress-core.js","./release.json","./ht-errors.js","./toeic-bank.js","./toeic-bank-fixes.js","./system-check.html"];
 const OPTIONAL=["./diagnostic-toeic.html","./sauvegarde-progression.html","./flashcards.html","./constructeur-de-phrases.html","./prononciation-ecoute.html","./corporate-mysteries.html","./successful-toeic-kingdom.html","./survival-island-listening.html","./zombie-prepositions-survival.html","./escape-game-toeic.html","./detective-game.html","./grammar-time-machine.html","./phrasal-verb-city.html","./modal-galaxy-explorer.html"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.allSettled(OPTIONAL.map(u=>c.add(u)));}).then(()=>self.skipWaiting()));});
