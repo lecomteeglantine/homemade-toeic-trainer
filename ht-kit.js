@@ -481,3 +481,84 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   function init(){scrub();hardDisableLegacy();loadProgress(()=>{mountProgress();if(!HT.__progressSubscribed&&HTProgress.subscribe){HT.__progressSubscribed=true;HTProgress.subscribe(()=>mountProgress());}try{HTProgress.record('platform',{release:30,event:'loaded'})}catch(e){}});}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+
+/* ============================================================
+   v30.9 — dashboard / unified-progress coherence hotfix
+   - stale "Reprendre — Diagnostic" is shown only for a real unfinished attempt
+   - dashboard exposes all 13 Progress Core activities, including Sentence Builder
+     and Pronunciation & Listening
+   - XP widget is explicitly labelled as gamified homepage practice only
+   ============================================================ */
+(function(){
+  "use strict";
+  const $=(s,r)=>(r||document).querySelector(s);
+  const root=()=>/(?:^|\/)homemade-toeic-trainer\/?(?:index\.html)?$/.test(location.pathname);
+  function diagDB(){try{return JSON.parse(localStorage.getItem("ht_toeic_diagnostic_v3")||"null")}catch(e){return null}}
+  function validAttempt(a){return !!(a&&!a.completed&&Number.isFinite(Number(a.index))&&Number(a.index)>=0&&Number(a.index)<24&&Array.isArray(a.answers));}
+  function getLast(){try{return window.Store?Store.get("lastView",""):((JSON.parse(localStorage.getItem("l1toeic.v1")||"{}")||{}).lastView||"")}catch(e){return ""}}
+  function setLast(v){try{if(window.Store)Store.set("lastView",v);else{const r=JSON.parse(localStorage.getItem("l1toeic.v1")||"{}")||{};r.lastView=v;localStorage.setItem("l1toeic.v1",JSON.stringify(r));}}catch(e){}}
+  function syncResume(){
+    if(!root())return;
+    const btn=$(".nav-pill.resume"),last=getLast(),a=diagDB()&&diagDB().attempt;
+    if(last!=="diagnostic"||!btn)return;
+    if(validAttempt(a)){
+      btn.style.display="inline-flex";
+      btn.innerHTML='<span aria-hidden="true">&#9654;</span> Reprendre — Diagnostic';
+      btn.setAttribute("aria-label","Reprendre le diagnostic en cours");
+    }else{
+      btn.style.display="none";
+      setLast("");
+    }
+  }
+  function statusText(a){
+    if(a.status==="complete")return "Terminé";
+    if(a.status==="in_progress")return "En cours";
+    return "Non commencé";
+  }
+  function progressValue(a){
+    if(a.id==="diagnostic"&&a.status==="complete")return a.done+" / "+(a.total||24)+" correctes";
+    if(a.id==="sentences")return a.done+" phrase"+(a.done>1?"s":"")+" résolue"+(a.done>1?"s":"");
+    if(a.id==="pronunciation")return a.done+" exercice"+(a.done>1?"s":"")+" répondu"+(a.done>1?"s":"");
+    if(a.total!=null)return a.done+" / "+a.total;
+    if(a.done)return String(a.done);
+    return "—";
+  }
+  function clarifyGamification(){
+    if(!root())return;
+    const host=$("[data-ht-gamify]");if(!host)return;
+    let note=host.querySelector("[data-ht-xp-scope]");
+    if(!note){note=document.createElement("p");note.dataset.htXpScope="1";note.className="disclaimer";note.style.margin="8px 0 0";host.appendChild(note);}
+    note.textContent="XP d’entraînement : ce compteur concerne les exercices gamifiés de la page principale. Le diagnostic et les jeux autonomes sont suivis dans la progression unifiée ci-dessous.";
+    const q=host.querySelector(".ht-week-q");if(q){const m=(q.textContent||"").match(/(\d+)\s+question/);if(m)q.textContent="🎯 "+m[1]+" question"+(m[1]!=="1"?"s":"")+" gamifiée"+(m[1]!=="1"?"s":"")+" cette semaine";}
+  }
+  function renderUnifiedProgress(){
+    if(!root()||!window.HTProgress)return;
+    const host=$("#dashFull");if(!host)return;
+    const s=HTProgress.summary(),acts=s.activities||[];
+    let box=host.querySelector("[data-ht-platform-progress]");
+    if(!box){box=document.createElement("div");box.dataset.htPlatformProgress="1";box.className="card";box.style.marginTop="16px";host.appendChild(box);}
+    const complete=acts.filter(a=>a.status==="complete").length;
+    const progress=acts.filter(a=>a.status==="in_progress").length;
+    const started=acts.filter(a=>a.status!=="untouched");
+    const rows=started.length?started.map(a=>'<div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)"><strong>'+a.label+'</strong><span>'+progressValue(a)+'</span><span class="pill '+(a.status==="complete"?'green':'blue')+'">'+statusText(a)+'</span></div>').join(''):'<p style="margin:10px 0 0">Aucune activité commencée pour le moment.</p>';
+    box.innerHTML='<span class="pill blue">Progression unifiée</span><h3 style="margin-top:10px">'+complete+' module'+(complete>1?'s':'')+' terminé'+(complete>1?'s':'')+' · '+progress+' en cours · '+acts.length+' suivis</h3><p>Cette vue regroupe le diagnostic, les jeux, Sentence Builder, Pronunciation & Listening et l’entraînement principal. Les scores propres à chaque jeu restent conservés.</p><div data-ht-progress-rows>'+rows+'</div>';
+    clarifyGamification();
+  }
+  document.addEventListener("click",function(e){
+    const b=e.target.closest&&e.target.closest(".nav-pill.resume");if(!b||!root())return;
+    if(getLast()==="diagnostic"){
+      e.preventDefault();e.stopImmediatePropagation();
+      const a=diagDB()&&diagDB().attempt;
+      if(validAttempt(a))location.href="diagnostic-toeic.html";else syncResume();
+    }
+  },true);
+  function init(){
+    if(!root())return;
+    syncResume();
+    setTimeout(syncResume,0);
+    setTimeout(()=>{clarifyGamification();renderUnifiedProgress();},60);
+    if(window.HTProgress&&HTProgress.subscribe&&!window.__ht309ProgressSub){window.__ht309ProgressSub=HTProgress.subscribe(()=>{renderUnifiedProgress();syncResume();});}
+    const dash=$("#dashboard");if(dash&&window.MutationObserver){new MutationObserver(()=>{if(dash.classList.contains("active")){setTimeout(()=>{syncResume();clarifyGamification();renderUnifiedProgress();},0);}}).observe(dash,{attributes:true,attributeFilter:["class"]});}
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();

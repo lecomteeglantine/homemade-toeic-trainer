@@ -115,4 +115,16 @@ let sentence=text('constructeur-de-phrases.html');if(sentence){if(!/toeicSentenc
 let pron=text('prononciation-ecoute.html');if(pron){if(/setTimeout\s*\(\s*\(\)\s*=>\s*say/.test(pron))err('Pronunciation: autoplay returned');if(!/employ-EE/.test(pron))err('Pronunciation: employee stress regression');if(/Please record the record\.|I will present the present\.|We expect sales to increase after the increase\./.test(pron))err('Pronunciation: ambiguous noun/verb stress item returned');if(!/speakItem\(current/.test(pron)||!/speakerVoice=new Map/.test(pron))err('Pronunciation: mini-dialogue speaker separation missing');if(!/Which stress pattern do you hear in record/.test(pron)||!/RE-cord \(noun\)/.test(pron)||!/re-CORD \(verb\)/.test(pron))err('Pronunciation: stress prompts are not explicit enough');else ok()}
 let backup=text('sauvegarde-progression.html');if(backup){if(!/VERSION=4/.test(backup)||!/HTProgress\.keys/.test(backup))err('Backup: P4 whitelist/version contract missing');if(/for\s*\([^)]*localStorage\.length/.test(backup))err('Backup: whole-origin localStorage export returned');else ok()}
 let sys=text('system-check.html');if(sys){if(!/(?:Deployment|Quality) check v30/.test(sys)||!/homemade-toeic-v30/.test(sys)||!/Progression unifiée/.test(sys))err('System Check: v30/progress checks missing');if(!/__htcheck/.test(sys)||!/freshSeq/.test(sys))err('System Check: cache-busting deployment verification missing');if(/Aucune voix anglaise trouvée/.test(sys))err('System Check: speech synthesis false-negative wording returned');else ok()}
+
+// v30.9 live-dashboard coherence regressions.
+{
+  const kit309=text('ht-kit.js');
+  if(kit309){
+    if(!/v30\.9 — dashboard \/ unified-progress coherence hotfix/.test(kit309)) err('Dashboard: v30.9 coherence layer missing'); else ok();
+    if(!/last!=="diagnostic"\|\|!btn/.test(kit309)||!/validAttempt\(a\)/.test(kit309)||!/setLast\(""\)/.test(kit309)) err('Dashboard: stale Diagnostic resume guard missing'); else ok();
+    if(!/Progression unifiée/.test(kit309)||!/Sentence Builder/.test(kit309)||!/Pronunciation & Listening/.test(kit309)) err('Dashboard: unified Progress Core coverage is incomplete'); else ok();
+    if(!/XP d’entraînement/.test(kit309)||!/gamifiée/.test(kit309)) err('Dashboard: XP scope is not explained clearly'); else ok();
+  }
+}
+
 console.log(`\nHomemade TOEIC Trainer QA v30`);console.log(`Checks passed: ${checks}`);if(warnings.length){console.log(`Warnings (${warnings.length}):`);warnings.forEach(x=>console.log('  ⚠ '+x))}if(errors.length){console.error(`Errors (${errors.length}):`);errors.forEach(x=>console.error('  ✖ '+x));process.exit(1)}console.log('Result: PASS — no blocking regression found.');
