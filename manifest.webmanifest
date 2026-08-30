@@ -62,6 +62,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "System Check",
+      "short_name": "System Check",
+      "url": "./system-check.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

@@ -1,5 +1,5 @@
 /* ============================================================
-   HT TOEIC KIT — v25 P0 release
+   HT TOEIC KIT — v27 P2 quality release
    Audio speed, strategies, gamification + root-site audit fixes.
    No dependency. Local data only (localStorage).
    ============================================================ */
@@ -259,8 +259,54 @@ function exposeDataAPI(){
 }
 function addUpdateNotice(){
   if(!onRoot()||!("serviceWorker" in navigator))return;
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('ht_sw_reloaded_v26'))return;sessionStorage.setItem('ht_sw_reloaded_v26','1');location.reload();}catch(e){}});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('ht_sw_reloaded_v27'))return;sessionStorage.setItem('ht_sw_reloaded_v27','1');location.reload();}catch(e){}});
 }
 function init(){exposeDataAPI();cleanHomepageCopy();hardenReset();addUpdateNotice();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+
+/* ============================================================
+   P2 v27 — quality layer: bank hygiene, recommendations, system check
+   ============================================================ */
+(function(){"use strict";
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function norm(s){return String(s||"").trim().toLowerCase().replace(/\s+/g," ");}
+function sessionSeed(){try{let x=sessionStorage.getItem("ht_bank_seed_v27");if(!x){x=String(Date.now())+"-"+Math.random();sessionStorage.setItem("ht_bank_seed_v27",x)}let h=2166136261>>>0;for(let i=0;i<x.length;i++){h^=x.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}catch(e){return (Date.now()>>>0)}}
+function rng(seed){return function(){seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuf(a,r){let b=a.slice();for(let i=b.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function remapQuestion(q,target,r){if(!q||!Array.isArray(q.opts)||q.opts.length<2||!Number.isInteger(q.a)||q.a<0||q.a>=q.opts.length)return;const old=q.opts.map((text,i)=>({text,i})),correct=old[q.a],rest=shuf(old.filter(x=>x.i!==q.a),r),pos=Math.min(target,q.opts.length-1);rest.splice(pos,0,correct);q.opts=rest.map(x=>x.text);q.a=rest.findIndex(x=>x.i===correct.i);if(q.dx&&typeof q.dx==="object"){const nd={};rest.forEach((x,newI)=>{if(Object.prototype.hasOwnProperty.call(q.dx,x.i))nd[newI]=q.dx[x.i]});q.dx=nd}q._htV27=true;}
+function cleanBank(){const B=window.TOEIC_BANK;if(!B)return {questions:0,vocab:0};
+  let Q=Array.isArray(B.QUESTIONS)?B.QUESTIONS:[];
+  // Known semantic fixes.
+  let by=id=>Q.find(q=>q&&q.id===id),x=by("X02-003");
+  if(x){x.stem="According to the published opening schedule, the new branch ____ on 3 September.";x.opts=["opened","will open","has opened","opens"];x.a=3;x.why="A published timetable or schedule can use the present simple for a fixed future event: the branch opens on 3 September.";x.skill="Présent simple pour horaire futur";}
+  x=by("D10-001");if(x){x.stem="The prize money was distributed ____ all members of the winning team.";x.opts=["between","among","beside","across"];x.a=1;x.why="Among is natural for distribution within a group. Avoid the oversimplified rule 'between = two only': between can also be used with more than two when individual relationships are considered.";}
+  x=by("X08-011");if(x&&Array.isArray(x.opts))x.opts=x.opts.map(v=>v==="asster"?"assert":v);
+  x=by("I08-001");if(x){x.dom="Stratégie";x.skill="Réponse indirecte — entraînement Part 2";x.why="Cet item écrit entraîne la logique d'une réponse indirecte de Part 2 ; il ne mesure pas la compréhension orale.";}
+  x=by("J03-002");if(x){x.dom="Stratégie";x.skill="Inférence — entraînement Part 7";x.why="Cet item court entraîne une inférence de lecture ; il ne remplace pas une véritable question Part 7 sur document.";}
+  x=by("L08-001");if(x){x.stem="Au TOEIC, que vaut-il mieux faire si tu hésites entre plusieurs réponses ?";x.opts=["Laisser la case vide","Choisir quand même une réponse","Sauter toute la partie","Répondre deux fois"];x.a=1;x.why="Il n'y a pas de pénalité supplémentaire pour une mauvaise réponse : mieux vaut répondre à chaque question que laisser une case vide.";x.skill="Toujours répondre";}
+  // Remove exact duplicate questions (same stem + same correct answer text).
+  const seen=new Set(),unique=[];Q.forEach(q=>{if(!q||!Array.isArray(q.opts))return;const key=norm(q.stem)+"|"+norm(q.opts[q.a]);if(!seen.has(key)){seen.add(key);unique.push(q)}});Q.splice(0,Q.length,...unique);
+  // Balance answer positions for each browser session. This preserves each question's correct text and dx mapping.
+  const r=rng(sessionSeed()), four=Q.filter(q=>q.opts&&q.opts.length===4), other=Q.filter(q=>q.opts&&q.opts.length!==4);
+  const slots=shuf(four.map((_,i)=>i%4),r);four.forEach((q,i)=>remapQuestion(q,slots[i],r));other.forEach((q,i)=>remapQuestion(q,i%(q.opts?.length||1),r));
+  // Clean and merge duplicate vocabulary records while preserving useful collocations.
+  let V=Array.isArray(B.VOCAB)?B.VOCAB:[],map=new Map(),clean=[];V.forEach(v=>{if(!v||!v.w)return;let cols=Array.isArray(v.col)?v.col.filter(c=>c&&!/TOEIC\s*(EXERCISE|COLLOCATIONS|SUPER|Favorite|Trap)|Match the word|Très fréquentes|⚠|Important$/i.test(String(c))).map(String):[];cols=[...new Set(cols.map(c=>c.trim()).filter(Boolean))];const k=norm(v.w);if(!map.has(k)){v.col=cols;map.set(k,v);clean.push(v)}else{const base=map.get(k);base.col=[...new Set([...(base.col||[]),...cols])];if((v.ex||"").length>(base.ex||"").length)base.ex=v.ex;}});V.splice(0,V.length,...clean);
+  window.HT=window.HT||{};HT.BANK_QUALITY={version:27,questions:Q.length,vocab:V.length,balanced:true,duplicatesRemoved:true};return HT.BANK_QUALITY;
+}
+function recommendationFor(part){const map={
+  1:{title:"Affûter l'écoute visuelle",text:"Travaille la reconnaissance rapide des actions et du vocabulaire descriptif.",href:"prononciation-ecoute.html",label:"Pronunciation & Listening"},
+  2:{title:"Réponses courtes et indirectes",text:"Entraîne-toi à repérer immédiatement who / where / when / why et les réponses indirectes.",href:"survival-island-listening.html",label:"Survival Island"},
+  3:{title:"Conversations professionnelles",text:"Travaille les intentions, problèmes, décisions et prochaines actions dans des dialogues.",href:"corporate-mysteries.html",label:"Corporate Mysteries"},
+  4:{title:"Annonces et monologues",text:"Travaille le but du message, les changements, horaires, chiffres et actions demandées.",href:"survival-island-listening.html",label:"Survival Island"},
+  5:{title:"Grammaire et vocabulaire en contexte",text:"Renforce les formes grammaticales qui permettent d'éliminer rapidement les distracteurs.",href:"grammar-time-machine.html",label:"Grammar Time Machine"},
+  6:{title:"Cohérence d'un texte",text:"Travaille les liens logiques, formes verbales et choix de mots dans un contexte plus long.",href:"constructeur-de-phrases.html",label:"Sentence Builder"},
+  7:{title:"Lecture et croisement d'informations",text:"Entraîne scanning, inférence et lecture de plusieurs documents sous pression.",href:"successful-toeic-kingdom.html",label:"Successful TOEIC Kingdom"}
+};return map[Number(part)]||null}
+function addSystemCheckLink(){if(!/(?:^|\/)homemade-toeic-trainer\/?(?:index\.html)?$/.test(location.pathname))return;const about=$("#about .card");if(about&&!about.querySelector(".ht-system-check")){const p=document.createElement("p");p.className="ht-system-check";p.style.marginTop="16px";p.innerHTML='<a class="btn ghost" href="system-check.html">🩺 Vérifier mon appareil et le site</a>';about.appendChild(p)}const foot=document.querySelector("footer");if(foot&&!foot.querySelector('a[href="system-check.html"]')){const a=document.createElement("a");a.href="system-check.html";a.textContent="System Check";a.style.marginLeft="10px";foot.appendChild(a)}}
+function enrichDashboard(){if(!/(?:^|\/)homemade-toeic-trainer\/?(?:index\.html)?$/.test(location.pathname))return;try{const db=JSON.parse(localStorage.getItem("ht_toeic_diagnostic_v3")||"null"),r=db&&db.lastResult;if(!r)return;let weak=null;for(let p=1;p<=7;p++){const v=(r.byPart||{})[String(p)]||{ok:0,n:0};if(!v.n)continue;const pct=v.ok/v.n;if(!weak||pct<weak.pct||(pct===weak.pct&&v.n>weak.n))weak={p,pct,n:v.n}}const rec=weak&&recommendationFor(weak.p);const line=$("#nextStepLine");if(line&&rec)line.innerHTML='Priorité conseillée : <strong>Part '+weak.p+'</strong> · '+rec.title+' — <a href="'+rec.href+'">'+rec.label+'</a>'; }catch(e){}}
+cleanBank();
+function init(){cleanBank();addSystemCheckLink();setTimeout(enrichDashboard,0);window.HT=window.HT||{};HT.recommendationForPart=recommendationFor;HT.cleanQuestionBank=cleanBank;}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
