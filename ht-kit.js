@@ -193,14 +193,14 @@
 
 
 /* ============================================================
-   P0 RELEASE v25 — final root overrides
+   P1 RELEASE v26 — cumulative root overrides
    Keeps the original toolkit (speed, strategies, XP) and replaces
    only the remaining fragile homepage behaviours.
    ============================================================ */
 (function(){"use strict";
 const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const dayKey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-const progressKeys=["l1toeic.v1","htoeic_gamify_v1","htoeic_errors_v1","toeicDaily_v1","ht_toeic_diagnostic_v3","CORP_MYSTERIES_V2","CORP_MYSTERIES_V1","HT_TOEIC_KINGDOM_V1","HT_SURVIVAL_ISLAND_V1","zombieGrammarSurvival_v1","zombieGrammarSurvival_v2","detectiveAcademy_v1","detectiveAcademy_v2","toeicEscapeGame_v1","toeicEscapeGame_v2","grammarTimeMachine_v1","grammarTimeMachine_v2","phrasalVerbCity_v1","phrasalVerbCity_v2","modalGalaxyExplorer_v1","modalGalaxyExplorer_v2","toeicSentenceBuilder_v1","htt_pron"];
+const progressKeys=["l1toeic.v1","htoeic_gamify_v1","htoeic_errors_v1","toeicDaily_v1","ht_toeic_diagnostic_v3","CORP_MYSTERIES_V2","CORP_MYSTERIES_V1","HT_TOEIC_KINGDOM_V1","HT_SURVIVAL_ISLAND_V1","zombieGrammarSurvival_v1","zombieGrammarSurvival_v2","detectiveAcademy_v1","detectiveAcademy_v2","toeicEscapeGame_v1","toeicEscapeGame_v2","grammarTimeMachine_v1","grammarTimeMachine_v2","phrasalVerbCity_v1","phrasalVerbCity_v2","modalGalaxyExplorer_v1","modalGalaxyExplorer_v2","toeicSentenceBuilder_v1","htt_pron","ht_accent","htoeic_speed_v1"];
 window.HT=window.HT||{};HT.PROGRESS_KEYS=progressKeys;HT.localDateKey=dayKey;
 HT.resetAllProgress=function(){let keep={};try{let root=JSON.parse(localStorage.getItem("l1toeic.v1")||"{}");keep.a11y=root.a11y;keep.target=root.target;keep.dailyGoal=root.dailyGoal}catch(e){}progressKeys.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});try{let root={};if(keep.a11y)root.a11y=keep.a11y;if(keep.target!=null)root.target=keep.target;if(keep.dailyGoal!=null)root.dailyGoal=keep.dailyGoal;localStorage.setItem("l1toeic.v1",JSON.stringify(root))}catch(e){}};
 function diagDB(){try{return JSON.parse(localStorage.getItem("ht_toeic_diagnostic_v3")||"null")}catch(e){return null}}
@@ -215,4 +215,52 @@ function scrubLegacyCopy(){
 }
 function patchRoot(){fixBankSemantics();replaceDiagSection();scrubLegacyCopy();document.addEventListener("click",redirectDiagnostic,true);if(typeof window.todayStr==="function")window.todayStr=dayKey;if(typeof window.estimateScore==="function")window.estimateScore=()=>null;if(typeof window.renderDashboard==="function")window.renderDashboard=renderDashboardV3;let reset=$("#resetData");if(reset)document.addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest("#resetData")))return;e.preventDefault();e.stopImmediatePropagation();if(confirm("Effacer toute la progression Homemade TOEIC Trainer sur cet appareil ? Les réglages d'accessibilité et ton objectif sont conservés.")){HT.resetAllProgress();renderDashboardV3();if(typeof go==="function")go("home");if(typeof toast==="function")toast("Progression TOEIC réinitialisée")}},true);$$("[data-nav='chrono']").forEach(b=>{if(/TOEIC blanc complet/i.test(b.textContent))b.textContent=b.textContent.replace(/Passer un TOEIC blanc complet/i,"Ouvrir la mini-simulation TOEIC")});try{let v=sessionStorage.getItem("ht_open_view");if(v&&typeof go==="function"){sessionStorage.removeItem("ht_open_view");setTimeout(()=>go(v),0)}}catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",patchRoot);else patchRoot();
+})();
+
+
+/* ============================================================
+   P1 v26 — storage / copy / PWA hardening
+   ============================================================ */
+(function(){"use strict";
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function onRoot(){return /(?:^|\/)homemade-toeic-trainer\/?(?:index\.html)?$/.test(location.pathname);}
+function replaceText(root,rx,repl){if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(rx.test(n.nodeValue||""))n.nodeValue=(n.nodeValue||"").replace(rx,repl);}}
+function cleanHomepageCopy(){
+  if(!onRoot())return;
+  const home=$("#home"), about=$("#about"), dashboard=$("#dashboard"), chrono=$("#chrono");
+  replaceText(home,/un score estimé qui progresse avec toi/gi,"un suivi de progression qui évolue avec toi");
+  replaceText(home,/repérer ton point faible et estimer ton score/gi,"repérer tes points forts et les parties à renforcer");
+  replaceText(home,/Le score affiché est une estimation pédagogique, pas un score officiel\./gi,"Les résultats d'entraînement et de diagnostic sont pédagogiques et ne constituent pas un score officiel TOEIC.");
+  replaceText(about,/du vocabulaire avec audio et un score estimé/gi,"du vocabulaire avec audio et un suivi de progression");
+  replaceText(about,/Le score affiché est une estimation, pas un résultat officiel\./gi,"Les résultats affichés sont des indicateurs pédagogiques, pas des résultats officiels.");
+  replaceText(document.querySelector('footer'),/Score = estimation pédagogique\./gi,"Résultats = indicateurs pédagogiques.");
+  replaceText(document,/Passer un TOEIC blanc complet/gi,"Ouvrir la mini-simulation TOEIC");
+  replaceText(document,/TOEIC blanc complet \(structuré\)/gi,"Mini-simulation TOEIC structurée");
+  replaceText(document,/Examen blanc/gi,"Mini-simulation");
+  if(dashboard){
+    const h=[...dashboard.querySelectorAll('h3,.pill')].find(x=>/Score TOEIC estimé/i.test(x.textContent||''));if(h)h.textContent='Dernier mini-diagnostic';
+    replaceText(dashboard,/Estimation — indice de confiance\s*:?\s*—?/gi,"Résultat diagnostique");
+    replaceText(dashboard,/Tu verras ici ton score estimé/gi,"Tu verras ici ton dernier résultat diagnostique");
+  }
+  if(chrono){const h=chrono.querySelector('h1');if(h&&/Mode chronométré/i.test(h.textContent))h.textContent='Mini-simulation chronométrée';}
+  // Public card may still describe old Modal build.
+  const modal=document.querySelector('a[href="modal-galaxy-explorer.html"] p');
+  if(modal)modal.textContent=modal.textContent.replace(/96 questions style TOEIC/gi,'112 questions dans la banque, 12 tirées par mission');
+}
+function hardenReset(){
+  if(!onRoot())return;
+  const btn=$("#resetData");if(!btn)return;
+  btn.setAttribute('title','Efface toutes les données de progression Homemade TOEIC Trainer, sans toucher aux autres sites du domaine.');
+}
+function exposeDataAPI(){
+  window.HT=window.HT||{};
+  HT.backupKeys=function(){return (HT.PROGRESS_KEYS||[]).slice();};
+  HT.progressSnapshot=function(){const out={};HT.backupKeys().forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)out[k]=v}catch(e){}});return out;};
+}
+function addUpdateNotice(){
+  if(!onRoot()||!("serviceWorker" in navigator))return;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('ht_sw_reloaded_v26'))return;sessionStorage.setItem('ht_sw_reloaded_v26','1');location.reload();}catch(e){}});
+}
+function init(){exposeDataAPI();cleanHomepageCopy();hardenReset();addUpdateNotice();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
