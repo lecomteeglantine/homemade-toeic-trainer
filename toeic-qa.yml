@@ -1,0 +1,22 @@
+name: TOEIC Trainer QA
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run repository zero-regression checks
+        run: node qa-site.mjs
+      - name: Run progress and reset contract checks
+        run: node qa-progress.mjs
