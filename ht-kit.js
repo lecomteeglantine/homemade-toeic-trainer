@@ -1,5 +1,5 @@
 /* ============================================================
-   HT TOEIC KIT — v22 homepage stabilisation
+   HT TOEIC KIT — v23 diagnostic rebuild + homepage stabilisation
    Audio speed, strategies, gamification + root-site audit fixes.
    No dependency. Local data only (localStorage).
    ============================================================ */
@@ -103,40 +103,26 @@
     if(typeof FULLMOCK==="undefined"||!FULLMOCK)return;
     ["listening","reading"].forEach(function(section,si){var qs=[];(FULLMOCK[section]||[]).forEach(function(b){(b.qs||[]).forEach(function(q){qs.push(q);});});var r=seeded(hash(todayKey()+"|FULLMOCK22|"+si)),pos=positions(qs.length,r);qs.forEach(function(q,i){placeCorrect(q,pos[i],r,false);});});
   }
-  function stratifiedSample(arr,n){
-    var groups={},out=[],r=seeded(hash(todayKey()+"|DIAG22|"+Date.now()));arr.forEach(function(q){var k=q.dom||"Autre";(groups[k]=groups[k]||[]).push(q);});Object.keys(groups).forEach(function(k){groups[k]=shuffle(groups[k],r);});var names=shuffle(Object.keys(groups),r),round=0;while(out.length<n&&names.length){var progressed=false;for(var i=0;i<names.length&&out.length<n;i++){var q=groups[names[i]][round];if(q){out.push(q);progressed=true;}}if(!progressed)break;round++;}if(out.length<n){var rest=arr.filter(function(q){return out.indexOf(q)<0;});out=out.concat(shuffle(rest,r).slice(0,n-out.length));}return shuffle(out,r).slice(0,n);
-  }
+  function diagDb(){try{return JSON.parse(localStorage.getItem("ht_toeic_diagnostic_v3")||"null")}catch(e){return null}}
+  function diagResult(){var d=diagDb();return d&&d.lastResult&&d.lastResult.n===24?d.lastResult:null}
   function installDiagnosticFix(){
-    var btn=document.getElementById("startDiag");if(!btn||btn.__ht22)return;btn.__ht22=true;
-    btn.addEventListener("click",function(e){
-      if(typeof diagState==="undefined"||typeof QUESTIONS==="undefined"||typeof renderDiagQ!=="function")return;
-      e.preventDefault();e.stopImmediatePropagation();
-      var picked=stratifiedSample(QUESTIONS,Math.min(24,QUESTIONS.length));picked=balancedClone(picked,Math.random);
-      diagState={i:0,answers:[],items:picked};var intro=document.getElementById("diagIntro"),res=document.getElementById("diagResult"),run=document.getElementById("diagRun");if(intro)intro.hidden=true;if(res)res.hidden=true;if(run)run.hidden=false;renderDiagQ();
-    },true);
-    var intro=btn.closest(".card");if(intro&&!intro.querySelector(".ht-diag-note")){var p=document.createElement("p");p.className="disclaimer ht-diag-note";p.style.marginBottom="0";p.textContent="Diagnostic court : 24 questions équilibrées couvrant plusieurs domaines. Le score indicatif est calculé uniquement à partir de ce diagnostic.";intro.appendChild(p);}
-  }
-
-  function diagnosticStats(){
-    try{if(typeof Store==="undefined")return null;var d=Store.get("lastDiag",null);if(!d||!d.byDom)return null;var ok=0,n=0;Object.keys(d.byDom).forEach(function(k){ok+=Number(d.byDom[k].ok)||0;n+=Number(d.byDom[k].n)||0;});if(!n)return null;return{ok:ok,n:n,pct:ok/n};}catch(e){return null;}
+    var btn=document.getElementById("startDiag");if(!btn||btn.__ht23)return;btn.__ht23=true;
+    btn.textContent="Commencer le vrai diagnostic TOEIC (24 questions)";
+    function goDiag(e,newRun){if(e){e.preventDefault();e.stopImmediatePropagation();}try{if(newRun)sessionStorage.setItem("ht_diag_new","1")}catch(x){}location.href="diagnostic-toeic.html";}
+    btn.addEventListener("click",function(e){goDiag(e,true);},true);
+    document.querySelectorAll('[data-nav="diagnostic"]').forEach(function(n){if(n.__htDiagLink)return;n.__htDiagLink=true;n.addEventListener("click",function(e){goDiag(e,false);},true);});
+    var intro=btn.closest(".card");if(intro){var old=intro.querySelector(".ht-diag-note");if(old)old.remove();var p=document.createElement("p");p.className="disclaimer ht-diag-note";p.style.marginBottom="0";p.textContent="12 questions Listening + 12 Reading, réparties sur les Parts 1 à 7. Les résultats restent locaux et ne sont pas présentés comme un faux score officiel /990.";intro.appendChild(p);var cont=document.createElement("a");cont.href="diagnostic-toeic.html";cont.className="btn ghost block";cont.style.marginTop="10px";cont.textContent="Continuer / revoir mon dernier diagnostic";intro.appendChild(cont);}
   }
   function installScoreFix(){
-    if(typeof window.estimateScore==="function"){
-      window.estimateScore=function(){var x=diagnosticStats();if(!x)return null;var score=Math.round((10+x.pct*980)/5)*5;score=Math.max(10,Math.min(990,score));return{score:score,pct:Math.round(x.pct*100),conf:x.n>=24?"moyen (mini-diagnostic)":"faible",n:x.n};};
+    window.estimateScore=function(){return null;}; /* No fake /990 conversion from the mini-diagnostic. */
+    window.drawGauge=function(node){if(!node)return;var r=diagResult();if(!r){node.innerHTML="";return}var pct=Math.round(r.ok/r.n*100),R=84,C=2*Math.PI*R,nodePct=r.ok/r.n;node.innerHTML='<svg width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Diagnostic '+r.ok+' bonnes réponses sur 24"><circle cx="100" cy="100" r="'+R+'" fill="none" stroke="var(--bg2)" stroke-width="16"/><circle cx="100" cy="100" r="'+R+'" fill="none" stroke="var(--blue)" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-nodePct))+'"/></svg><div class="val"><div class="n">'+r.ok+'/24</div><div class="l">mini-diagnostic · '+pct+'%</div></div>';};
+    if(typeof window.renderDashboard==="function"){
+      window.renderDashboard=function(){var r=diagResult(),has=!!r;var de=document.getElementById("dashEmpty"),df=document.getElementById("dashFull");if(de)de.hidden=has;if(df)df.hidden=!has;if(!has)return;window.drawGauge(document.getElementById("scoreGauge"));var scorePill=document.querySelector("#dashboard .pill.teal");if(scorePill)scorePill.textContent="Profil du dernier diagnostic";var conf=document.getElementById("confLine");if(conf)conf.textContent="Mini-diagnostic 24 questions · Listening "+r.listening.ok+"/12 · Reading "+r.reading.ok+"/12 · aucun faux score officiel /990";var tgt=document.getElementById("targetInput");if(tgt)tgt.value=(typeof Store!=="undefined"?Store.get("target",800):800);var gap=document.getElementById("gapLine");if(gap)gap.textContent="Ton objectif /990 reste utile pour le vrai TOEIC, mais ce mini-diagnostic ne fournit volontairement pas de conversion officielle.";var j=document.querySelector("#dashboard .journey");if(j)j.style.display="none";var streak=document.getElementById("stStreak"),answered=document.getElementById("stAnswered"),words=document.getElementById("stWords"),acc=document.getElementById("stAcc");if(streak&&typeof Store!=="undefined")streak.textContent=Store.get("streak",{count:0}).count||0;if(answered&&typeof Store!=="undefined")answered.textContent=Store.get("global",{n:0}).n||0;if(words&&typeof Store!=="undefined")words.textContent=(Store.get("mywords",[])||[]).length;if(acc)acc.textContent=Math.round(r.ok/r.n*100)+"%";var stat=acc&&acc.closest(".mini-stat"),lab=stat&&stat.querySelector(".l");if(lab)lab.textContent="réussite au dernier diagnostic";var bars=document.getElementById("skillBars");if(bars){bars.innerHTML="";for(var p=1;p<=7;p++){var v=r.byPart[String(p)]||{ok:0,n:0},pct=v.n?Math.round(v.ok/v.n*100):0;var d=document.createElement("div");d.className="skill";d.innerHTML='<div class="h"><span>TOEIC Part '+p+'</span><span class="v">'+v.ok+'/'+v.n+' · '+pct+'%</span></div><div class="bar"><i class="fill-'+(pct<50?'red':pct<70?'orange':pct<85?'yellow':'green')+'" style="width:'+pct+'%"></i></div>';bars.appendChild(d);}}
+        var weak=Object.entries(r.byPart||{}).sort(function(a,b){return(a[1].ok/a[1].n)-(b[1].ok/b[1].n)})[0];var next=document.getElementById("nextStepLine");if(next)next.innerHTML=weak?'Prochaine étape conseillée : <strong>TOEIC Part '+weak[0]+'</strong>.':'Continue comme ça.';
+      };
     }
-    if(typeof window.drawGauge==="function"){
-      window.drawGauge=function(node,score){if(!node)return;var pct=Math.max(0,Math.min(1,(score-10)/(990-10))),R=84,C=2*Math.PI*R,col=score>=785?"var(--green)":score>=600?"var(--yellow)":score>=450?"var(--orange)":"var(--coral)";node.innerHTML='<svg width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Score indicatif '+score+' sur 990"><circle cx="100" cy="100" r="'+R+'" fill="none" stroke="var(--bg2)" stroke-width="16"/><circle cx="100" cy="100" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pct))+'"/></svg><div class="val"><div class="n">'+score+'</div><div class="l">/ 990 indicatif</div></div>';};
-    }
-    if(typeof window.showDiagResult==="function"){var old=window.showDiagResult;window.showDiagResult=function(){var v=old.apply(this,arguments);patchScoreCopy();return v;};}
-    if(typeof window.renderDashboard==="function"){var oldDash=window.renderDashboard;window.renderDashboard=function(){var v=oldDash.apply(this,arguments);patchScoreCopy();return v;};}
   }
-  function patchScoreCopy(){
-    $all("#diagResult .pill, #dashboard .pill").forEach(function(x){if(/Score TOEIC estimé/i.test(x.textContent))x.textContent="Score indicatif · mini-diagnostic";});
-    var c=document.getElementById("confLine");if(c&&c.textContent.indexOf("mini-diagnostic")<0)c.textContent=c.textContent.replace("Estimation","Indication issue du dernier diagnostic");
-    var acc=document.getElementById("stAcc");if(acc){var stat=acc.closest(".mini-stat"),lab=stat&&stat.querySelector(".l");if(lab)lab.textContent="réussite au dernier diagnostic";}
-    var streak=document.getElementById("stStreak");if(streak){var st=streak.closest(".mini-stat"),sl=st&&st.querySelector(".l");if(sl)sl.textContent="jours d'activité d'affilée";}
-  }
-
+  function patchScoreCopy(){var x=document.querySelector("#dashboard .pill.teal");if(x&&/Score TOEIC estimé/i.test(x.textContent))x.textContent="Profil du dernier diagnostic";}
 
   function installLocalDateFix(){
     if(typeof window.todayStr==="function")window.todayStr=todayKey;
@@ -195,10 +181,15 @@
     var mo=new MutationObserver(run);mo.observe(body,{childList:true,subtree:true});run();
   }
 
+
+  function installGlobalResetFix(){var b=document.getElementById("resetData");if(!b||b.__ht23)return;b.__ht23=true;b.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();if(!confirm("Effacer toute ta progression sur cet appareil ? Cette action est définitive."))return;try{var a=typeof Store!=="undefined"?Store.get("a11y",{}):{};if(typeof Store!=="undefined"){Store.clear();Store.set("a11y",a);}localStorage.removeItem("ht_toeic_diagnostic_v3");localStorage.removeItem("toeicDaily_v1");if(window.HT&&HT.xp)HT.xp.reset();if(typeof renderDashboard==="function")renderDashboard();if(typeof toast==="function")toast("Progression réinitialisée");if(typeof go==="function")go("home");}catch(x){}},true);}
+
+  function openRequestedView(){try{var v=sessionStorage.getItem("ht_open_view");if(!v)return;sessionStorage.removeItem("ht_open_view");setTimeout(function(){var b=document.querySelector('[data-nav="'+v+'"]');if(b)b.click();},80);}catch(e){}}
+
   function init(){
     HT.speed.enableGlobal();$all("[data-ht-speed]").forEach(HT.speed.mount);$all("[data-ht-strategy]").forEach(HT.renderStrategies);$all("[data-ht-gamify]").forEach(renderGamify);if("speechSynthesis" in window){try{speechSynthesis.getVoices();}catch(e){}}
     if(rootSite()){
-      rebalanceSharedBank();rebalanceFullMock();installLocalDateFix();installDiagnosticFix();installScoreFix();installRecordFix();installExamFix();wrapChronoMenu();patchChronoCopy();patchStress();patchA11y();patchDailyChallenge();patchScoreCopy();
+      rebalanceSharedBank();rebalanceFullMock();installLocalDateFix();installDiagnosticFix();installScoreFix();installRecordFix();installExamFix();wrapChronoMenu();patchChronoCopy();patchStress();patchA11y();patchDailyChallenge();patchScoreCopy();installGlobalResetFix();openRequestedView();
     }
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();

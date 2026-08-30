@@ -1,10 +1,10 @@
-/* Homemade TOEIC Trainer — service worker v22
-   Root-site audit: reliable shell precache + cumulative audited games. */
-const CACHE = "homemade-toeic-v22";
+/* Homemade TOEIC Trainer — service worker v23
+   Diagnostic rebuild: adds the dedicated 24-question TOEIC diagnostic + cumulative audited games. */
+const CACHE = "homemade-toeic-v23";
 const CORE = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "./ht-kit.css", "./ht-kit.js", "./ht-errors.js", "./toeic-bank.js",
-  "./sauvegarde-progression.html"
+  "./sauvegarde-progression.html", "./diagnostic-toeic.html"
 ];
 const OPTIONAL = [
   "./constructeur-de-phrases.html", "./controle-vitesse-audio.html",
