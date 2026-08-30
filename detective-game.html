@@ -2,812 +2,182 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Detective Academy — a corporate investigation reading game for TOEIC practice.">
 <title>Detective Academy — TOEIC Escape Game</title>
-<!--
-  DETECTIVE ACADEMY — TOEIC ESCAPE GAME
-  ====================================================================
-  Fichier autonome (HTML + CSS + JS), sans dépendance externe.
-  Compatible GitHub Pages. Progression sauvegardée dans localStorage.
-
-  STRUCTURE DES MÉDIAS (chemins relatifs, modifiables dans CONFIG) :
-    images/detective/01_home_screen.png ... mission_05_final_interview.png
-    audio/theme_detective_jazz_vintage_poirot_style.mp3
-
-  AJOUTER UNE MISSION : ajoute un objet dans le tableau MISSIONS.
-  La progression, les rangs, l'XP et le tableau d'indices s'adaptent
-  automatiquement à la taille du tableau.
--->
 <style>
-/* =================================================================
-   1. THÈME — détective vintage, sombre + accents dorés
-   ================================================================= */
 :root{
-  --bg:#0C1019; --bg2:#121826; --panel:#19212F; --panel2:#212C40;
-  --ink:#ECE8DC; --muted:#9AA3B6; --line:#2C3650;
-  --gold:#D9B45A; --gold-2:#F0CE76; --gold-line:#6E5A2A; --gold-soft:#241F12;
-  --green:#62B673; --green-soft:#16291D; --red:#D9695C; --red-soft:#2E1B1A;
-  --parch:#E9DEC2; --parch-ink:#241E12; --parch-line:#C9B68A;
-  --r:18px; --r-sm:12px;
-  --shadow:0 18px 44px rgba(0,0,0,.55), 0 4px 12px rgba(0,0,0,.4);
-  --display:Georgia,"Times New Roman",'Iowan Old Style',serif;
-  --body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --tap:48px;
+  --bg:#0C1019;--bg2:#121826;--panel:#19212F;--panel2:#212C40;--ink:#ECE8DC;--muted:#AAB2C3;
+  --line:#34415D;--gold:#D9B45A;--gold2:#F0CE76;--goldline:#75632F;--goldsoft:#282214;
+  --green:#6BC27B;--greensoft:#16291D;--red:#E27668;--redsoft:#321C1A;--parch:#E9DEC2;--parchink:#241E12;
+  --parchline:#C9B68A;--r:18px;--rs:12px;--shadow:0 18px 44px rgba(0,0,0,.5);--tap:48px;
+  --display:Georgia,"Times New Roman",serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
-*{ box-sizing:border-box; }
-html{ -webkit-text-size-adjust:100%; }
-body{
-  margin:0; font-family:var(--body); color:var(--ink); line-height:1.55;
-  background:
-    radial-gradient(60vw 50vw at 100% -10%, rgba(217,180,90,.10), transparent 60%),
-    radial-gradient(50vw 40vw at -10% 110%, rgba(217,180,90,.07), transparent 60%),
-    var(--bg);
-  background-attachment:fixed; min-height:100vh;
-}
-.wrap{ max-width:1020px; margin:0 auto; padding:18px 18px 80px; }
-h1,h2,h3,h4{ font-family:var(--display); line-height:1.15; letter-spacing:.01em; }
-.eyebrow{ font-family:var(--body); text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:700; color:var(--gold); }
-.muted{ color:var(--muted); }
-.hide{ display:none !important; }
-
-/* Screens (une seule visible à la fois) */
-.screen{ display:none; animation:fade .5s ease both; }
-.screen.active{ display:block; }
-@keyframes fade{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none; } }
-
-/* =================================================================
-   2. MUSIQUE — bouton fixé en haut à droite
-   ================================================================= */
-.music-dock{
-  position:fixed; top:14px; right:14px; z-index:60;
-  display:flex; align-items:center; gap:10px;
-  background:rgba(12,16,25,.92); color:var(--ink);
-  border:1px solid var(--gold-line); border-radius:999px;
-  padding:7px 10px 7px 14px; box-shadow:var(--shadow); backdrop-filter:blur(6px);
-}
-.music-btn{ border:0; background:transparent; color:var(--gold-2); cursor:pointer; font:inherit; font-weight:700; font-size:.85rem; display:flex; align-items:center; gap:7px; min-height:32px; }
-.vol input[type=range]{ width:84px; accent-color:var(--gold); cursor:pointer; }
-@media (max-width:560px){ .vol input[type=range]{ width:56px; } }
-
-/* =================================================================
-   3. COMPOSANTS GÉNÉRAUX
-   ================================================================= */
-.btn{ display:inline-flex; align-items:center; justify-content:center; gap:9px;
-  min-height:var(--tap); padding:0 24px; border-radius:999px; border:1px solid transparent;
-  font-family:var(--display); font-weight:700; font-size:1.02rem; cursor:pointer; text-decoration:none;
-  transition:transform .15s, box-shadow .2s, background .2s, border-color .2s; }
-.btn:active{ transform:translateY(1px); }
-.btn.gold{ background:linear-gradient(135deg,var(--gold),var(--gold-2)); color:#241B05; box-shadow:0 10px 24px rgba(217,180,90,.32); }
-.btn.gold:hover{ box-shadow:0 14px 30px rgba(217,180,90,.45); transform:translateY(-1px); }
-.btn.ghost{ background:transparent; border-color:var(--gold-line); color:var(--gold-2); }
-.btn.ghost:hover{ border-color:var(--gold); }
-.btn.dark{ background:var(--panel2); color:var(--ink); border-color:var(--line); }
-.btn-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
-
-.panel{ background:linear-gradient(180deg,var(--panel),var(--bg2)); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); }
-.banner-img{ width:100%; height:clamp(200px,40vh,380px); object-fit:cover; object-position:center; display:block; border-bottom:1px solid var(--gold-line); }
-.banner-img.square{ height:clamp(220px,44vh,420px); }
-
-/* Image avec cadre doré + léger zoom au survol */
-.framed{ overflow:hidden; border-radius:var(--r); border:1px solid var(--gold-line); position:relative; }
-.framed img{ transition:transform .6s cubic-bezier(.2,.8,.2,1); }
-.framed:hover img{ transform:scale(1.04); }
-.framed .img-missing{ min-height:200px; background:var(--panel2); display:grid; place-items:center; color:var(--muted); }
-
-/* =================================================================
-   4. HOME / BRIEFING
-   ================================================================= */
-.hero{ border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--gold-line); position:relative; }
-.hero .hero-img-wrap{ position:relative; }
-.hero .overlay{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(12,16,25,.15) 0%, rgba(12,16,25,.55) 55%, rgba(12,16,25,.96) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:28px 26px; }
-.hero h1{ font-size:clamp(1.8rem,5.5vw,3.2rem); margin:6px 0 6px; color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.6); }
-.hero .tagline{ color:#E7DFCB; max-width:48ch; margin:0; font-size:clamp(1rem,2.4vw,1.18rem); }
-.case-stamp{ display:inline-block; border:2px solid var(--red); color:var(--red); font-family:var(--display); font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:4px 12px; border-radius:6px; transform:rotate(-3deg); font-size:.8rem; }
-
-.story{ padding:22px 24px; }
-.story p{ margin:0 0 12px; }
-.story .lead{ font-size:1.08rem; }
-
-/* =================================================================
-   5. HUD (rang + XP + progression + score)
-   ================================================================= */
-.hud{ display:grid; gap:14px; margin-bottom:18px; }
-.rankbar{ display:grid; grid-template-columns:auto 1fr auto; gap:6px 16px; align-items:center; padding:14px 18px; }
-.badge-rank{ width:46px; height:46px; border-radius:12px; background:radial-gradient(circle at 30% 25%, var(--gold-2), var(--gold) 60%, var(--gold-line)); display:grid; place-items:center; color:#241B05; font-size:1.4rem; box-shadow:0 6px 16px rgba(217,180,90,.35); }
-.rankbar .rk-label{ font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
-.rankbar .rk-name{ font-family:var(--display); font-weight:700; font-size:clamp(1.1rem,3vw,1.5rem); color:var(--gold-2); }
-.rankbar .score{ text-align:right; }
-.rankbar .score b{ font-family:var(--display); font-size:1.3rem; color:var(--ink); display:block; }
-.rankbar .score span{ font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
-.xp-wrap{ grid-column:1 / -1; }
-.xp-meta{ display:flex; justify-content:space-between; font-size:.72rem; color:var(--muted); margin:6px 0 5px; }
-.xp-bar{ height:10px; background:#0c1119; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
-.xp-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold-2)); box-shadow:0 0 12px rgba(240,206,118,.6); transition:width .9s cubic-bezier(.2,.8,.2,1); }
-
-/* Progression des missions */
-.track{ display:flex; align-items:center; gap:6px; padding:12px 14px; overflow-x:auto; }
-.track .node{ display:flex; align-items:center; gap:6px; flex:none; }
-.track .dot{ width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-family:var(--display); font-weight:700; background:var(--panel2); color:var(--muted); border:2px solid var(--line); font-size:.85rem; }
-.track .dot.done{ background:var(--gold); color:#241B05; border-color:var(--gold-2); }
-.track .dot.current{ border-color:var(--gold-2); color:var(--gold-2); box-shadow:0 0 0 3px rgba(217,180,90,.18); }
-.track .link{ width:24px; height:3px; background:var(--line); border-radius:2px; flex:none; }
-.track .link.done{ background:var(--gold); }
-.track .cap{ font-size:.66rem; color:var(--muted); white-space:nowrap; }
-
-/* =================================================================
-   6. MISSION
-   ================================================================= */
-.mission .m-head{ padding:16px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line); }
-.mission .m-num{ width:34px; height:34px; border-radius:50%; background:var(--gold); color:#241B05; display:grid; place-items:center; font-family:var(--display); font-weight:700; flex:none; }
-.mission .m-head .eyebrow{ display:block; }
-.mission .m-head h2{ margin:0; font-size:clamp(1.15rem,3vw,1.5rem); color:var(--gold-2); }
-.mission .m-body{ padding:20px; }
-.context{ font-style:italic; color:var(--muted); margin:0 0 16px; }
-
-/* Document de type "dossier d'enquête" sur parchemin */
-.doc{ background:var(--parch); color:var(--parch-ink); border:1px solid var(--parch-line); border-radius:var(--r-sm); padding:16px 18px; margin:0 0 22px; box-shadow:inset 0 0 40px rgba(120,90,40,.12); }
-.doc .doc-kind{ font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:#7a6326; font-weight:700; margin-bottom:6px; }
-.doc .doc-title{ font-family:var(--display); font-weight:700; margin:0 0 10px; font-size:1.08rem; }
-.doc pre{ font-family:var(--body); white-space:pre-wrap; margin:0; font-size:.96rem; line-height:1.5; }
-.doc hr{ border:0; border-top:1px dashed var(--parch-line); margin:12px 0; }
-
-/* Questions */
-.q{ border-top:1px solid var(--line); padding:16px 0; }
-.q:first-of-type{ border-top:0; padding-top:0; }
-.q .q-text{ font-weight:700; margin:0 0 10px; }
-.q .q-text .qn{ color:var(--gold-2); font-family:var(--display); }
-.opts{ display:grid; gap:8px; }
-.opt{ display:flex; align-items:center; gap:11px; width:100%; text-align:left; cursor:pointer; font:inherit; color:var(--ink);
-  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-sm); padding:11px 13px; min-height:var(--tap);
-  transition:border-color .15s, background .15s, transform .1s; }
-.opt:hover:not(:disabled){ border-color:var(--gold); transform:translateY(-1px); }
-.opt:disabled{ cursor:default; }
-.opt .key{ width:26px; height:26px; border-radius:7px; background:#0c1119; border:1px solid var(--line); color:var(--muted); font-family:var(--display); font-weight:700; display:grid; place-items:center; flex:none; font-size:.85rem; }
-.opt.correct{ background:var(--green-soft); border-color:var(--green); }
-.opt.correct .key{ background:var(--green); color:#06210f; border-color:var(--green); }
-.opt.wrong{ background:var(--red-soft); border-color:var(--red); }
-.opt.wrong .key{ background:var(--red); color:#2a0d0a; border-color:var(--red); }
-.fb{ margin-top:9px; font-weight:700; font-size:.92rem; display:none; }
-.fb.show{ display:block; }
-.fb.ok{ color:var(--green); }
-.fb.no{ color:var(--red); }
-
-.result{ border-top:1px solid var(--line); margin-top:6px; padding-top:18px; }
-.result .r-head{ font-family:var(--display); font-size:1.2rem; margin:0 0 4px; display:flex; gap:9px; align-items:center; }
-.result.pass .r-head{ color:var(--green); } .result.fail .r-head{ color:var(--red); }
-.result .r-sc{ color:var(--muted); margin:0 0 14px; }
-
-/* Révélation d'indice */
-.clue-reveal{ margin-top:14px; border:1px solid var(--gold-line); border-radius:var(--r); overflow:hidden; }
-.clue-reveal .ci{ display:grid; grid-template-columns:120px 1fr; gap:0; align-items:stretch; }
-.clue-reveal img{ width:100%; height:100%; object-fit:cover; }
-.clue-reveal .ct{ padding:14px 16px; }
-.clue-reveal .ct .tag{ display:inline-block; background:var(--gold); color:#241B05; font-family:var(--display); font-weight:700; border-radius:999px; padding:3px 12px; font-size:.8rem; }
-@media (max-width:520px){ .clue-reveal .ci{ grid-template-columns:1fr; } .clue-reveal img{ height:150px; } }
-
-/* =================================================================
-   7. TABLEAU D'INDICES (evidence rail)
-   ================================================================= */
-.evidence{ padding:16px 18px; }
-.evidence h3{ margin:0 0 12px; color:var(--gold-2); display:flex; align-items:center; gap:8px; font-size:1.05rem; }
-.clue-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
-@media (max-width:640px){ .clue-grid{ grid-template-columns:repeat(2,1fr); } }
-.clue{ border:1px solid var(--line); border-radius:var(--r-sm); overflow:hidden; background:var(--panel2); }
-.clue .thumb{ aspect-ratio:1/1; width:100%; object-fit:cover; display:block; filter:grayscale(.4) brightness(.7); }
-.clue.open .thumb{ filter:none; }
-.clue .cap{ padding:8px 10px; font-size:.78rem; color:var(--muted); }
-.clue.open .cap{ color:var(--ink); }
-.clue .cap b{ display:block; color:var(--gold-2); font-family:var(--display); font-size:.82rem; margin-bottom:2px; }
-
-/* =================================================================
-   8. SUSPECT FINAL
-   ================================================================= */
-.suspects{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:8px; }
-@media (max-width:560px){ .suspects{ grid-template-columns:1fr; } }
-.suspect{ text-align:left; cursor:pointer; font:inherit; color:var(--ink);
-  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-sm); padding:14px 16px;
-  transition:border-color .15s, transform .1s, background .15s; }
-.suspect:hover:not(:disabled){ border-color:var(--gold); transform:translateY(-1px); }
-.suspect .nm{ font-family:var(--display); font-weight:700; font-size:1.1rem; color:var(--gold-2); }
-.suspect .ro{ font-size:.85rem; color:var(--muted); }
-.suspect.guilty{ background:var(--green-soft); border-color:var(--green); }
-.suspect.cleared{ background:var(--red-soft); border-color:var(--red); opacity:.7; }
-
-/* =================================================================
-   9. COFFRE + PROMOTION + confettis
-   ================================================================= */
-.reward-stage{ text-align:center; padding:8px 0 4px; }
-.reward-stage .framed{ display:inline-block; max-width:560px; width:100%; }
-.reward-stage img{ width:100%; display:block; }
-.chest-tap{ cursor:pointer; }
-@keyframes shake{ 0%,100%{transform:rotate(0)} 20%{transform:rotate(-2deg) scale(1.02)} 40%{transform:rotate(2deg) scale(1.03)} 60%{transform:rotate(-1.5deg) scale(1.04)} 80%{transform:rotate(1deg) scale(1.02)} }
-.chest-tap.opening{ animation:shake .7s ease; }
-.medal{ display:inline-block; background:var(--gold-soft); border:1px solid var(--gold-line); color:var(--gold-2); font-family:var(--display); font-weight:700; border-radius:999px; padding:8px 18px; margin:10px 0; }
-
-#confetti{ position:fixed; inset:0; pointer-events:none; z-index:70; overflow:hidden; }
-.cf{ position:absolute; top:-12px; width:9px; height:13px; opacity:.95; animation:fall linear forwards; }
-@keyframes fall{ to{ transform:translateY(110vh) rotate(720deg); } }
-
-/* Toast */
-.toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--panel); border:1px solid var(--gold-line); color:var(--ink); padding:13px 22px; border-radius:999px; box-shadow:var(--shadow); font-family:var(--display); font-weight:700; z-index:80; opacity:0; pointer-events:none; transition:opacity .4s, transform .4s; }
-.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-.toast .g{ color:var(--gold-2); }
-
-@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:var(--body);color:var(--ink);line-height:1.55;background:radial-gradient(60vw 50vw at 100% -10%,rgba(217,180,90,.1),transparent 60%),var(--bg)}
+button,input{font:inherit}.wrap{max-width:1020px;margin:auto;padding:18px 18px 80px}.screen{display:none}.screen.active{display:block}.hide{display:none!important}
+h1,h2,h3{font-family:var(--display);line-height:1.15}.eyebrow{text-transform:uppercase;letter-spacing:.19em;font-size:.7rem;font-weight:800;color:var(--gold)}.muted{color:var(--muted)}
+.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:100;background:#fff;color:#111;padding:10px 14px;border-radius:8px}
+.music-dock{position:fixed;top:12px;right:12px;z-index:60;display:flex;align-items:center;gap:9px;background:rgba(12,16,25,.95);border:1px solid var(--goldline);border-radius:999px;padding:7px 10px;box-shadow:var(--shadow)}
+.music-btn{border:0;background:transparent;color:var(--gold2);font-weight:800;cursor:pointer;min-height:34px}.vol input{width:84px;accent-color:var(--gold)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);padding:0 22px;border-radius:999px;border:1px solid transparent;font-family:var(--display);font-weight:700;font-size:1rem;cursor:pointer;text-decoration:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#241B05}.btn.dark{background:var(--panel2);border-color:var(--line);color:var(--ink)}.btn.ghost{background:transparent;border-color:var(--goldline);color:var(--gold2)}.btn:disabled{opacity:.55;cursor:not-allowed}.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}.panel{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.hero{position:relative;border:1px solid var(--goldline);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);margin-top:46px}.hero img,.banner{width:100%;height:clamp(210px,40vh,390px);object-fit:cover;display:block}.overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,16,25,.1),rgba(12,16,25,.55) 55%,rgba(12,16,25,.96));display:flex;flex-direction:column;justify-content:flex-end;padding:28px 26px}.overlay h1{font-size:clamp(1.9rem,5vw,3.15rem);margin:7px 0;color:#fff}.tagline{max-width:54ch;margin:0;color:#E7DFCB}.case-stamp{align-self:flex-start;border:2px solid var(--red);color:var(--red);font-family:var(--display);font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 11px;border-radius:6px;transform:rotate(-2deg);font-size:.8rem}
+.story{padding:22px 24px}.story p{margin:0 0 12px}.notice{margin:16px 0 0;padding:12px 14px;border-radius:var(--rs);background:var(--goldsoft);border:1px solid var(--goldline);color:#F3E5B2}
+.hud{display:grid;gap:13px;margin:46px 0 18px}.rankbar{padding:14px 18px;display:grid;grid-template-columns:auto 1fr auto;gap:7px 16px;align-items:center}.badge-rank{width:46px;height:46px;border-radius:12px;background:radial-gradient(circle at 30% 25%,var(--gold2),var(--gold) 60%,var(--goldline));display:grid;place-items:center;color:#241B05;font-size:1.4rem}.rk-label{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}.rk-name{font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--gold2)}.score{text-align:right}.score b{display:block;font-family:var(--display);font-size:1.25rem}.score span{font-size:.66rem;color:var(--muted)}.xp-wrap{grid-column:1/-1}.xp-meta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin:5px 0}.xp-bar{height:10px;background:#0c1119;border:1px solid var(--line);border-radius:999px;overflow:hidden}.xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .45s ease}
+.track{display:flex;align-items:center;gap:7px;padding:12px 14px;overflow-x:auto}.node{display:flex;align-items:center;gap:6px;flex:none}.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;background:var(--panel2);border:2px solid var(--line);color:var(--muted)}.dot.done{background:var(--gold);border-color:var(--gold2);color:#241B05}.dot.current{border-color:var(--gold2);color:var(--gold2);box-shadow:0 0 0 3px rgba(217,180,90,.18)}.link{width:24px;height:3px;background:var(--line)}.link.done{background:var(--gold)}
+.m-head{padding:16px 20px;display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--line)}.m-num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#241B05;font-family:var(--display);font-weight:800}.m-head h2{margin:0;color:var(--gold2)}.m-body{padding:20px}.context{font-style:italic;color:var(--muted)}
+.doc{background:var(--parch);color:var(--parchink);border:1px solid var(--parchline);border-radius:var(--rs);padding:16px 18px;margin:0 0 20px;box-shadow:inset 0 0 40px rgba(120,90,40,.12)}.doc-kind{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;font-weight:800;color:#725C24}.doc-title{font-family:var(--display);font-weight:800;margin:4px 0 10px}.doc pre{font-family:var(--body);white-space:pre-wrap;margin:0;line-height:1.55}
+.q{border-top:1px solid var(--line);padding:16px 0}.q:first-child{border-top:0}.q-text{font-weight:800;margin:0 0 10px}.qn{color:var(--gold2);font-family:var(--display)}.opts{display:grid;gap:8px}.opt{width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 13px;min-height:var(--tap);border:1px solid var(--line);border-radius:var(--rs);background:var(--panel2);color:var(--ink);cursor:pointer}.opt:hover:not(:disabled){border-color:var(--gold)}.opt:disabled{cursor:default}.key{width:27px;height:27px;border-radius:7px;display:grid;place-items:center;background:#0c1119;border:1px solid var(--line);color:var(--muted);font-family:var(--display);font-weight:800;flex:none}.opt.correct{background:var(--greensoft);border-color:var(--green)}.opt.correct .key{background:var(--green);color:#06210f}.opt.wrong{background:var(--redsoft);border-color:var(--red)}.opt.wrong .key{background:var(--red);color:#2a0d0a}.fb{display:none;margin-top:9px;font-weight:800}.fb.show{display:block}.fb.ok{color:var(--green)}.fb.no{color:var(--red)}
+.result{border-top:1px solid var(--line);padding-top:18px}.r-head{font-family:var(--display);font-size:1.2rem;font-weight:800;margin:0}.pass .r-head{color:var(--green)}.fail .r-head{color:var(--red)}
+.evidence{padding:16px 18px}.evidence h3{margin:0 0 12px;color:var(--gold2)}.clue-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.clue{border:1px solid var(--line);border-radius:var(--rs);overflow:hidden;background:var(--panel2)}.clue img{width:100%;aspect-ratio:1/1;object-fit:cover;filter:grayscale(.45) brightness(.7)}.clue.open img{filter:none}.clue .cap{padding:8px 9px;font-size:.77rem;color:var(--muted)}.clue .cap b{display:block;color:var(--gold2);font-family:var(--display);margin-bottom:3px}
+.suspects{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.suspect{padding:14px 16px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:var(--rs);color:var(--ink);cursor:pointer}.suspect:hover:not(:disabled){border-color:var(--gold)}.suspect .nm{font-family:var(--display);font-size:1.08rem;font-weight:800;color:var(--gold2)}.suspect .ro{font-size:.84rem;color:var(--muted)}.suspect.guilty{background:var(--greensoft);border-color:var(--green)}.suspect.cleared{background:var(--redsoft);border-color:var(--red);opacity:.72}
+.reward{text-align:center;padding:18px}.reward img{display:block;width:100%;max-width:560px;margin:auto;border-radius:var(--r)}.chest{cursor:pointer}.medal{display:inline-block;background:var(--goldsoft);border:1px solid var(--goldline);color:var(--gold2);font-family:var(--display);font-weight:800;border-radius:999px;padding:8px 18px;margin:10px 0}.mistake{border-left:4px solid var(--red);background:var(--redsoft);border-radius:8px;padding:10px 12px;margin:9px 0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--goldline);padding:12px 18px;border-radius:999px;box-shadow:var(--shadow);z-index:80;font-weight:800}.toast.hide{display:none}.footer{text-align:center;color:var(--muted);font-size:.84rem;margin-top:28px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}.cf{position:absolute;top:-12px;width:9px;height:13px;animation:fall linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media(max-width:640px){.music-dock{left:10px;right:10px;justify-content:center}.hero{margin-top:58px}.hud{margin-top:58px}.rankbar{grid-template-columns:auto 1fr}.score{grid-column:1/-1;text-align:left}.clue-grid{grid-template-columns:repeat(2,1fr)}.suspects{grid-template-columns:1fr}.btn{width:100%}.vol input{width:64px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
 </head>
 <body>
-
-<!-- MUSIQUE : bouton fixé en haut à droite -->
-<div class="music-dock" role="group" aria-label="Music controls">
-  <button id="musicBtn" class="music-btn" aria-pressed="true">🔊 Music ON</button>
-  <span class="vol"><input id="vol" type="range" min="0" max="100" value="60" aria-label="Volume"></span>
-</div>
-
+<a class="skip" href="#main">Skip to main content</a>
+<div class="music-dock" role="group" aria-label="Music controls"><button id="musicBtn" class="music-btn" type="button" aria-pressed="false">🔇 Music OFF</button><span class="vol"><input id="vol" type="range" min="0" max="100" value="60" aria-label="Music volume"></span></div>
 <div class="wrap">
-
-  <!-- ===================== HOME ===================== -->
-  <section id="home" class="screen active" aria-labelledby="home-h">
-    <div class="hero">
-      <div class="hero-img-wrap framed" style="border:0">
-        <img class="banner-img" src="images/detective/01_home_screen.png?v=3" alt="Detective Academy — bureau d'enquête" onerror="this.classList.add('img-missing')">
-        <div class="overlay">
-          <span class="case-stamp">Confidential · Case #24-17-B</span>
-          <h1>Detective Academy<br>Escape Game</h1>
-          <p class="tagline">Une enquête pour fraude d'entreprise. Lis les pièces du dossier en anglais, déduis la vérité, et démasque le coupable. Chaque mission réussie débloque un indice.</p>
-        </div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button id="startBtn" class="btn gold"><span aria-hidden="true">🕵️</span> Start Investigation</button>
-      <button class="btn dark resetBtn">↺ Reset Progress</button>
-    </div>
-  </section>
-
-  <!-- ===================== BRIEFING ===================== -->
-  <section id="briefing" class="screen" aria-labelledby="brief-h">
-    <div class="panel">
-      <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img" src="images/detective/02_briefing_screen.png?v=3" alt="Briefing de l'enquête" onerror="this.classList.add('img-missing')">
-      </div>
-      <div class="story">
-        <span class="eyebrow">Case briefing</span>
-        <h2 id="brief-h" style="color:var(--gold-2);margin:6px 0 12px">The Northbridge Fraud</h2>
-        <p class="lead">You are a <strong>trainee detective</strong> at the Academy. A corporate fraud has been reported at <strong>Northbridge Industries</strong>: a signed client contract has gone missing, and the company suspects one of four employees of covering it up.</p>
-        <p>Your job: work through <strong>five investigations</strong>. Each is a short reading task in English. Solve a mission and you <strong>unlock a clue</strong>. Once all five clues are on the evidence board, you may name the <strong>guilty suspect</strong> — but only then.</p>
-        <p class="muted">Read every document carefully, Detective. As they say around here: <em>every detail matters.</em></p>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button id="briefBtn" class="btn gold"><span aria-hidden="true">🔎</span> Begin Investigation</button>
-      <button class="btn ghost" data-screen="home">← Back</button>
-    </div>
-  </section>
-
-  <!-- ===================== GAME (HUD + mission + indices) ===================== -->
-  <section id="game" class="screen" aria-labelledby="game-h">
-    <h2 id="game-h" class="visually-hidden" style="position:absolute;left:-9999px">Investigation</h2>
-    <div class="hud">
-      <div class="panel rankbar">
-        <div class="badge-rank" aria-hidden="true">🕵️</div>
-        <div>
-          <div class="rk-label">Your rank</div>
-          <div class="rk-name" id="rankName">Trainee Detective</div>
-        </div>
-        <div class="score"><b id="scoreBig">0 / 15</b><span>Clues solved correctly</span></div>
-        <div class="xp-wrap">
-          <div class="xp-meta"><span>Experience</span><span id="xpText">0 / 1000 XP</span></div>
-          <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
-        </div>
-      </div>
-      <div class="panel track" id="track" aria-label="Mission progress"></div>
-    </div>
-
-    <div id="missionZone"></div>
-
-    <div class="panel evidence" style="margin-top:18px">
-      <h3>🧷 Evidence board</h3>
-      <div id="clueGrid" class="clue-grid"></div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn ghost small resetBtn">↺ Reset Progress</button>
-    </div>
-  </section>
-
-  <!-- ===================== FINAL SUSPECT ===================== -->
-  <section id="final" class="screen" aria-labelledby="final-h">
-    <div class="panel">
-      <div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">
-        <img class="banner-img square" src="images/detective/06_final_suspect.png?v=3" alt="Identifier le suspect" onerror="this.classList.add('img-missing')">
-      </div>
-      <div class="story">
-        <span class="eyebrow">Final deduction</span>
-        <h2 id="final-h" style="color:var(--gold-2);margin:6px 0 12px">Who is lying?</h2>
-        <p>All five clues are on the board. Re-read them, then name the person whose statement contradicts the evidence.</p>
-        <div class="panel evidence" style="margin:14px 0">
-          <h3>🧷 Collected clues</h3>
-          <div id="finalClues" class="clue-grid"></div>
-        </div>
-        <h3 style="color:var(--gold-2)">Name the fraudster</h3>
-        <div id="suspects" class="suspects"></div>
-        <div id="finalFb" class="fb" style="margin-top:14px"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== PROMOTION ===================== -->
-  <section id="promotion" class="screen" aria-labelledby="promo-h">
-    <div class="panel">
-      <div class="reward-stage" style="padding-top:18px">
-        <div class="framed" id="chestFrame">
-          <img id="chestImg" src="images/detective/03_chest_closed.png?v=3" alt="Reward chest" onerror="this.classList.add('img-missing')">
-        </div>
-        <p class="muted" id="chestHint" style="margin:10px 0 0">Tap the chest to claim your reward.</p>
-      </div>
-      <div class="story" id="promoBody" style="text-align:center; display:none">
-        <span class="eyebrow">Case closed</span>
-        <h2 id="promo-h" style="color:var(--gold-2);margin:6px 0 4px">Congratulations, Detective!</h2>
-        <p>You solved the case and earned your promotion.</p>
-        <div class="framed" style="max-width:520px;margin:8px auto;border:0">
-          <img src="images/detective/05_promotion_screen.png?v=3" alt="Promotion unlocked" style="width:100%;display:block;border-radius:var(--r)" onerror="this.classList.add('img-missing')">
-        </div>
-        <div class="medal" id="promoMedal">New rank</div>
-        <p class="muted" id="promoScore"></p>
-        <div class="btn-row" style="justify-content:center">
-          <button class="btn ghost" id="reviewBtn">Review the case file</button>
-          <button class="btn gold resetBtn">▶ Play again</button>
-        </div>
-        <div id="caseFile" style="margin-top:14px;text-align:left"></div>
-      </div>
-    </div>
-  </section>
-
+<section id="home" class="screen active">
+  <div class="hero"><img src="images/detective/01_home_screen.png?v=4" alt="Detective Academy investigation office" onerror="this.hidden=true"><div class="overlay"><span class="case-stamp">Confidential · Case #24-17-B</span><h1>Detective Academy<br>Escape Game</h1><p class="tagline">Investigate a missing corporate contract. Read the evidence in English, test each alibi, and identify the suspect whose story does not survive the records.</p></div></div>
+  <div class="btn-row"><button id="startBtn" class="btn gold" type="button">🕵️ Start New Investigation</button><button id="continueBtn" class="btn dark hide" type="button">Continue saved case →</button><button class="btn dark resetBtn" type="button">↺ Reset Progress</button></div>
+</section>
+<section id="briefing" class="screen">
+  <div class="panel"><img class="banner" src="images/detective/02_briefing_screen.png?v=4" alt="Case briefing" onerror="this.hidden=true"><div class="story"><span class="eyebrow">Case briefing</span><h2>The Northbridge Fraud</h2><p>You are a trainee detective. A signed client contract disappeared from Northbridge Industries. Four employees gave accounts of the afternoon.</p><p>Complete five reading investigations. Each solved mission unlocks one clue. The final deduction opens only after all five clues have been collected.</p><p class="notice">A booking, a cancelled flight or a badge record must be interpreted carefully: each record proves only what it actually records.</p></div></div>
+  <div class="btn-row"><button id="briefBtn" class="btn gold" type="button">🔎 Begin Investigation</button><button id="briefBack" class="btn ghost" type="button">← Back</button></div>
+</section>
+<main id="main">
+<section id="game" class="screen">
+  <div class="hud"><div class="panel rankbar"><div class="badge-rank" aria-hidden="true">🕵️</div><div><div class="rk-label">Your rank</div><div id="rankName" class="rk-name">Trainee Detective</div></div><div class="score"><b id="scoreBig">0 / 15</b><span>Correct answers</span></div><div class="xp-wrap"><div class="xp-meta"><span>Case progress</span><span id="xpText">0 / 5 missions</span></div><div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div></div></div><div class="panel track" id="track" aria-label="Mission progress"></div></div>
+  <div id="missionZone"></div>
+  <div class="panel evidence" style="margin-top:18px"><h3>🧷 Evidence board</h3><div id="clueGrid" class="clue-grid"></div></div>
+  <div class="btn-row"><button class="btn ghost resetBtn" type="button">↺ Reset Progress</button><a class="btn ghost" href="index.html">← TOEIC Trainer</a></div>
+</section>
+<section id="final" class="screen">
+  <div class="panel"><img class="banner" src="images/detective/board_evidence.png?v=4" alt="Evidence board for the final deduction" onerror="this.hidden=true"><div class="story"><span class="eyebrow">Final deduction</span><h2>Whose account cannot be reconciled with the records?</h2><p>All five clues are available. Use the evidence as a whole; do not rely on one clue alone.</p><div class="panel evidence" style="margin:14px 0"><h3>🧷 Collected clues</h3><div id="finalClues" class="clue-grid"></div></div><h3 style="color:var(--gold2)">Name the suspect</h3><div id="suspects" class="suspects"></div><div id="finalFb" class="fb" aria-live="polite"></div></div></div>
+</section>
+<section id="promotion" class="screen">
+  <div class="panel"><div class="reward"><div id="chestFrame" class="chest"><img id="chestImg" src="images/detective/03_chest_closed.png?v=4" alt="Closed reward chest"></div><p id="chestHint" class="muted">Open the chest to complete the case.</p></div><div id="promoBody" class="story" style="text-align:center;display:none"><span class="eyebrow">Case closed</span><h2>Congratulations, Detective!</h2><p>You solved the case and earned your promotion.</p><img src="images/detective/detective_working.png?v=4" alt="Detective reviewing the completed case" style="width:100%;max-width:520px;border-radius:var(--r)" onerror="this.hidden=true"><div class="medal" id="promoMedal">New rank</div><p id="promoScore" class="muted"></p><div class="btn-row" style="justify-content:center"><button id="reviewBtn" class="btn ghost" type="button">Review the case file</button><button id="playAgain" class="btn gold" type="button">▶ Play Again</button></div><div id="caseFile" style="text-align:left;margin-top:14px"></div></div></div>
+</section>
+</main>
+<footer class="footer">Homemade TOEIC Trainer · Educational training game</footer>
 </div>
-
-<div id="confetti" aria-hidden="true"></div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
+<div id="confetti" aria-hidden="true"></div><div id="toast" class="toast hide" role="status" aria-live="polite"></div>
 <script>
 "use strict";
-/* =================================================================
-   CONFIG — chemins des médias (relatifs pour GitHub Pages)
-   ================================================================= */
-var IMG = "images/detective/";
-var IMG_EXT = "?v=3";   // images nommées en .png simple
-var MUSIC_SRC = "audio/theme_detective_jazz_vintage_poirot_style.mp3?v=2";
+const IMG="images/detective/", MUSIC_SRC="audio/theme_detective_jazz_vintage_poirot_style.mp3?v=3";
+const LETTERS=["A","B","C","D"];
+const RANKS=["Trainee Detective","Junior Detective","Detective","Senior Detective","Inspector","Chief Inspector"];
+const MISSIONS=[
+{id:1,theme:"Suspicious Email",eyebrow:"Mission 1 · Reading emails",image:IMG+"mission_01_email.png?v=4",context:"Two employees describe the same afternoon differently. Separate what each person claims from what is independently verified.",doc:{kind:"Email thread",title:"Subject: Client Meeting Documents",body:`From: Laura Jenkins · To: Project Team
+“I printed the signed contract yesterday afternoon and left it in Meeting Room B at 4:00 p.m. I also sent a digital copy to Mark, just in case.”
 
-/* =================================================================
-   DATA — Missions (document + questions + indice débloqué)
-   L'enquête est cohérente : les 5 indices convergent vers le coupable.
-   ================================================================= */
-var MISSIONS = [
-  {
-    id:1, theme:"Suspicious Email", eyebrow:"Mission 1 · Reading emails",
-    image:IMG+"mission_01_email.png"+IMG_EXT,
-    context:"Two employees describe the same afternoon very differently. Read both emails and spot the contradiction.",
-    doc:{ kind:"Email thread", title:"Subject: Client Meeting Documents",
-      body:"From: Laura Jenkins  ·  To: Project Team\n\"I printed the signed contract yesterday afternoon and left it in Meeting Room B at 4:00 p.m. I also sent a digital copy to Mark, just in case.\"\n\n— — —\n\nFrom: Mark Evans  ·  To: Laura Jenkins\n\"Thanks, but I never received the digital copy — I checked my inbox this morning. I also went to Meeting Room B at 4:00 p.m. and there was no contract on the table.\"" },
-    questions:[
-      { text:"What did Laura say she did with the printed contract?",
-        options:["She mailed it to the client","She left it in Meeting Room B at 4:00 p.m.","She locked it in her desk","She gave it to Mark in person"], answer:1 },
-      { text:"What does Mark claim?",
-        options:["He received the digital copy","He signed the contract","He never got the copy and the room was empty","He cancelled the meeting"], answer:2 },
-      { text:"What is the key problem with these two emails?",
-        options:["They were sent on different days","Their accounts of the same afternoon contradict each other","Both employees agree completely","Neither mentions the contract"], answer:1 }
-    ],
-    clue:{ title:"Clue 1 — Conflicting stories", text:"Laura and Mark describe the same 4:00 p.m. moment in opposite ways. One of them is not telling the truth." }
-  },
-  {
-    id:2, theme:"Meeting Room Mystery", eyebrow:"Mission 2 · Reading a schedule",
-    image:IMG+"mission_02_meeting.png"+IMG_EXT,
-    context:"Mark says Meeting Room B was empty at 4:00 p.m. The booking log tells another story.",
-    doc:{ kind:"Room booking log — Tuesday", title:"Meeting Room B",
-      body:"14:00 – 15:00   Finance review        — S. Lee\n15:30 – 16:30   Private meeting       — M. Evans\n16:30 – 17:00   Cleaning\n\nNote: badge access is required to enter Room B after 15:00." },
-    questions:[
-      { text:"Who had Meeting Room B booked from 3:30 to 4:30 p.m.?",
-        options:["Sarah Lee","Mark Evans","Laura Jenkins","The cleaning team"], answer:1 },
-      { text:"Was the room free at 4:00 p.m.?",
-        options:["Yes, it was empty","No, it was booked by Mark Evans","It was being cleaned","It was closed all day"], answer:1 },
-      { text:"Why does this matter for the case?",
-        options:["It proves Laura lied","Mark was in the room at 4:00 p.m., yet he claims it was empty","Sarah took the contract","Nobody could enter Room B"], answer:1 }
-    ],
-    clue:{ title:"Clue 2 — He was there", text:"Mark had Room B booked 3:30–4:30 p.m. He was inside at 4:00 — exactly when Laura left the contract — yet he says the room was empty." }
-  },
-  {
-    id:3, theme:"Cancelled Flight", eyebrow:"Mission 3 · Reading travel info",
-    image:IMG+"mission_03_flight.png"+IMG_EXT,
-    context:"Mark told colleagues he was flying out that afternoon and would be unreachable. Check the departures board.",
-    doc:{ kind:"Travel record + departures board", title:"Flight NB220 — Lyon → London",
-      body:"Passenger: M. Evans\nScheduled departure: Tuesday, 15:50\n\nDEPARTURES BOARD (Tuesday):\nNB218  Amsterdam   15:20   ON TIME\nNB220  London      15:50   CANCELLED\nNB224  Geneva      16:10   ON TIME\n\nMark had told the team: \"I'll be flying to London this afternoon — unreachable.\"" },
-    questions:[
-      { text:"What was Mark's stated plan for Tuesday afternoon?",
-        options:["To work from home","To fly to London and be unreachable","To meet the client in Lyon","To take the train to Geneva"], answer:1 },
-      { text:"What happened to flight NB220?",
-        options:["It was on time","It was delayed one hour","It was cancelled","It left early"], answer:2 },
-      { text:"What does this mean for Mark's alibi?",
-        options:["It is confirmed — he was abroad","It fails — he never left the city","He was on the Geneva flight","He missed his train"], answer:1 }
-    ],
-    clue:{ title:"Clue 3 — Broken alibi", text:"Mark's flight NB220 was cancelled, so he never flew out. His 'I was away' alibi does not hold." }
-  },
-  {
-    id:4, theme:"Product Investigation", eyebrow:"Mission 4 · Reading an access log",
-    image:IMG+"mission_04_inventory.png"+IMG_EXT,
-    context:"The document vault keeps an electronic access log. Find out who opened the safe in Room B.",
-    doc:{ kind:"Document vault — access log", title:"Room B — Tuesday afternoon",
-      body:"16:00   Room B entered          — badge: M. EVANS\n16:05   Document safe OPENED     — badge: M. EVANS\n16:18   File 'Client contract' marked REMOVED\n16:22   Room B exited            — badge: M. EVANS" },
-    questions:[
-      { text:"Whose badge opened the document safe at 4:05 p.m.?",
-        options:["S. Lee","D. Cooper","M. Evans","L. Jenkins"], answer:2 },
-      { text:"What was marked 'removed' at 4:18 p.m.?",
-        options:["A laptop","The client contract file","A set of keys","The cleaning supplies"], answer:1 },
-      { text:"What does the log establish?",
-        options:["Nobody entered Room B","Mark entered, opened the safe and removed the contract minutes after Laura left it","The contract was never in Room B","Laura removed the file"], answer:1 }
-    ],
-    clue:{ title:"Clue 4 — The access log", text:"Mark's badge opened the Room B safe at 4:05 p.m.; the client contract was marked removed at 4:18 p.m." }
-  },
-  {
-    id:5, theme:"Final Witness Statements", eyebrow:"Mission 5 · Comparing statements",
-    image:IMG+"mission_05_final_interview.png"+IMG_EXT,
-    context:"Four short statements. Three are backed by records; one contradicts the evidence at every point.",
-    doc:{ kind:"Witness statements", title:"Interview summaries",
-      body:"Laura Jenkins: \"I left the contract in Room B at 4:00 and emailed Mark a copy.\"  (matches the email log)\n\nSarah Lee: \"My finance review ended at 3:00; I left the building at 3:15.\"  (confirmed by exit log)\n\nDaniel Cooper: \"I was off-site with the client all afternoon — see the visitor log.\"  (confirmed by visitor log)\n\nMark Evans: \"I was away on a flight, and Room B was empty.\"  (booking, flight and access logs all disagree)" },
-    questions:[
-      { text:"Which statement is contradicted by the booking, flight and access logs?",
-        options:["Laura's","Sarah's","Daniel's","Mark's"], answer:3 },
-      { text:"Whose alibi is confirmed by a visitor log?",
-        options:["Mark Evans","Daniel Cooper","Laura Jenkins","Nobody's"], answer:1 },
-      { text:"Putting every clue together, who is lying?",
-        options:["Laura Jenkins","Sarah Lee","Mark Evans","Daniel Cooper"], answer:2 }
-    ],
-    clue:{ title:"Clue 5 — Only one story breaks", text:"Three alibis check out. Only Mark's account contradicts the booking log, the flight status AND the access log." }
-  }
+From: Mark Evans · To: Laura Jenkins
+“Thanks, but I never received the digital copy — I checked my inbox this morning. I also went to Meeting Room B at 4:00 p.m. and there was no contract on the table.”`},questions:[
+{text:"What does Laura say she did with the printed contract?",options:["She mailed it to the client","She left it in Meeting Room B at 4:00 p.m.","She locked it in her desk","She gave it to Mark in person"],answer:1},
+{text:"What does Mark claim?",options:["He received the digital copy","He signed the contract","He never received the copy and saw no contract in the room","He cancelled the meeting"],answer:2},
+{text:"What can the email thread establish by itself?",options:["Which employee is guilty","That the two accounts conflict","That Mark opened the safe","That Laura definitely told the truth"],answer:1}
+],clue:{title:"Clue 1 — Conflicting accounts",text:"Laura says the contract was left in Room B at 4:00. Mark says he saw no contract there. The emails establish a contradiction, not yet who is truthful."}},
+{id:2,theme:"Meeting Room Mystery",eyebrow:"Mission 2 · Reading a schedule",image:IMG+"mission_02_meeting.png?v=4",context:"Check what the booking record really proves — and what it does not.",doc:{kind:"Room booking log — Tuesday",title:"Meeting Room B",body:`14:00 – 15:00   Finance review        — S. Lee
+15:30 – 16:30   Private meeting       — M. Evans
+16:30 – 17:00   Cleaning
+
+Note: badge access is required to enter Room B after 15:00.`},questions:[
+{text:"Who had Meeting Room B reserved from 3:30 to 4:30 p.m.?",options:["Sarah Lee","Mark Evans","Laura Jenkins","The cleaning team"],answer:1},
+{text:"Was Meeting Room B available for another booking at 4:00 p.m.?",options:["Yes","No — it was reserved under Mark Evans's name","Yes — cleaning had started","The log does not show any booking"],answer:1},
+{text:"What is the safest conclusion from the booking log alone?",options:["Mark definitely entered the room","Mark definitely stole the contract","The room was reserved under Mark's name, but the log does not prove who physically entered","Laura could not have entered the room"],answer:2}
+],clue:{title:"Clue 2 — The reservation",text:"Room B was reserved under Mark's name from 3:30–4:30. A booking does not prove physical presence, so the investigators still need the badge-access record."}},
+{id:3,theme:"Cancelled Flight",eyebrow:"Mission 3 · Reading travel information",image:IMG+"mission_03_flight.png?v=4",context:"Mark said he was flying to London. Check whether the travel record supports that specific claim.",doc:{kind:"Travel record + departures board",title:"Flight NB220 — Lyon → London",body:`Passenger: M. Evans
+Scheduled departure: Tuesday, 15:50
+
+DEPARTURES BOARD
+NB218  Amsterdam   15:20   ON TIME
+NB220  London      15:50   CANCELLED
+NB224  Geneva      16:10   ON TIME
+
+Mark told the team: “I'll be flying to London this afternoon — unreachable.”`},questions:[
+{text:"What was Mark's stated plan for Tuesday afternoon?",options:["To work from home","To fly to London and be unreachable","To meet the client in Lyon","To take the train to Geneva"],answer:1},
+{text:"What happened to flight NB220?",options:["It was on time","It was delayed one hour","It was cancelled","It left early"],answer:2},
+{text:"What does the cancellation prove?",options:["Mark was definitely in Room B","Mark did not travel on flight NB220 as claimed","Mark never left Lyon by any means","Mark took the Geneva flight"],answer:1}
+],clue:{title:"Clue 3 — Unsupported flight alibi",text:"NB220 was cancelled. That does not prove where Mark was all afternoon, but the cancelled flight cannot support his claim that he was away on that flight."}},
+{id:4,theme:"Access Log",eyebrow:"Mission 4 · Reading an electronic log",image:IMG+"mission_04_inventory.png?v=4",context:"The badge and safe records are more direct than the room booking. Read the sequence precisely.",doc:{kind:"Document vault — access log",title:"Room B — Tuesday afternoon",body:`16:00   Room B entered          — badge: M. EVANS
+16:05   Document safe OPENED     — badge: M. EVANS
+16:18   File “Client contract” marked REMOVED
+16:22   Room B exited            — badge: M. EVANS`},questions:[
+{text:"Whose badge opened the document safe at 4:05 p.m.?",options:["S. Lee","D. Cooper","M. Evans","L. Jenkins"],answer:2},
+{text:"What was marked REMOVED at 4:18 p.m.?",options:["A laptop","The client contract file","A set of keys","Cleaning supplies"],answer:1},
+{text:"Which statement matches the log exactly?",options:["Nobody entered Room B","Mark's badge entered Room B and opened the safe; the contract was marked removed 13 minutes later","Laura's badge removed the file","The contract was removed before the safe opened"],answer:1}
+],clue:{title:"Clue 4 — The access sequence",text:"Mark's badge entered Room B at 4:00 and opened the safe at 4:05. The contract was marked removed at 4:18, before the same badge exited at 4:22."}},
+{id:5,theme:"Witness Statements",eyebrow:"Mission 5 · Comparing statements and records",image:IMG+"mission_05_final_interview.png?v=4",context:"Compare each statement with the independent record summary. Do not rely on the comments of another witness.",doc:{kind:"Witness statements + record summary",title:"Interview summaries",body:`STATEMENTS
+Laura Jenkins: “I left the contract in Room B at 4:00 and emailed Mark a copy.”
+Sarah Lee: “My finance review ended at 3:00; I left the building at 3:15.”
+Daniel Cooper: “I was off-site with the client all afternoon.”
+Mark Evans: “I was away on a flight, and Room B was empty.”
+
+RECORD SUMMARY
+15:15  Building exit log: S. LEE
+13:10–17:20  Client visit log: D. COOPER off-site
+15:58  Mail server: attachment sent from L. JENKINS to M. EVANS
+15:50  Flight NB220: CANCELLED
+16:00–16:22  Room B / safe: M. EVANS badge activity`},questions:[
+{text:"Which employee's off-site claim is supported by the client visit log?",options:["Mark Evans","Daniel Cooper","Laura Jenkins","Sarah Lee"],answer:1},
+{text:"Which record most directly conflicts with Mark's claim that he was away on the flight?",options:["Sarah's exit record","Daniel's client visit","The cancelled NB220 record","Laura's email attachment"],answer:2},
+{text:"Which evidence most directly challenges Mark's claim that Room B was empty?",options:["His badge activity in Room B from 4:00 to 4:22","Sarah leaving at 3:15","Daniel being off-site","The cleaning schedule after 4:30"],answer:0}
+],clue:{title:"Clue 5 — Cross-check the records",text:"Three accounts have independent support. One account conflicts with both the travel record and the Room B badge record. Use all five clues for the final deduction."}}
 ];
-
-/* Suspects pour la déduction finale (un seul coupable) */
-var SUSPECTS = [
-  { name:"Laura Jenkins", role:"Project coordinator" },
-  { name:"Mark Evans",    role:"Account manager", guilty:true },
-  { name:"Sarah Lee",     role:"Finance analyst" },
-  { name:"Daniel Cooper", role:"Sales lead" }
-];
-var CULPRIT_EXPLAIN = "Mark Evans is the fraudster. He claimed the room was empty and that he was away — but the booking log puts him in Room B at 4:00, the flight he claimed was cancelled, and the access log shows his badge opened the safe and removed the contract.";
-
-/* Échelle de carrière (dernier rang = promotion finale) */
-var RANKS = ["Trainee Detective","Junior Detective","Detective","Senior Detective","Inspector","Chief Inspector"];
-
-/* =================================================================
-   ÉTAT + localStorage
-   ================================================================= */
-var STORAGE_KEY = "detectiveAcademy_v1";
-var MAX_SCORE = MISSIONS.length * 3;
-var XP_PER_MISSION = 200;
-var XP_TARGET = MISSIONS.length * XP_PER_MISSION;   // 1000
-
-function defaultState(){
-  return { screen:"home", current:0, completed:[], missionScore:{}, totalScore:0,
-    xp:0, rankIndex:0, clues:[], solved:false, finished:false, chestOpened:false,
-    music:{ on:true, volume:0.6 } };
-}
-function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY))||null; }catch(e){ return null; } }
-function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
-var state = loadState() || defaultState();
-
-function $(s,r){ return (r||document).querySelector(s); }
-var LETTERS=["A","B","C","D","E"];
-function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
-function rankForCompleted(n){ return Math.min(n, RANKS.length-2); }
-
-/* =================================================================
-   NAVIGATION ENTRE ÉCRANS
-   ================================================================= */
-function showScreen(id){
-  Array.prototype.forEach.call(document.querySelectorAll(".screen"), function(s){ s.classList.toggle("active", s.id===id); });
-  state.screen = id; saveState();
-  window.scrollTo({ top:0, behavior:"smooth" });
-}
-
-/* =================================================================
-   HUD
-   ================================================================= */
-function renderHUD(){
-  $("#rankName").textContent = RANKS[state.rankIndex];
-  $("#scoreBig").textContent = state.totalScore + " / " + MAX_SCORE;
-  $("#xpText").textContent = state.xp + " / " + XP_TARGET + " XP";
-  $("#xpFill").style.width = Math.min(100, Math.round(state.xp/XP_TARGET*100)) + "%";
-
-  var track = $("#track"); track.innerHTML="";
-  MISSIONS.forEach(function(m,i){
-    if(i>0){ var l=document.createElement("div"); l.className="link"+(state.completed.indexOf(MISSIONS[i-1].id)>=0?" done":""); track.appendChild(l); }
-    var done = state.completed.indexOf(m.id)>=0;
-    var cur = (i===state.current && !done);
-    var node=document.createElement("div"); node.className="node";
-    var dot=document.createElement("div"); dot.className="dot"+(done?" done":"")+(cur?" current":"");
-    dot.textContent = done? "✓" : (i+1); node.appendChild(dot);
-    if(cur){ var cap=document.createElement("span"); cap.className="cap"; cap.textContent="Mission "+(i+1)+"/"+MISSIONS.length; node.appendChild(cap); }
-    track.appendChild(node);
-  });
-
-  renderClueGrid($("#clueGrid"));
-}
-
-/* Grille d'indices (verrouillé / débloqué) */
-function renderClueGrid(host){
-  if(!host) return;
-  host.innerHTML="";
-  MISSIONS.forEach(function(m){
-    var open = state.clues.indexOf(m.id)>=0;
-    var el=document.createElement("div"); el.className="clue"+(open?" open":"");
-    var img = open ? IMG+"clue_unlocked.png"+IMG_EXT : IMG+"clue_locked.png"+IMG_EXT;
-    el.innerHTML = '<img class="thumb" src="'+img+'" alt="'+(open?"Clue unlocked":"Clue locked")+'" onerror="this.style.display=\'none\'">'
-      + '<div class="cap">' + (open
-          ? '<b>'+esc(m.clue.title)+'</b>'+esc(m.clue.text)
-          : '<b>Locked</b>Solve Mission '+m.id+' to reveal.') + '</div>';
-    host.appendChild(el);
-  });
-}
-
-/* =================================================================
-   MISSION
-   ================================================================= */
-var attempt=null;
-function renderMission(){
-  var m = MISSIONS[state.current];
-  attempt = { ans:new Array(m.questions.length).fill(null), answered:0, correct:0 };
-
-  var html = '<div class="panel mission">'
-    + '<div class="m-head"><span class="m-num">'+(state.current+1)+'</span>'
-    +   '<div><span class="eyebrow">'+esc(m.eyebrow)+'</span><h2>'+esc(m.theme)+'</h2></div></div>'
-    + '<div class="framed" style="border:0;border-bottom:1px solid var(--gold-line)">'
-    +   '<img class="banner-img square" src="'+m.image+'" alt="'+esc(m.theme)+'" onerror="this.classList.add(\'img-missing\')">'
-    + '</div>'
-    + '<div class="m-body">'
-    +   '<p class="context">'+esc(m.context)+'</p>'
-    +   '<div class="doc"><div class="doc-kind">'+esc(m.doc.kind)+'</div><div class="doc-title">'+esc(m.doc.title)+'</div><pre>'+esc(m.doc.body)+'</pre></div>'
-    +   '<div id="questions"></div><div id="missionResult"></div>'
-    + '</div></div>';
-  $("#missionZone").innerHTML = html;
-
-  var qWrap=$("#questions");
-  m.questions.forEach(function(q,qi){
-    var opts='<div class="opts">';
-    q.options.forEach(function(o,oi){ opts+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'"><span class="key">'+LETTERS[oi]+'</span><span>'+esc(o)+'</span></button>'; });
-    opts+='</div>';
-    var el=document.createElement("div"); el.className="q";
-    el.innerHTML='<p class="q-text"><span class="qn">Q'+(qi+1)+'.</span> '+esc(q.text)+'</p>'+opts+'<div class="fb" id="fb-'+qi+'"></div>';
-    qWrap.appendChild(el);
-  });
-  Array.prototype.forEach.call(qWrap.querySelectorAll(".opt"), function(b){ b.addEventListener("click", function(){ onAnswer(m,b); }); });
-
-  renderHUD();
-}
-
-function onAnswer(m,btn){
-  var qi=+btn.getAttribute("data-q"), oi=+btn.getAttribute("data-o");
-  if(attempt.ans[qi]!==null) return;
-  var q=m.questions[qi], ok=(oi===q.answer);
-  attempt.ans[qi]=oi; attempt.answered++; if(ok) attempt.correct++;
-  Array.prototype.forEach.call(btn.parentNode.querySelectorAll(".opt"), function(b){
-    b.disabled=true; var bo=+b.getAttribute("data-o");
-    if(bo===q.answer) b.classList.add("correct"); else if(bo===oi) b.classList.add("wrong");
-  });
-  var fb=$("#fb-"+qi); fb.className="fb show "+(ok?"ok":"no");
-  fb.textContent = ok ? "Good deduction, Detective." : "That doesn't hold up. Re-read the file.";
-  if(attempt.answered===m.questions.length) showMissionResult(m);
-}
-
-function showMissionResult(m){
-  var passed = attempt.correct>=2;
-  var first = state.completed.indexOf(m.id)<0;
-  var box=$("#missionResult");
-  var html='<div class="result '+(passed?"pass":"fail")+'">'
-    + '<p class="r-head">'+(passed?"✓ Mission solved":"✗ Not enough evidence")+'</p>'
-    + '<p class="r-sc">Score: <strong>'+attempt.correct+' / '+m.questions.length+'</strong>. '
-    +   (passed?"You needed 2/3 — well reasoned.":"You need at least 2/3 to unlock the clue.")+'</p>';
-
-  if(passed){
-    if(first) awardMission(m);
-    html += '<div class="clue-reveal"><div class="ci">'
-      + '<img src="'+IMG+'clue_unlocked.png" alt="Clue unlocked" onerror="this.style.display=\'none\'">'
-      + '<div class="ct"><span class="tag">🔓 '+esc(m.clue.title)+'</span><p style="margin:10px 0 0">'+esc(m.clue.text)+'</p></div>'
-      + '</div></div>';
-    var last = (state.current >= MISSIONS.length-1);
-    html += '<div class="btn-row"><button class="btn gold" id="nextBtn">'
-      + (last ? "Go to the final deduction →" : "Next investigation →") + '</button></div>';
-  } else {
-    html += '<div class="btn-row"><button class="btn gold" id="retryBtn">↻ Re-open the file</button></div>';
-  }
-  html += '</div>';
-  box.innerHTML = html;
-  box.scrollIntoView({ behavior:"smooth", block:"nearest" });
-
-  if(passed){
-    $("#nextBtn").addEventListener("click", function(){
-      if(state.current >= MISSIONS.length-1){ saveState(); openFinal(); }
-      else { state.current++; saveState(); renderMission(); window.scrollTo({top:0,behavior:"smooth"}); }
-    });
-  } else {
-    $("#retryBtn").addEventListener("click", function(){ renderMission(); });
-  }
-  renderHUD();
-}
-
-function awardMission(m){
-  state.completed.push(m.id);
-  state.missionScore[m.id]=attempt.correct;
-  state.totalScore = MISSIONS.reduce(function(s,mm){ return s+(state.missionScore[mm.id]||0); },0);
-  if(state.clues.indexOf(m.id)<0) state.clues.push(m.id);
-  state.xp += XP_PER_MISSION;
-  var old=state.rankIndex;
-  state.rankIndex = rankForCompleted(state.completed.length);
-  saveState();
-  if(state.rankIndex>old){
-    animateXP();
-    showToast('🎉 Promotion unlocked — you are now <span class="g">'+RANKS[state.rankIndex]+'</span>');
-  } else { animateXP(); }
-}
-
-/* =================================================================
-   SUSPECT FINAL
-   ================================================================= */
-function openFinal(){
-  renderClueGrid($("#finalClues"));
-  var host=$("#suspects"); host.innerHTML="";
-  SUSPECTS.forEach(function(s,i){
-    var b=document.createElement("button"); b.className="suspect"; b.setAttribute("data-i",i);
-    b.innerHTML='<div class="nm">'+esc(s.name)+'</div><div class="ro">'+esc(s.role)+'</div>';
-    b.addEventListener("click", function(){ pickSuspect(i); });
-    host.appendChild(b);
-  });
-  $("#finalFb").className="fb"; $("#finalFb").textContent="";
-  showScreen("final");
-}
-
-function pickSuspect(i){
-  var btns = $("#suspects").querySelectorAll(".suspect");
-  var fb=$("#finalFb");
-  if(SUSPECTS[i].guilty){
-    Array.prototype.forEach.call(btns, function(b,j){ b.disabled=true; if(j===i) b.classList.add("guilty"); });
-    fb.className="fb show ok";
-    fb.innerHTML = "Case closed. " + esc(CULPRIT_EXPLAIN);
-    state.solved=true; saveState();
-    setTimeout(goPromotion, 1100);
-  } else {
-    btns[i].classList.add("cleared"); btns[i].disabled=true;
-    fb.className="fb show no";
-    fb.textContent = "Their alibi checks out. Re-read the clues and try again, Detective.";
-  }
-}
-
-/* =================================================================
-   COFFRE + PROMOTION
-   ================================================================= */
-function goPromotion(){
-  state.rankIndex = RANKS.length-1;   // Chief Inspector
-  saveState();
-  // reset visuel du coffre selon l'état
-  var img=$("#chestImg"), hint=$("#chestHint"), body=$("#promoBody"), frame=$("#chestFrame");
-  if(state.chestOpened){
-    img.src = IMG+"04_chest_open.png"+IMG_EXT; hint.style.display="none"; body.style.display="block";
-    fillPromo();
-  } else {
-    img.src = IMG+"03_chest_closed.png"+IMG_EXT; img.className=""; frame.classList.add("chest-tap");
-    hint.style.display="block"; hint.textContent="Tap the chest to claim your reward.";
-    body.style.display="none";
-    frame.onclick = openChest; frame.setAttribute("role","button"); frame.setAttribute("tabindex","0");
-    frame.onkeydown = function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openChest(); } };
-  }
-  showScreen("promotion");
-}
-function openChest(){
-  if(state.chestOpened) return;
-  var frame=$("#chestFrame"), img=$("#chestImg");
-  frame.classList.add("opening");
-  setTimeout(function(){
-    img.src = IMG+"04_chest_open.png"+IMG_EXT;
-    state.chestOpened=true; state.finished=true; saveState();
-    $("#chestHint").style.display="none";
-    $("#promoBody").style.display="block";
-    fillPromo();
-    launchConfetti();
-    showToast("🏅 Promotion: <span class=\"g\">Chief Inspector</span>");
-    frame.onclick=null;
-  }, 700);
-}
-function fillPromo(){
-  $("#promoMedal").textContent = "New rank — " + RANKS[RANKS.length-1];
-  $("#promoScore").textContent = "Final score: " + state.totalScore + " / " + MAX_SCORE + " · " + state.xp + " XP";
-  // case file (récap des indices) caché par défaut
-  var cf=$("#caseFile"); cf.innerHTML="";
-}
-
-/* Bouton "Review the case file" : affiche le récap des indices + coupable */
-function bindReview(){
-  var btn=$("#reviewBtn"); if(!btn) return;
-  btn.addEventListener("click", function(){
-    var cf=$("#caseFile");
-    if(cf.innerHTML){ cf.innerHTML=""; return; }
-    var html='<div class="panel evidence"><h3>🗂️ Case file</h3>';
-    MISSIONS.forEach(function(m){ html += '<p style="margin:0 0 8px"><strong style="color:var(--gold-2)">'+esc(m.clue.title)+'.</strong> '+esc(m.clue.text)+'</p>'; });
-    html += '<p style="margin:10px 0 0;color:var(--green)"><strong>Verdict:</strong> '+esc(CULPRIT_EXPLAIN)+'</p></div>';
-    cf.innerHTML = html;
-  });
-}
-
-/* =================================================================
-   ANIMATIONS
-   ================================================================= */
-function animateXP(){ var f=$("#xpFill"); if(!f) return; f.style.filter="brightness(1.5)"; setTimeout(function(){ f.style.filter=""; },600); }
-var toastTimer=null;
-function showToast(html){ var t=$("#toast"); t.innerHTML=html; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove("show"); },3200); }
-function launchConfetti(){
-  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var box=$("#confetti"); var colors=["#D9B45A","#F0CE76","#9AA3B6","#62B673","#E9DEC2"];
-  for(var i=0;i<110;i++){ var p=document.createElement("div"); p.className="cf";
-    p.style.left=Math.random()*100+"vw"; p.style.background=colors[i%colors.length];
-    p.style.animationDuration=(2.6+Math.random()*2.4)+"s"; p.style.animationDelay=(Math.random()*.6)+"s";
-    if(Math.random()>.5) p.style.borderRadius="50%"; box.appendChild(p); }
-  setTimeout(function(){ box.innerHTML=""; },5600);
-}
-
-/* =================================================================
-   MUSIQUE (autoplay si possible, sinon au 1er clic) + mémorisation
-   ================================================================= */
-var audio=new Audio(MUSIC_SRC); audio.loop=true; audio.preload="auto"; audio.volume=0;
-var fadeTimer=null;
-function fadeTo(target,ms,done){ clearInterval(fadeTimer); var start=audio.volume; var steps=Math.max(1,Math.round(ms/40)); var i=0;
-  fadeTimer=setInterval(function(){ i++; audio.volume=Math.min(1,Math.max(0,start+(target-start)*(i/steps))); if(i>=steps){ clearInterval(fadeTimer); audio.volume=Math.min(1,Math.max(0,target)); if(done) done(); } },40); }
-function startMusic(){ var p=audio.play(); if(p&&p.catch){ p.then(function(){ fadeTo(state.music.volume,2000); }).catch(function(){}); } else { fadeTo(state.music.volume,2000); } }
-function stopMusic(){ fadeTo(0,2000,function(){ audio.pause(); }); }
-function updateMusicBtn(){ var b=$("#musicBtn"); b.textContent=state.music.on?"🔊 Music ON":"🔇 Music OFF"; b.setAttribute("aria-pressed", state.music.on?"true":"false"); }
-function setMusic(on){ state.music.on=on; saveState(); updateMusicBtn(); if(on) startMusic(); else stopMusic(); }
-$("#musicBtn").addEventListener("click", function(){ setMusic(!state.music.on); });
-$("#vol").addEventListener("input", function(e){ state.music.volume=(+e.target.value||0)/100; saveState(); if(state.music.on && !audio.paused) audio.volume=state.music.volume; });
-
-/* =================================================================
-   PRÉCHARGEMENT DES IMAGES (quand utile)
-   ================================================================= */
-function preloadImages(){
-  ["01_home_screen.png","02_briefing_screen.png","clue_locked.png","clue_unlocked.png",
-   "mission_01_email.png","mission_02_meeting.png","mission_03_flight.png","mission_04_inventory.png",
-   "mission_05_final_interview.png","06_final_suspect.png","03_chest_closed.png","04_chest_open.png",
-   "05_promotion_screen.png","board_evidence.png","detective_working.png"]
-   .forEach(function(f){ var im=new Image(); im.src=IMG+f; });
-}
-
-/* =================================================================
-   RESET / BOUTONS / INIT
-   ================================================================= */
-function resetProgress(){
-  var music=state.music; state=defaultState(); state.music=music; saveState();
-  $("#confetti").innerHTML=""; renderHUD(); showScreen("home");
-}
-$("#startBtn").addEventListener("click", function(){ showScreen("briefing"); });
-$("#briefBtn").addEventListener("click", function(){ if(state.completed.length>=MISSIONS.length){ openFinal(); } else { renderMission(); showScreen("game"); } });
-Array.prototype.forEach.call(document.querySelectorAll("[data-screen]"), function(b){ b.addEventListener("click", function(){ showScreen(b.getAttribute("data-screen")); }); });
-Array.prototype.forEach.call(document.querySelectorAll(".resetBtn"), function(b){ b.addEventListener("click", function(){ if(confirm("Reset the whole case? Your rank, XP and clues will be erased.")) resetProgress(); }); });
-
-(function init(){
-  $("#vol").value = Math.round((state.music.volume||0.6)*100);
-  updateMusicBtn();
-  preloadImages();
-  bindReview();
-  renderHUD();
-
-  // Musique : tentative d'autoplay ; sinon démarrage à la 1re interaction
-  if(state.music.on){
-    startMusic();
-    var resume=function(){ if(state.music.on && audio.paused) startMusic(); window.removeEventListener("pointerdown", resume); };
-    window.addEventListener("pointerdown", resume, { once:true });
-  }
-
-  // Reprise à l'écran approprié
-  if(state.finished){ goPromotion(); }
-  else if(state.completed.length>=MISSIONS.length){ openFinal(); }
-  else if(state.screen==="game"){ renderMission(); showScreen("game"); }
-  else if(state.screen==="briefing"){ showScreen("briefing"); }
-  else { showScreen("home"); }
-})();
+const SUSPECTS=[{name:"Laura Jenkins",role:"Project coordinator"},{name:"Mark Evans",role:"Account manager",guilty:true},{name:"Sarah Lee",role:"Finance analyst"},{name:"Daniel Cooper",role:"Sales lead"}];
+const CULPRIT_EXPLAIN="Mark Evans's account cannot be reconciled with the records: his London flight was cancelled, while his badge entered Room B and opened the document safe during the period in which the contract was marked removed.";
+const STORAGE_V2="detectiveAcademy_v2", STORAGE_V1="detectiveAcademy_v1";
+const XP_PER_MISSION=200, MAX_SCORE=15;
+function defaultState(){return{version:2,started:false,screen:"home",current:0,completed:[],missionScore:{},totalScore:0,xp:0,rankIndex:0,clues:[],solved:false,finished:false,chestOpened:false,music:{on:false,volume:.6},questionOrder:{},optionOrder:{},attempts:{},mistakes:[],suspectOrder:[],deductionAttempts:0,bestScore:0}}
+function shuffled(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function buildLayouts(s){let deck;do{deck=shuffled([0,0,0,0,1,1,1,1,2,2,2,2,3,3,3])}while(MISSIONS.some((m,mi)=>{const x=deck.slice(mi*3,mi*3+3);return x[0]===x[1]&&x[1]===x[2]}));let k=0;MISSIONS.forEach(m=>{s.questionOrder[m.id]=shuffled([0,1,2]);s.optionOrder[m.id]={};m.questions.forEach((q,qi)=>{const target=deck[k++],others=shuffled([0,1,2,3].filter(x=>x!==q.answer));const order=[];let oi=0;for(let p=0;p<4;p++)order[p]=p===target?q.answer:others[oi++];s.optionOrder[m.id][qi]=order})});s.suspectOrder=shuffled([0,1,2,3])}
+function normalise(raw){const s=Object.assign(defaultState(),raw||{});s.completed=Array.isArray(s.completed)?s.completed.filter(id=>MISSIONS.some(m=>m.id===id)):[];s.clues=Array.isArray(s.clues)?s.clues.filter(id=>MISSIONS.some(m=>m.id===id)):[];s.mistakes=Array.isArray(s.mistakes)?s.mistakes:[];s.missionScore=s.missionScore&&typeof s.missionScore==="object"?s.missionScore:{};s.attempts=s.attempts&&typeof s.attempts==="object"?s.attempts:{};s.music=s.music&&typeof s.music==="object"?s.music:{on:false,volume:.6};s.music.volume=Math.max(0,Math.min(1,Number.isFinite(+s.music.volume)?+s.music.volume:.6));s.current=Math.max(0,Math.min(MISSIONS.length-1,parseInt(s.current,10)||0));s.totalScore=MISSIONS.reduce((n,m)=>n+(+s.missionScore[m.id]||0),0);s.xp=s.completed.length*XP_PER_MISSION;s.rankIndex=Math.min(s.completed.length,RANKS.length-2);if(!s.questionOrder||Object.keys(s.questionOrder).length!==MISSIONS.length||!s.optionOrder||Object.keys(s.optionOrder).length!==MISSIONS.length)buildLayouts(s);if(!Array.isArray(s.suspectOrder)||s.suspectOrder.length!==4)s.suspectOrder=shuffled([0,1,2,3]);return s}
+function load(){try{const v2=localStorage.getItem(STORAGE_V2);if(v2)return normalise(JSON.parse(v2));const v1=localStorage.getItem(STORAGE_V1);if(v1){const old=JSON.parse(v1)||{};const fresh=defaultState();if(old.music)fresh.music=old.music;buildLayouts(fresh);return normalise(fresh)}}catch(e){}const s=defaultState();buildLayouts(s);return s}
+let state=load();const $=s=>document.querySelector(s);const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function save(){try{localStorage.setItem(STORAGE_V2,JSON.stringify(state))}catch(e){}}
+function smooth(){return !(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));state.screen=id;save();window.scrollTo({top:0,behavior:smooth()?"smooth":"auto"});refreshContinue()}
+function refreshContinue(){const active=state.started&&!state.finished&&(state.completed.length>0||Object.keys(state.attempts||{}).length>0||state.current>0);$("#continueBtn").classList.toggle("hide",!active)}
+function newCampaign(){const music=state.music,best=state.bestScore||0;state=defaultState();state.music=music;state.bestScore=best;state.started=true;buildLayouts(state);save();show("briefing")}
+function renderHUD(){$("#rankName").textContent=RANKS[state.rankIndex];$("#scoreBig").textContent=state.totalScore+" / "+MAX_SCORE;$("#xpText").textContent=state.completed.length+" / "+MISSIONS.length+" missions";$("#xpFill").style.width=Math.round(state.completed.length/MISSIONS.length*100)+"%";const tr=$("#track");tr.innerHTML="";MISSIONS.forEach((m,i)=>{if(i){const l=document.createElement("div");l.className="link"+(state.completed.includes(MISSIONS[i-1].id)?" done":"");tr.appendChild(l)}const node=document.createElement("div");node.className="node";const d=document.createElement("div");const done=state.completed.includes(m.id),cur=i===state.current&&!done;d.className="dot"+(done?" done":"")+(cur?" current":"");d.textContent=done?"✓":String(i+1);node.appendChild(d);tr.appendChild(node)});renderClues($("#clueGrid"))}
+function renderClues(host){if(!host)return;host.innerHTML="";MISSIONS.forEach(m=>{const open=state.clues.includes(m.id),el=document.createElement("div");el.className="clue"+(open?" open":"");el.innerHTML=`<img src="${IMG+(open?"clue_unlocked.png":"clue_locked.png")}?v=4" alt="${open?"Clue unlocked":"Clue locked"}" onerror="this.hidden=true"><div class="cap">${open?`<b>${esc(m.clue.title)}</b>${esc(m.clue.text)}`:`<b>Locked</b>Solve Mission ${m.id} to reveal.`}</div>`;host.appendChild(el)})}
+function blankAttempt(m){return{ans:{},answered:0,correct:0,phase:"playing"}}
+function getAttempt(m){if(!state.attempts[m.id])state.attempts[m.id]=blankAttempt(m);return state.attempts[m.id]}
+function renderMission(){const m=MISSIONS[state.current],a=getAttempt(m);let html=`<div class="panel"><div class="m-head"><span class="m-num">${state.current+1}</span><div><span class="eyebrow">${esc(m.eyebrow)}</span><h2>${esc(m.theme)}</h2></div></div><img class="banner" src="${m.image}" alt="${esc(m.theme)}" onerror="this.hidden=true"><div class="m-body"><p class="context">${esc(m.context)}</p><div class="doc"><div class="doc-kind">${esc(m.doc.kind)}</div><div class="doc-title">${esc(m.doc.title)}</div><pre>${esc(m.doc.body)}</pre></div><div id="questions"></div><div id="missionResult"></div></div></div>`;$("#missionZone").innerHTML=html;const host=$("#questions");state.questionOrder[m.id].forEach((qi,displayIndex)=>{const q=m.questions[qi],order=state.optionOrder[m.id][qi],chosen=a.ans[qi];const el=document.createElement("div");el.className="q";let opts="<div class='opts'>";order.forEach((orig,p)=>{let cls="opt",disabled="",aria="";if(chosen!==undefined){disabled=" disabled";if(orig===q.answer)cls+=" correct";else if(orig===chosen)cls+=" wrong"}opts+=`<button type="button" class="${cls}" data-q="${qi}" data-orig="${orig}"${disabled}${aria}><span class="key">${LETTERS[p]}</span><span>${esc(q.options[orig])}</span></button>`});opts+="</div>";const ok=chosen!==undefined&&chosen===q.answer,fb=chosen===undefined?"":`<div class="fb show ${ok?"ok":"no"}">${ok?"Good deduction, Detective.":"That does not hold up. Re-read the evidence."}</div>`;el.innerHTML=`<p class="q-text"><span class="qn">Q${displayIndex+1}.</span> ${esc(q.text)}</p>${opts}${fb}`;host.appendChild(el)});host.querySelectorAll(".opt:not(:disabled)").forEach(b=>b.addEventListener("click",()=>answer(m,b)));if(a.phase==="result"||a.answered===m.questions.length)showResult(m);renderHUD();save()}
+function answer(m,b){const a=getAttempt(m),qi=+b.dataset.q,orig=+b.dataset.orig;if(a.ans[qi]!==undefined)return;a.ans[qi]=orig;a.answered++;if(orig===m.questions[qi].answer)a.correct++;else{const key=m.id+":"+qi;if(!state.mistakes.some(x=>x.key===key))state.mistakes.push({key,mission:m.id,question:m.questions[qi].text,chosen:m.questions[qi].options[orig],correct:m.questions[qi].options[m.questions[qi].answer]})}save();renderMission()}
+function award(m,a){if(state.completed.includes(m.id))return;state.completed.push(m.id);state.clues.push(m.id);state.missionScore[m.id]=a.correct;state.totalScore=MISSIONS.reduce((n,x)=>n+(+state.missionScore[x.id]||0),0);state.xp=state.completed.length*XP_PER_MISSION;state.rankIndex=Math.min(state.completed.length,RANKS.length-2);save();toast("🔓 Evidence added to the board")}
+function showResult(m){const a=getAttempt(m),pass=a.correct>=2;a.phase="result";if(pass)award(m,a);save();let html=`<div class="result ${pass?"pass":"fail"}"><p class="r-head">${pass?"✓ Mission solved":"✗ Not enough evidence"}</p><p>Score: <strong>${a.correct} / 3</strong>. ${pass?"The clue is unlocked.":"You need at least 2/3."}</p>`;if(pass)html+=`<div class="notice"><strong>${esc(m.clue.title)}</strong><br>${esc(m.clue.text)}</div><div class="btn-row"><button id="nextBtn" class="btn gold" type="button">${state.current===MISSIONS.length-1?"Go to final deduction →":"Next investigation →"}</button></div>`;else html+=`<div class="btn-row"><button id="retryBtn" class="btn gold" type="button">↻ Re-open the file</button></div>`;html+="</div>";$("#missionResult").innerHTML=html;if(pass)$("#nextBtn").onclick=()=>{delete state.attempts[m.id];if(state.current>=MISSIONS.length-1){save();openFinal()}else{state.current++;save();renderMission();window.scrollTo({top:0,behavior:smooth()?"smooth":"auto"})}};else $("#retryBtn").onclick=()=>{state.attempts[m.id]=blankAttempt(m);save();renderMission()}}
+function resume(){if(state.finished||state.chestOpened){goPromotion();return}if(state.completed.length>=MISSIONS.length){openFinal();return}if(state.current<MISSIONS.length&&state.completed.includes(MISSIONS[state.current].id)){const next=MISSIONS.findIndex(m=>!state.completed.includes(m.id));if(next>=0)state.current=next}renderMission();show("game")}
+function openFinal(){if(state.completed.length<MISSIONS.length){resume();return}renderClues($("#finalClues"));const host=$("#suspects");host.innerHTML="";state.suspectOrder.forEach(idx=>{const s=SUSPECTS[idx],b=document.createElement("button");b.type="button";b.className="suspect";b.dataset.idx=idx;b.innerHTML=`<div class="nm">${esc(s.name)}</div><div class="ro">${esc(s.role)}</div>`;b.onclick=()=>pickSuspect(idx,b);host.appendChild(b)});$("#finalFb").className="fb";$("#finalFb").textContent="";show("final")}
+function pickSuspect(i,b){state.deductionAttempts++;const fb=$("#finalFb");if(SUSPECTS[i].guilty){$("#suspects").querySelectorAll(".suspect").forEach(x=>x.disabled=true);b.classList.add("guilty");fb.className="fb show ok";fb.textContent="Case closed. "+CULPRIT_EXPLAIN;state.solved=true;save();setTimeout(goPromotion,900)}else{b.classList.add("cleared");b.disabled=true;fb.className="fb show no";fb.textContent="That account still fits the available records. Compare the travel and badge evidence again.";save()}}
+function goPromotion(){state.rankIndex=RANKS.length-1;save();const opened=state.chestOpened;$("#chestImg").src=IMG+(opened?"04_chest_open.png":"03_chest_closed.png")+"?v=4";$("#chestHint").style.display=opened?"none":"block";$("#promoBody").style.display=opened?"block":"none";$("#chestFrame").onclick=opened?null:openChest;$("#chestFrame").tabIndex=opened?-1:0;fillPromo();show("promotion")}
+function openChest(){if(state.chestOpened)return;state.chestOpened=true;state.finished=true;state.bestScore=Math.max(state.bestScore||0,state.totalScore);save();$("#chestImg").src=IMG+"04_chest_open.png?v=4";$("#chestHint").style.display="none";$("#promoBody").style.display="block";fillPromo();confetti();toast("🏅 Promotion unlocked — Chief Inspector")}
+function fillPromo(){$("#promoMedal").textContent="New rank — Chief Inspector";$("#promoScore").textContent=`Final reading score: ${state.totalScore} / ${MAX_SCORE} · Final deduction attempts: ${state.deductionAttempts}`}
+function review(){const cf=$("#caseFile");if(cf.innerHTML){cf.innerHTML="";return}let h='<div class="panel evidence"><h3>🗂️ Case file</h3>';MISSIONS.forEach(m=>h+=`<p><strong style="color:var(--gold2)">${esc(m.clue.title)}</strong><br>${esc(m.clue.text)}</p>`);h+=`<p style="color:var(--green)"><strong>Verdict:</strong> ${esc(CULPRIT_EXPLAIN)}</p>`;if(state.mistakes.length){h+='<h3>Questions to review</h3>';state.mistakes.forEach(x=>h+=`<div class="mistake"><strong>${esc(x.question)}</strong>Your answer: ${esc(x.chosen)}<br>Correct answer: ${esc(x.correct)}</div>`)}h+='</div>';cf.innerHTML=h}
+function resetProgress(keepMusic=true){const music=keepMusic?state.music:{on:false,volume:.6},best=state.bestScore||0;state=defaultState();state.music=music;state.bestScore=best;buildLayouts(state);save();$("#confetti").innerHTML="";renderHUD();show("home")}
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add("hide"),2800)}
+function confetti(){if(!smooth())return;const box=$("#confetti"),colors=["#D9B45A","#F0CE76","#62B673","#E9DEC2"];for(let i=0;i<90;i++){const p=document.createElement("div");p.className="cf";p.style.left=Math.random()*100+"vw";p.style.background=colors[i%colors.length];p.style.animationDuration=(2.5+Math.random()*2)+"s";box.appendChild(p)}setTimeout(()=>box.innerHTML="",5000)}
+const audio=new Audio();audio.loop=true;audio.preload="none";audio.src=MUSIC_SRC;audio.volume=0;let fadeTimer=null;
+function updateMusic(){const b=$("#musicBtn");b.textContent=state.music.on?"🔊 Music ON":"🔇 Music OFF";b.setAttribute("aria-pressed",state.music.on?"true":"false")}
+function fade(target,ms,done){clearInterval(fadeTimer);const start=audio.volume,steps=Math.max(1,Math.round(ms/40));let i=0;fadeTimer=setInterval(()=>{i++;audio.volume=Math.max(0,Math.min(1,start+(target-start)*(i/steps)));if(i>=steps){clearInterval(fadeTimer);if(done)done()}},40)}
+function startMusic(){audio.play().then(()=>fade(state.music.volume,500)).catch(()=>{state.music.on=false;save();updateMusic()})}
+function stopMusic(){fade(0,300,()=>audio.pause())}
+function setMusic(on){state.music.on=on;save();updateMusic();on?startMusic():stopMusic()}
+audio.addEventListener("error",()=>{state.music.on=false;save();updateMusic();toast("Music file unavailable on this device.")});
+$("#musicBtn").onclick=()=>setMusic(!state.music.on);$("#vol").oninput=e=>{state.music.volume=Math.max(0,Math.min(1,+e.target.value/100));save();if(state.music.on&&!audio.paused)audio.volume=state.music.volume};
+$("#startBtn").onclick=()=>{if(state.started&&!state.finished&&(state.completed.length||Object.keys(state.attempts).length)){if(!confirm("Start a new case and replace the current saved investigation?"))return}newCampaign()};
+$("#continueBtn").onclick=resume;$("#briefBtn").onclick=()=>{state.started=true;save();resume()};$("#briefBack").onclick=()=>show("home");
+document.querySelectorAll(".resetBtn").forEach(b=>b.onclick=()=>{if(confirm("Reset the whole case? Current clues and case progress will be erased."))resetProgress(true)});$("#reviewBtn").onclick=review;$("#playAgain").onclick=()=>{newCampaign()};
+$("#chestFrame").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&!state.chestOpened){e.preventDefault();openChest()}};
+document.addEventListener("keydown",e=>{if(!$("#game").classList.contains("active"))return;if(!["1","2","3","4"].includes(e.key))return;const q=document.querySelector(".q .opt:not(:disabled)")?.closest(".q");if(!q)return;const opts=q.querySelectorAll(".opt:not(:disabled)");const i=+e.key-1;if(opts[i])opts[i].click()});
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+(function init(){if(!state.questionOrder||Object.keys(state.questionOrder).length!==MISSIONS.length)buildLayouts(state);$("#vol").value=Math.round(state.music.volume*100);updateMusic();renderHUD();refreshContinue();if(state.music.on){const once=()=>{if(state.music.on&&audio.paused)startMusic();window.removeEventListener("pointerdown",once)};window.addEventListener("pointerdown",once,{once:true})}if(state.finished||state.chestOpened)goPromotion();else if(state.completed.length>=MISSIONS.length)openFinal();else if(state.started&&state.screen==="game")resume();else if(state.started&&state.screen==="briefing")show("briefing");else show("home")})();
 </script>
 </body>
 </html>
