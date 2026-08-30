@@ -1,62 +1,7 @@
-/* Homemade TOEIC Trainer — service worker v23
-   Diagnostic rebuild: adds the dedicated 24-question TOEIC diagnostic + cumulative audited games. */
-const CACHE = "homemade-toeic-v23";
-const CORE = [
-  "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
-  "./ht-kit.css", "./ht-kit.js", "./ht-errors.js", "./toeic-bank.js",
-  "./sauvegarde-progression.html", "./diagnostic-toeic.html"
-];
-const OPTIONAL = [
-  "./constructeur-de-phrases.html", "./controle-vitesse-audio.html",
-  "./detective-game.html", "./escape-game-toeic.html", "./exemple-placement.html",
-  "./flashcards.html", "./grammar-time-machine.html", "./phrasal-verb-city.html",
-  "./prononciation-ecoute.html", "./corporate-mysteries.html",
-  "./successful-toeic-kingdom.html", "./survival-island-listening.html",
-  "./zombie-prepositions-survival.html", "./modal-galaxy-explorer.html"
-];
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => Promise.all(CORE.map(url => cache.add(url)))
-        .then(() => Promise.allSettled(OPTIONAL.map(url => cache.add(url)))))
-      .then(() => self.skipWaiting())
-  );
-});
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
-});
-self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET") return;
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-  const isPage = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
-  if (isPage) {
-    event.respondWith(
-      fetch(req).then(res => {
-        if (res && res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then(cache => cache.put(req, copy)).catch(() => {});
-        }
-        return res;
-      }).catch(() => caches.match(req).then(hit => hit || caches.match("./index.html")))
-    );
-    return;
-  }
-  event.respondWith(
-    caches.match(req).then(hit => {
-      const network = fetch(req).then(res => {
-        if (res && res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then(cache => cache.put(req, copy)).catch(() => {});
-        }
-        return res;
-      }).catch(() => hit);
-      return hit || network;
-    })
-  );
-});
+/* Homemade TOEIC Trainer — service worker v24 stable */
+const CACHE="homemade-toeic-v24";
+const CORE=["./", "./index.html", "./offline.html", "./manifest.webmanifest", "./icon.svg", "./ht-kit.css", "./ht-kit.js", "./ht-errors.js", "./toeic-bank.js", "./toeic-bank-fixes.js"];
+const OPTIONAL=["./diagnostic-toeic.html", "./sauvegarde-progression.html", "./flashcards.html", "./constructeur-de-phrases.html", "./prononciation-ecoute.html", "./corporate-mysteries.html", "./successful-toeic-kingdom.html", "./survival-island-listening.html", "./zombie-prepositions-survival.html", "./escape-game-toeic.html", "./detective-game.html", "./grammar-time-machine.html", "./phrasal-verb-city.html", "./modal-galaxy-explorer.html"];
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.allSettled(OPTIONAL.map(u=>c.add(u)));}).then(()=>self.skipWaiting()));});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k.startsWith("homemade-toeic-")).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET"||new URL(r.url).origin!==self.location.origin)return;const nav=r.mode==="navigate"||(r.headers.get("accept")||"").includes("text/html");if(nav){e.respondWith(fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(CACHE).then(c=>c.put(r,cp)).catch(()=>{});}return res;}).catch(async()=>await caches.match(r)||await caches.match("./offline.html")));return;}e.respondWith(caches.match(r).then(hit=>hit||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(CACHE).then(c=>c.put(r,cp)).catch(()=>{});}return res;})));});

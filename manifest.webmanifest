@@ -1,8 +1,7 @@
 {
-  "id": "./",
   "name": "Homemade TOEIC Trainer",
   "short_name": "TOEIC Trainer",
-  "description": "Entraînement TOEIC Listening & Reading — créé par Eglantine Lecomte. Non affilié à ETS Global.",
+  "description": "Entraînement pédagogique indépendant au TOEIC Listening & Reading, créé par Eglantine Lecomte.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
@@ -10,8 +9,15 @@
   "orientation": "any",
   "background_color": "#FFFDF8",
   "theme_color": "#4F7CFF",
-  "categories": ["education"],
+  "categories": [
+    "education"
+  ],
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }

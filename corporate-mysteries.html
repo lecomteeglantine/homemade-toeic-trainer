@@ -34,7 +34,7 @@ body.hc{background:#000;color:#fff;--bg:#000;--card:#050505;--line:#fff;--slate:
 </style>
 </head>
 <body>
-<audio id="bgm" loop preload="metadata" src="audio/corporate_mysteries_main_theme.mp3"></audio>
+<audio id="bgm" loop preload="none" src="audio/corporate_mysteries_main_theme.mp3"></audio>
 <div class="app">
 <header class="topbar"><div class="brand"><span class="logo" id="brandLogo">CM</span><span class="full">Corporate Mysteries</span></div><div class="spacer"></div><div class="ctrl"><span class="vol"><button class="icon-btn" id="musicBtn" aria-pressed="false">🔇 Music</button><input type="range" id="volRange" min="0" max="100" value="40" aria-label="Music volume"></span><button class="icon-btn" id="contrastBtn" aria-pressed="false">◑ Contrast</button><a class="icon-btn" href="index.html">↩ Trainer</a></div></header>
 <section id="scr-home" class="screen active"><div class="container"><div class="hero"><div class="hero-bg" id="homeBg"></div><div class="hero-in"><div class="kicker">Tri-State Investigations</div><h1>Corporate Mysteries</h1><p>Step into the role of a corporate investigator. Listen to what happens around the office, gather the evidence, and crack the case — no exam in sight.</p><div class="btn-row"><button class="btn" data-act="start">▶ Start Investigating</button><button class="btn btn-steel" data-act="cases">📁 Case Files</button><button class="btn btn-ghost" data-act="how" style="color:#fff;border-color:rgba(255,255,255,.45)">❓ How it works</button></div></div></div><div class="h-row" style="margin-top:26px"><h2 class="page-title" id="homeName">Welcome, investigator</h2><span class="rank-pill"><span class="dot"></span><span id="dashRank">Intern Investigator</span></span></div><div class="grid cols2 mb"><div class="stat"><div class="v" id="dashScore">0</div><div class="k">Score</div></div><div class="stat"><div class="v" id="dashCases">0 / 1</div><div class="k">Cases solved</div></div></div><div class="panel"><div class="section-title">Badges</div><div class="badge-grid" id="dashBadges"></div></div><div class="btn-row mt"><button class="btn btn-danger" data-act="reset">↺ Reset Progress</button></div></div></section>
@@ -153,5 +153,6 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")$$('.modal').forEach
 function boot(){applyMusic();applyContrast();const logo=$("#brandLogo"),im=new Image();im.onload=()=>{logo.style.backgroundImage=`url('${DATA.brand.logo}')`;logo.textContent=""};im.src=DATA.brand.logo;renderHome();show("home")}boot();
 })();
 </script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
 </body>
 </html>

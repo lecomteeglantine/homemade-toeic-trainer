@@ -300,5 +300,6 @@ var loadMsgs=["Polishing the armour…","Unrolling the scrolls…","Feeding the 
 function boot(){reflectMusic();show("loading");var pct=0,i=0;$("loadMsg").textContent=loadMsgs[0];var t=setInterval(function(){pct+=Math.random()*22+10;if(pct>100)pct=100;$("loadFill").style.width=pct+"%";i=Math.min(loadMsgs.length-1,Math.floor(pct/20));$("loadMsg").textContent=loadMsgs[i];if(pct>=100){clearInterval(t);setTimeout(function(){show("menu")},250)}},280)}
 boot();
 </script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
 </body>
 </html>
