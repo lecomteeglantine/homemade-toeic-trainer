@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — zero-regression QA v30.1. No dependencies. */
+/* Homemade TOEIC Trainer — zero-regression QA v30.2. No dependencies. */
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -11,7 +11,10 @@ let errors=[],warnings=[],checks=0;
 const err=m=>errors.push(m), warn=m=>warnings.push(m), ok=()=>checks++;
 function walk(dir){let out=[];for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(SKIP.has(e.name))continue;const p=path.join(dir,e.name);if(e.isDirectory())out.push(...walk(p));else out.push(p)}return out}
 const files=walk(ROOT), rel=p=>path.relative(ROOT,p).replaceAll(path.sep,'/');
-// Only deployable HTML pages at repository root are audited as pages.\n// Nested HTML files under asset folders (for example images/index.html) are not site routes;\n// resolving their relative href/src values as pages creates false missing-asset failures.\nconst html=files.filter(f=>/\.html?$/i.test(f)&&path.dirname(f)===ROOT), js=files.filter(f=>/\.js$/i.test(f)&&!f.endsWith('qa-site.mjs'));
+// Only deployable HTML pages at repository root are audited as pages.
+// Nested HTML files under asset folders (for example images/index.html) are not site routes;
+// resolving their relative href/src values as pages creates false missing-asset failures.
+const html=files.filter(f=>/\.html?$/i.test(f)&&path.dirname(f)===ROOT), js=files.filter(f=>/\.js$/i.test(f)&&!f.endsWith('qa-site.mjs'));
 const nestedHtml=files.filter(f=>/\.html?$/i.test(f)&&path.dirname(f)!==ROOT);if(nestedHtml.length)warn(`nested HTML ignored as non-route: ${nestedHtml.map(rel).join(', ')}`);
 function cleanRef(v){return v.split('#')[0].split('?')[0].trim()}
 function localTarget(from,v){v=cleanRef(v);if(!v||v==='#'||/^(?:https?:|mailto:|tel:|data:|blob:|javascript:)/i.test(v)||/[${}<>]/.test(v))return null;let t=v.startsWith('/')?path.join(ROOT,v.replace(/^\/+/,'')):path.resolve(path.dirname(from),v);if(v.endsWith('/'))t=path.join(t,'index.html');return t}
