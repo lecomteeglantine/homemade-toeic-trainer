@@ -1,5 +1,5 @@
-/* Homemade TOEIC Trainer — service worker v20 */
-const CACHE = "homemade-toeic-v20";
+/* Homemade TOEIC Trainer — service worker v21 */
+const CACHE = "homemade-toeic-v21";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "./ht-kit.css", "./ht-kit.js", "./ht-errors.js", "./toeic-bank.js",
@@ -8,7 +8,7 @@ const ASSETS = [
   "./flashcards.html", "./grammar-time-machine.html", "./phrasal-verb-city.html",
   "./prononciation-ecoute.html", "./corporate-mysteries.html",
   "./successful-toeic-kingdom.html", "./survival-island-listening.html",
-  "./zombie-prepositions-survival.html"
+  "./zombie-prepositions-survival.html", "./modal-galaxy-explorer.html"
 ];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(ASSETS.map(u => c.add(u)))).then(() => self.skipWaiting()).catch(() => {}));
