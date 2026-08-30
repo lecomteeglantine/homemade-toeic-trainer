@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — zero-regression QA v30.4. No dependencies. */
+/* Homemade TOEIC Trainer — zero-regression QA v30.5. No dependencies. */
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -111,7 +111,7 @@ const gameRules=[
  ['phrasal-verb-city.html',/phrasalVerbCity_v2/,/serviceWorker\.register/,/preload=["']auto["']/i]
 ];
 for(const [name,stateRe,swRe,preloadRe] of gameRules){const c=text(name);if(!c){err(`${name}: missing`);continue}if(!stateRe.test(c))err(`${name}: expected audited state schema missing`);if(!swRe.test(c))err(`${name}: service worker registration missing`);if(preloadRe.test(c))err(`${name}: preload=auto returned`);else ok()}
-let sentence=text('constructeur-de-phrases.html');if(sentence){if(!/toeicSentenceBuilder_v1/.test(sentence)||!/best/.test(sentence)||!/solved/.test(sentence))err('Sentence Builder: v1 best/solved state contract missing');else ok()}
+let sentence=text('constructeur-de-phrases.html');if(sentence){if(!/toeicSentenceBuilder_v1/.test(sentence)||!/best/.test(sentence)||!/solved/.test(sentence))err('Sentence Builder: v1 best/solved state contract missing');else ok();if(!/validated=false/.test(sentence)||!/if\(validated\)return/.test(sentence)||!/validated=true/.test(sentence))err('Sentence Builder: anti-farming guard missing; one solved phrase could be counted repeatedly');else ok()}
 let pron=text('prononciation-ecoute.html');if(pron){if(/setTimeout\s*\(\s*\(\)\s*=>\s*say/.test(pron))err('Pronunciation: autoplay returned');if(!/employ-EE/.test(pron))err('Pronunciation: employee stress regression');else ok()}
 let backup=text('sauvegarde-progression.html');if(backup){if(!/VERSION=4/.test(backup)||!/HTProgress\.keys/.test(backup))err('Backup: P4 whitelist/version contract missing');if(/for\s*\([^)]*localStorage\.length/.test(backup))err('Backup: whole-origin localStorage export returned');else ok()}
 let sys=text('system-check.html');if(sys){if(!/(?:Deployment|Quality) check v30/.test(sys)||!/homemade-toeic-v30/.test(sys)||!/Progression unifiée/.test(sys))err('System Check: v30/progress checks missing');else ok()}
