@@ -1,4 +1,4 @@
-/* Homemade TOEIC Trainer — service worker v30.5 anti-farming refresh */
+/* Homemade TOEIC Trainer — service worker v30.8 diagnostic-resume refresh */
 const CACHE="homemade-toeic-v30";
 const CORE=["./","./index.html","./offline.html","./manifest.webmanifest","./icon.svg","./icon-192.png","./icon-512.png","./ht-kit.css","./ht-kit.js","./progress-core.js","./release.json","./ht-errors.js","./toeic-bank.js","./toeic-bank-fixes.js","./system-check.html"];
 const OPTIONAL=["./diagnostic-toeic.html","./sauvegarde-progression.html","./flashcards.html","./constructeur-de-phrases.html","./prononciation-ecoute.html","./corporate-mysteries.html","./successful-toeic-kingdom.html","./survival-island-listening.html","./zombie-prepositions-survival.html","./escape-game-toeic.html","./detective-game.html","./grammar-time-machine.html","./phrasal-verb-city.html","./modal-galaxy-explorer.html"];

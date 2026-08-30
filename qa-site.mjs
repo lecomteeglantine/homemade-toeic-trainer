@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — zero-regression QA v30.6. No dependencies. */
+/* Homemade TOEIC Trainer — zero-regression QA v30.8. No dependencies. */
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -100,7 +100,7 @@ let kit=text('ht-kit.js');if(kit){if(!/P3 v28 — human linguistic audit/.test(k
 // Games, diagnostic and shared-tool regression checks.
 let kingdom=text('successful-toeic-kingdom.html');if(kingdom){if(/parseInt\s*\([^\n]{0,120}replace\(\/\[\^0-9\]/.test(kingdom))err('Successful Kingdom: old money parser returned');if(!/August/.test(kingdom)||!/December/.test(kingdom))err('Successful Kingdom: month list incomplete');if(!/serviceWorker\.register/.test(kingdom))err('Successful Kingdom: no service worker registration');else ok()}
 let modal=text('modal-galaxy-explorer.html');if(modal){const qids=[...modal.matchAll(/"id"\s*:\s*"(?:ability|obligation|prohibition|advice|permission|possibility|deduction|pastmodals)-\d+"/g)];if(qids.length!==112)err(`Modal Galaxy: expected 112 bank questions, found ${qids.length}`);if(!/modalGalaxyExplorer_v2/.test(modal))err('Modal Galaxy: v2 storage missing');if(!/serviceWorker\.register/.test(modal))err('Modal Galaxy: no service worker registration');else ok()}
-let diag=text('diagnostic-toeic.html');if(diag){const qids=[...diag.matchAll(/"id"\s*:\s*"p[1-7]-\d+"/g)];if(qids.length!==24)err(`Diagnostic: expected 24 questions, found ${qids.length}`);for(let p=1;p<=7;p++)if(!new RegExp(`"part"\\s*:\\s*${p}`).test(diag))err(`Diagnostic: Part ${p} missing`);if(!/historyHtml/.test(diag)||!/recommendation\(/.test(diag))err('Diagnostic: P2 history/recommendation layer missing');if(/\/\s*990/.test(diag)&&/estimated|estimé/i.test(diag))err('Diagnostic: a homemade /990 estimate returned');else ok()}
+let diag=text('diagnostic-toeic.html');if(diag){const qids=[...diag.matchAll(/"id"\s*:\s*"p[1-7]-\d+"/g)];if(qids.length!==24)err(`Diagnostic: expected 24 questions, found ${qids.length}`);for(let p=1;p<=7;p++)if(!new RegExp(`"part"\\s*:\\s*${p}`).test(diag))err(`Diagnostic: Part ${p} missing`);if(!/historyHtml/.test(diag)||!/recommendation\(/.test(diag))err('Diagnostic: P2 history/recommendation layer missing');if(/\/\s*990/.test(diag)&&/estimated|estimé/i.test(diag))err('Diagnostic: a homemade /990 estimate returned');if(!/function autoOpen\(\)[^{]*\{[\s\S]*validState\(db\.attempt\)[\s\S]*render\(\)/.test(diag))err('Diagnostic: refresh does not automatically resume an in-progress attempt');else ok()}
 const gameRules=[
  ['corporate-mysteries.html',/CORP_MYSTERIES_V2/,/serviceWorker\.register/,/preload=["']auto["']/i],
  ['survival-island-listening.html',/HT_SURVIVAL_ISLAND_V1/,/serviceWorker\.register/,/preload=["']auto["']/i],
