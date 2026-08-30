@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — zero-regression QA v30.2. No dependencies. */
+/* Homemade TOEIC Trainer — zero-regression QA v30.4. No dependencies. */
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -29,7 +29,7 @@ for(const f of html){const t=fs.readFileSync(f,'utf8');const markup=t.replace(/<
 // Manifest
 try{const mf=JSON.parse(fs.readFileSync(path.join(ROOT,'manifest.webmanifest'),'utf8'));if(mf.orientation!=='any')err('manifest.webmanifest: orientation must be any');for(const i of mf.icons||[]){if(!fs.existsSync(path.join(ROOT,i.src)))err(`manifest: missing icon ${i.src}`)}ok()}catch(e){err(`manifest.webmanifest invalid: ${e.message}`)}
 // Service worker
-try{const sw=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8');if(!/homemade-toeic-v30/.test(sw))err('sw.js: expected cache homemade-toeic-v30');for(const m of sw.matchAll(/["']\.\/([^"']+)["']/g)){const u=m[1];if(u==='')continue;const f=path.join(ROOT,u);if(!fs.existsSync(f))err(`sw.js: cached file missing from repository: ${u}`)}ok()}catch(e){err(`sw.js check failed: ${e.message}`)}
+try{const sw=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8');if(!/homemade-toeic-v30/.test(sw))err('sw.js: expected cache homemade-toeic-v30');if(!/NETWORK_FIRST/.test(sw)||!/ht-kit\.js/.test(sw)||!/progress-core\.js/.test(sw))err('sw.js: critical deployment files must use network-first refresh');for(const m of sw.matchAll(/["']\.\/([^"']+)["']/g)){const u=m[1];if(u==='')continue;const f=path.join(ROOT,u);if(!fs.existsSync(f))err(`sw.js: cached file missing from repository: ${u}`)}ok()}catch(e){err(`sw.js check failed: ${e.message}`)}
 try{const r=JSON.parse(fs.readFileSync(path.join(ROOT,'release.json'),'utf8'));if(r.release!==30)err(`release.json: expected release 30, found ${r.release}`);if(r.serviceWorkerCache!=='homemade-toeic-v30')err('release.json: service worker cache metadata mismatch');if(r.progressCore!==1)err('release.json: Progress Core v1 metadata missing');ok()}catch(e){err(`release.json invalid: ${e.message}`)}
 try{const pc=fs.readFileSync(path.join(ROOT,'progress-core.js'),'utf8');if(!/global\.HTProgress=api/.test(pc)||!/EVENT_KEY="htoeic_progress_events_v1"/.test(pc))err('progress-core.js: public contract missing');ok()}catch(e){err(`progress-core.js check failed: ${e.message}`)}
 const PROGRESS_PAGES=['diagnostic-toeic.html','sauvegarde-progression.html','flashcards.html','constructeur-de-phrases.html','prononciation-ecoute.html','corporate-mysteries.html','successful-toeic-kingdom.html','survival-island-listening.html','zombie-prepositions-survival.html','escape-game-toeic.html','detective-game.html','grammar-time-machine.html','phrasal-verb-city.html','modal-galaxy-explorer.html','system-check.html'];for(const n of PROGRESS_PAGES){const t=path.join(ROOT,n);if(!fs.existsSync(t)){err(`P4: supported page missing ${n}`);continue}const c=fs.readFileSync(t,'utf8');if(!/progress-core\.js/.test(c))err(`P4: ${n} does not load progress-core.js`);else ok()}
@@ -95,7 +95,7 @@ try{const sandbox={window:{},document:undefined,Set,Map,Array,String,Object,RegE
 // Known high-risk regressions.
 function text(name){const f=path.join(ROOT,name);return fs.existsSync(f)?fs.readFileSync(f,'utf8'):''}
 // Runtime linguistic layer must mirror the standalone audited patch.
-let kit=text('ht-kit.js');if(kit){if(!/P3 v28 — human linguistic audit/.test(kit)||!/questionsReviewed:210/.test(kit)||!/E20-001/.test(kit)||!/X07-004/.test(kit))err('ht-kit.js: P3 v28 linguistic runtime layer is missing or incomplete');if(!/P4\.5 v30/.test(kit)||!/progress-core\.js/.test(kit)||!/HT\.RELEASE=30/.test(kit))err('ht-kit.js: P4.5 v30 consolidation layer is missing');else ok()}
+let kit=text('ht-kit.js');if(kit){if(!/P3 v28 — human linguistic audit/.test(kit)||!/questionsReviewed:210/.test(kit)||!/E20-001/.test(kit)||!/X07-004/.test(kit))err('ht-kit.js: P3 v28 linguistic runtime layer is missing or incomplete');if(!/P4\.5 v30/.test(kit)||!/progress-core\.js/.test(kit)||!/HT\.RELEASE=30/.test(kit))err('ht-kit.js: P4.5 v30 consolidation layer is missing');else ok();if(!/ainsi que ce site ont été créés par Eglantine Lecomte, avec l'assistance de ChatGPT/.test(kit))err('ht-kit.js: requested footer credit is missing');else ok();if(!/ht_sw_reloaded_v30/.test(kit))err('ht-kit.js: service-worker reload marker is stale');else ok()}
 
 // Games, diagnostic and shared-tool regression checks.
 let kingdom=text('successful-toeic-kingdom.html');if(kingdom){if(/parseInt\s*\([^\n]{0,120}replace\(\/\[\^0-9\]/.test(kingdom))err('Successful Kingdom: old money parser returned');if(!/August/.test(kingdom)||!/December/.test(kingdom))err('Successful Kingdom: month list incomplete');if(!/serviceWorker\.register/.test(kingdom))err('Successful Kingdom: no service worker registration');else ok()}

@@ -259,7 +259,7 @@ function exposeDataAPI(){
 }
 function addUpdateNotice(){
   if(!onRoot()||!("serviceWorker" in navigator))return;
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('ht_sw_reloaded_v28'))return;sessionStorage.setItem('ht_sw_reloaded_v28','1');location.reload();}catch(e){}});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('ht_sw_reloaded_v30'))return;sessionStorage.setItem('ht_sw_reloaded_v30','1');location.reload();}catch(e){}});
 }
 function init(){exposeDataAPI();cleanHomepageCopy();hardenReset();addUpdateNotice();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
@@ -459,6 +459,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
     while(n=walker.nextNode()){if(!n.nodeValue||!n.nodeValue.trim())continue;let v=n.nodeValue;patterns.forEach(p=>{v=v.replace(p[0],p[1])});if(v!==n.nodeValue)n.nodeValue=v;}
     const about=$('#about .card');if(about&&!about.querySelector('[data-ht-release]')){const p=document.createElement('p');p.dataset.htRelease='30';p.className='disclaimer';p.style.marginTop='12px';p.textContent='Version pédagogique stabilisée v30 · progression stockée uniquement sur cet appareil.';about.appendChild(p);}
+    const credit=[...document.querySelectorAll('footer .disclaimer')].find(el=>/Tout le contenu pédagogique, les parcours et le système d['’]entraînement/i.test(el.textContent||''));if(credit)credit.textContent="© Eglantine Lecomte. Tout le contenu pédagogique, les parcours et le système d'entraînement ainsi que ce site ont été créés par Eglantine Lecomte, avec l'assistance de ChatGPT.";
   }
   function hardDisableLegacy(){if(!root())return;
     try{window.startDiag=function(){location.href='diagnostic-toeic.html'};}catch(e){}
