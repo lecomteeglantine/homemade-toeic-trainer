@@ -1,0 +1,14 @@
+{
+  "product": "Homemade TOEIC Trainer",
+  "release": 29,
+  "name": "P4 Stabilisation",
+  "date": "2026-08-30",
+  "notes": "Local-first educational trainer. No server-side learner data.",
+  "questionBankAudit": {
+    "source_questions": 210,
+    "linguistic_audit": 28,
+    "runtime_quality_layer": 29
+  },
+  "progressCore": 1,
+  "serviceWorkerCache": "homemade-toeic-v29"
+}
