@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Homemade TOEIC Trainer — zero-regression QA v30.8. No dependencies. */
+/* Homemade TOEIC Trainer — zero-regression QA v30.10. No dependencies. */
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -124,6 +124,36 @@ let sys=text('system-check.html');if(sys){if(!/(?:Deployment|Quality) check v30/
     if(!/last!=="diagnostic"\|\|!btn/.test(kit309)||!/validAttempt\(a\)/.test(kit309)||!/setLast\(""\)/.test(kit309)) err('Dashboard: stale Diagnostic resume guard missing'); else ok();
     if(!/Progression unifiée/.test(kit309)||!/Sentence Builder/.test(kit309)||!/Pronunciation & Listening/.test(kit309)) err('Dashboard: unified Progress Core coverage is incomplete'); else ok();
     if(!/XP d’entraînement/.test(kit309)||!/gamifiée/.test(kit309)) err('Dashboard: XP scope is not explained clearly'); else ok();
+  }
+}
+
+
+// v30.10 autonomous-games hardening regressions.
+{
+  const corp=text('corporate-mysteries.html');
+  if(corp){
+    if(/\.png\.png["']/i.test(corp)) err('Corporate Mysteries: doubled image extension returned'); else ok();
+    if(!/const settings=\{\.\.\.state\.settings\}/.test(corp)||!/state\.settings=\{\.\.\.state\.settings,\.\.\.settings\}/.test(corp)) err('Corporate Mysteries: reset no longer preserves music/volume/contrast preferences'); else ok();
+  }
+  const grammar=text('grammar-time-machine.html');
+  if(grammar){
+    if(/audio\.pause\(\);S\.music=false;save\(\);reflectMusic\(\)/.test(grammar)) err('Grammar Time Machine: reset still forces the saved music preference off'); else ok();
+    if(!/Music and volume preferences were kept/.test(grammar)) err('Grammar Time Machine: preference-preserving reset marker missing'); else ok();
+  }
+  const kingdom=text('successful-toeic-kingdom.html');
+  if(kingdom){
+    if(!/const music=state\.settings\.music/.test(kingdom)||!/state\.settings\.music=music/.test(kingdom)) err('Successful TOEIC Kingdom: reset no longer preserves music preference'); else ok();
+  }
+  const island=text('survival-island-listening.html');
+  if(island){
+    if(/The order total comes to sixteen fifty\./.test(island)) err('Survival Island: ambiguous bare “sixteen fifty” amount returned'); else ok();
+    if(!/sixteen dollars and fifty cents/.test(island)) err('Survival Island: explicit $16.50 listening wording missing'); else ok();
+    if(!/const settings=\{\.\.\.state\.settings\}/.test(island)||!/state\.settings=\{\.\.\.state\.settings,\.\.\.settings\}/.test(island)) err('Survival Island: reset no longer preserves music/accent preferences'); else ok();
+  }
+  const zombie=text('zombie-prepositions-survival.html');
+  if(zombie){
+    if(/She hurried ___ the lobby to catch the lift\./.test(zombie)||/The manager walked ___ the office and closed the door\./.test(zombie)) err('Zombie Survival: ambiguous movement prompt returned'); else ok();
+    if(!/x\.mode==="zone"\?Q_PER_ZONE:Q_PER_ZONE\*ZONE_KEYS\.length/.test(zombie)) err('Zombie Survival: game-over denominator is not mode-aware'); else ok();
   }
 }
 
