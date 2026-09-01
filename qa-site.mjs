@@ -157,4 +157,21 @@ let sys=text('system-check.html');if(sys){if(!/(?:Deployment|Quality) check v30/
   }
 }
 
+
+
+// v30.11 remaining-content + dashboard-visual regressions.
+{
+  const phrasal=text('phrasal-verb-city.html');
+  if(phrasal){
+    if(/Her family came to ___ her at the airport\.|I['’]ll ___ you at the arrivals gate|Can you ___ me at the departures terminal/.test(phrasal)) err('Phrasal Verb City: separable phrasal verb still places a pronoun after the particle'); else ok();
+    if(!/see her off, not \*see off her\*/.test(phrasal)||!/pick them up, not \*pick up them\*/.test(phrasal)||!/drop me off, not \*drop off me\*/.test(phrasal)) err('Phrasal Verb City: pronoun word-order guidance missing'); else ok();
+  }
+  const kit311=text('ht-kit.js');
+  if(kit311){
+    if(!/v30\.11 — remaining-content \+ dashboard-visual QA hotfix/.test(kit311)) err('Dashboard: v30.11 visual QA layer marker missing'); else ok();
+    if(!/role=\"progressbar\" aria-label=\"Part '\+p\+' accuracy\"/.test(kit311)||!/aria-valuenow=\"'\+pp\+'\"/.test(kit311)||!/display:block;height:100%;width:'\+pp\+'%/.test(kit311)) err('Dashboard: Part skill bars are not visibly/semantically hardened'); else ok();
+    if(!/answeredLabel\.textContent=\"questions gamifiées\"/.test(kit311)) err('Dashboard: homepage question counter scope is still ambiguous'); else ok();
+  }
+}
+
 console.log(`\nHomemade TOEIC Trainer QA v30`);console.log(`Checks passed: ${checks}`);if(warnings.length){console.log(`Warnings (${warnings.length}):`);warnings.forEach(x=>console.log('  ⚠ '+x))}if(errors.length){console.error(`Errors (${errors.length}):`);errors.forEach(x=>console.error('  ✖ '+x));process.exit(1)}console.log('Result: PASS — no blocking regression found.');
